@@ -1,0 +1,66 @@
+using Bank.Application.Interfaces;
+using Bank.Domain.Entities;
+using Bank.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bank.Application.Services;
+
+public class AccountService : IAccountService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public AccountService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Account?> GetAccountByIdAsync(Guid id)
+    {
+        return await _unitOfWork.Repository<Account>().Query()
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<Account?> GetAccountByNumberAsync(string accountNumber)
+    {
+        return await _unitOfWork.Repository<Account>()
+            .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+    }
+
+    public async Task<IEnumerable<Account>> GetUserAccountsAsync(Guid userId)
+    {
+        return await _unitOfWork.Repository<Account>()
+            .FindAsync(a => a.UserId == userId);
+    }
+
+    public async Task<Account> CreateAccountAsync(Guid userId, string accountHolderName)
+    {
+        var account = new Account
+        {
+            AccountNumber = GenerateAccountNumber(),
+            AccountHolderName = accountHolderName,
+            UserId = userId,
+            Balance = 0
+        };
+
+        await _unitOfWork.Repository<Account>().AddAsync(account);
+        await _unitOfWork.SaveChangesAsync();
+        return account;
+    }
+
+    public async Task<bool> UpdateBalanceAsync(Guid accountId, decimal amount)
+    {
+        var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
+        if (account == null) return false;
+
+        account.Balance += amount;
+        _unitOfWork.Repository<Account>().Update(account);
+        await _unitOfWork.SaveChangesAsync();
+        return true;
+    }
+
+    private static string GenerateAccountNumber()
+    {
+        return $"BNK-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(10000000, 99999999)}";
+    }
+}

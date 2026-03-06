@@ -1,0 +1,50 @@
+:host {
+    display: block;
+    z-index: 50;
+    position: sticky;
+    top: 0;
+}
+
+/* Glassmorphism for Dropdowns */
+.backdrop-blur-xl {
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+}
+
+/* Custom Scrollbar for Dropdowns */
+.max-h-\[300px\]::-webkit-scrollbar {
+    width: 6px;
+}
+
+.max-h-\[300px\]::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.max-h-\[300px\]::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 10px;
+}
+
+/* Material Badge Overrides */
+::ng-deep .mat-badge-content {
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Animation Utilities */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
