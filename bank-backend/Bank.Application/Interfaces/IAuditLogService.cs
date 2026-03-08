@@ -114,4 +114,9 @@ public interface IAuditLogService
         DateTime fromDate,
         DateTime toDate,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Simple audit log method for backward compatibility
+    /// </summary>
+    Task LogAsync(string action, string description, Guid? userId = null);
 }

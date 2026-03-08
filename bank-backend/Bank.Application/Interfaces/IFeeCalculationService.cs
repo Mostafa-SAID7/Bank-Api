@@ -11,7 +11,7 @@ public interface IFeeCalculationService
     Task<decimal> CalculateEarlyClosureFeeAsync(Account account);
     Task<decimal> CalculateMinimumBalanceFeeAsync(Account account, decimal minimumBalance);
     Task<FeeSchedule> GetFeeScheduleAsync(AccountType accountType);
-    Task<List<AccountFee>> GetPendingFeesAsync(int accountId);
-    Task<bool> WaiveFeeAsync(int feeId, string reason, int userId);
-    Task<decimal> CalculateTotalFeesAsync(int accountId, DateTime fromDate, DateTime toDate);
+    Task<List<AccountFee>> GetPendingFeesAsync(Guid accountId);
+    Task<bool> WaiveFeeAsync(Guid feeId, string reason, Guid userId);
+    Task<decimal> CalculateTotalFeesAsync(Guid accountId, DateTime fromDate, DateTime toDate);
 }

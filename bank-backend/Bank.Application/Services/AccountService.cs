@@ -21,6 +21,11 @@ public class AccountService : IAccountService
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
+    public async Task<Account?> GetAccountAsync(Guid id)
+    {
+        return await GetAccountByIdAsync(id); // Alias for consistency
+    }
+
     public async Task<Account?> GetAccountByNumberAsync(string accountNumber)
     {
         return await _unitOfWork.Repository<Account>()
@@ -64,6 +69,31 @@ public class AccountService : IAccountService
         _unitOfWork.Repository<Account>().Update(account);
         await _unitOfWork.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<bool> CanUserAccessAccountAsync(Guid accountId, Guid userId)
+    {
+        var account = await _unitOfWork.Repository<Account>().Query()
+            .Include(a => a.JointHolders)
+            .FirstOrDefaultAsync(a => a.Id == accountId);
+        
+        if (account == null) return false;
+        
+        return account.CanUserAccess(userId);
+    }
+
+    public async Task<bool> UpdateAccountAsync(Account account)
+    {
+        try
+        {
+            _unitOfWork.Repository<Account>().Update(account);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static string GenerateAccountNumber()

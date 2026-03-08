@@ -5,14 +5,14 @@ namespace Bank.Application.Interfaces;
 
 public interface IJointAccountService
 {
-    Task<bool> AddJointHolderAsync(int accountId, Guid userId, JointAccountRole role, int addedByUserId);
-    Task<bool> RemoveJointHolderAsync(int accountId, Guid userId, int removedByUserId);
-    Task<bool> UpdateJointHolderRoleAsync(int accountId, Guid userId, JointAccountRole newRole, int updatedByUserId);
-    Task<List<JointAccountHolder>> GetJointHoldersAsync(int accountId);
-    Task<bool> CanUserAccessAccountAsync(int accountId, Guid userId);
-    Task<bool> CanUserPerformTransactionAsync(int accountId, Guid userId, decimal amount);
-    Task<bool> RequiresMultipleSignaturesAsync(int accountId, decimal amount);
+    Task<bool> AddJointHolderAsync(Guid accountId, Guid userId, JointAccountRole role, Guid addedByUserId);
+    Task<bool> RemoveJointHolderAsync(Guid accountId, Guid userId, Guid removedByUserId);
+    Task<bool> UpdateJointHolderRoleAsync(Guid accountId, Guid userId, JointAccountRole newRole, Guid updatedByUserId);
+    Task<List<JointAccountHolder>> GetJointHoldersAsync(Guid accountId);
+    Task<bool> CanUserAccessAccountAsync(Guid accountId, Guid userId);
+    Task<bool> CanUserPerformTransactionAsync(Guid accountId, Guid userId, decimal amount);
+    Task<bool> RequiresMultipleSignaturesAsync(Guid accountId, decimal amount);
     Task<List<Account>> GetAccountsForUserAsync(Guid userId);
-    Task<bool> ConvertToJointAccountAsync(int accountId, int convertedByUserId);
-    Task<bool> ConvertToSingleAccountAsync(int accountId, Guid remainingHolderId, int convertedByUserId);
+    Task<bool> ConvertToJointAccountAsync(Guid accountId, Guid convertedByUserId);
+    Task<bool> ConvertToSingleAccountAsync(Guid accountId, Guid remainingHolderId, Guid convertedByUserId);
 }

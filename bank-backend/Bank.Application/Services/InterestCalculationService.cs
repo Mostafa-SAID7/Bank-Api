@@ -91,7 +91,7 @@ public class InterestCalculationService : IInterestCalculationService
         }
     }
 
-    public async Task<bool> ApplyInterestAsync(int accountId, int userId)
+    public async Task<bool> ApplyInterestAsync(Guid accountId, Guid userId)
     {
         try
         {
@@ -139,7 +139,7 @@ public class InterestCalculationService : IInterestCalculationService
                 // Create interest credit transaction
                 var transaction = new Transaction
                 {
-                    FromAccountId = null, // Bank interest account
+                    FromAccountId = Guid.Empty, // System/Bank account
                     ToAccountId = account.Id,
                     Amount = interest,
                     Type = TransactionType.ACH, // Interest credit
@@ -155,7 +155,7 @@ public class InterestCalculationService : IInterestCalculationService
                 account.LastInterestCalculationDate = toDate;
                 account.UpdateActivity();
 
-                await _unitOfWork.Repository<Account>().UpdateAsync(account);
+                _unitOfWork.Repository<Account>().Update(account);
                 await _unitOfWork.SaveChangesAsync();
 
                 await _auditLogService.LogAsync("Interest Applied", $"Interest of {interest:C} applied to account {accountId}", userId);
@@ -180,7 +180,7 @@ public class InterestCalculationService : IInterestCalculationService
 
             foreach (var account in accountsForProcessing)
             {
-                var success = await ApplyInterestAsync((int)account.Id, 0); // System process
+                var success = await ApplyInterestAsync(account.Id, Guid.Empty); // System process
                 if (success) processedCount++;
             }
 
@@ -259,7 +259,7 @@ public class InterestCalculationService : IInterestCalculationService
         }
     }
 
-    public async Task<bool> UpdateInterestRateAsync(int accountId, decimal newRate, int userId)
+    public async Task<bool> UpdateInterestRateAsync(Guid accountId, decimal newRate, Guid userId)
     {
         try
         {
@@ -279,7 +279,7 @@ public class InterestCalculationService : IInterestCalculationService
             var oldRate = account.InterestRate;
             account.InterestRate = newRate;
 
-            await _unitOfWork.Repository<Account>().UpdateAsync(account);
+            _unitOfWork.Repository<Account>().Update(account);
             await _unitOfWork.SaveChangesAsync();
 
             await _auditLogService.LogAsync("Interest Rate Updated", 
@@ -296,3 +296,4 @@ public class InterestCalculationService : IInterestCalculationService
         }
     }
 }
+

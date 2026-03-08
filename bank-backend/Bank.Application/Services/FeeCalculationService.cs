@@ -170,13 +170,13 @@ public class FeeCalculationService : IFeeCalculationService
         }
     }
 
-    public async Task<List<AccountFee>> GetPendingFeesAsync(int accountId)
+    public async Task<List<AccountFee>> GetPendingFeesAsync(Guid accountId)
     {
         try
         {
             var fees = await _unitOfWork.Repository<AccountFee>().GetAllAsync();
             return fees.Where(f => 
-                f.AccountId == Guid.Parse(accountId.ToString()) && 
+                f.AccountId == accountId && 
                 f.AppliedDate == null && 
                 !f.IsWaived)
                 .ToList();
@@ -188,7 +188,7 @@ public class FeeCalculationService : IFeeCalculationService
         }
     }
 
-    public async Task<bool> WaiveFeeAsync(int feeId, string reason, int userId)
+    public async Task<bool> WaiveFeeAsync(Guid feeId, string reason, Guid userId)
     {
         try
         {
@@ -205,8 +205,8 @@ public class FeeCalculationService : IFeeCalculationService
                 return false;
             }
 
-            fee.WaiveFee(reason, Guid.Parse(userId.ToString()));
-            await _unitOfWork.Repository<AccountFee>().UpdateAsync(fee);
+            fee.WaiveFee(reason, userId);
+            _unitOfWork.Repository<AccountFee>().Update(fee);
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Fee {FeeId} waived successfully", feeId);
@@ -219,7 +219,7 @@ public class FeeCalculationService : IFeeCalculationService
         }
     }
 
-    public async Task<decimal> CalculateTotalFeesAsync(int accountId, DateTime fromDate, DateTime toDate)
+    public async Task<decimal> CalculateTotalFeesAsync(Guid accountId, DateTime fromDate, DateTime toDate)
     {
         try
         {
@@ -251,3 +251,4 @@ public class FeeCalculationService : IFeeCalculationService
         }
     }
 }
+

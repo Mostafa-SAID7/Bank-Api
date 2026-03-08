@@ -1,254 +1,63 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using FluentValidation;
-using Hangfire;
-using Bank.Domain.Entities;
-using Bank.Domain.Enums;
-using Bank.Domain.Interfaces;
-using Bank.Infrastructure;
-using Bank.Infrastructure.Repositories;
+using Bank.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add controllers with JSON configuration
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// === SERVICE REGISTRATIONS (Organized by Concern) ===
 
-// Database
-builder.Services.AddDbContext<BankDbContext>(options =>
-    options.UseSqlServer(connectionString));
+// 1. Database & Data Access Layer
+builder.Services.AddDatabaseServices(builder.Configuration);
 
-// Redis for caching and rate limiting
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
-});
+// 2. Caching & Session Management
+builder.Services.AddCachingServices(builder.Configuration);
 
-// Session support
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+// 3. Authentication & Authorization
+builder.Services.AddAuthenticationServices(builder.Configuration);
 
-// ASP.NET Core Identity
-builder.Services.AddIdentity<User, Role>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-    options.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<BankDbContext>()
-.AddDefaultTokenProviders();
+// 4. Repository Layer (Data Access)
+builder.Services.AddRepositoryServices();
 
-// JWT Authentication
-builder.Services.AddAuthentication(opts => {
-    opts.DefaultAuthenticateScheme = "Bearer";
-    opts.DefaultChallengeScheme = "Bearer";
-}).AddJwtBearer(options => {
-    var jwtSettings = builder.Configuration.GetSection("Jwt");
-    var key = System.Text.Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? "SUPER_SECRET_KEY");
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"]
-    };
-});
+// 5. Application Services (Business Logic)
+builder.Services.AddApplicationServices();
 
-// Unit of Work & Repositories
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.IAuditLogRepository, Bank.Infrastructure.Repositories.AuditLogRepository>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.ISessionRepository, Bank.Infrastructure.Repositories.SessionRepository>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.IAccountLockoutRepository, Bank.Infrastructure.Repositories.AccountLockoutRepository>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.IIpWhitelistRepository, Bank.Infrastructure.Repositories.IpWhitelistRepository>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.IPasswordPolicyRepository, Bank.Infrastructure.Repositories.PasswordPolicyRepository>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.IPasswordHistoryRepository, Bank.Infrastructure.Repositories.PasswordHistoryRepository>();
-builder.Services.AddScoped<Bank.Domain.Interfaces.IUserRepository, Bank.Infrastructure.Repositories.UserRepository>();
+// 6. Infrastructure Services (External Integrations)
+builder.Services.AddInfrastructureServices();
 
-// Application Services
-builder.Services.AddScoped<Bank.Application.Interfaces.IAuthService, Bank.Application.Services.AuthService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IAccountService, Bank.Application.Services.AccountService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.ITransactionService, Bank.Application.Services.TransactionService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IBatchService, Bank.Application.Services.BatchService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.ITwoFactorAuthService, Bank.Application.Services.TwoFactorAuthService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IAuditLogService, Bank.Application.Services.AuditLogService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IAuditEventPublisher, Bank.Application.Services.AuditEventPublisher>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IFraudDetectionService, Bank.Application.Services.FraudDetectionService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IRateLimitingService, Bank.Infrastructure.Services.RateLimitingService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.ISessionService, Bank.Application.Services.SessionService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IAccountLockoutService, Bank.Application.Services.AccountLockoutService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IIpWhitelistService, Bank.Application.Services.IpWhitelistService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IPasswordPolicyService, Bank.Application.Services.PasswordPolicyService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IAccountLifecycleService, Bank.Application.Services.AccountLifecycleService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IFeeCalculationService, Bank.Application.Services.FeeCalculationService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IInterestCalculationService, Bank.Application.Services.InterestCalculationService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.IJointAccountService, Bank.Application.Services.JointAccountService>();
+// 7. CQRS & Validation
+builder.Services.AddCqrsServices();
 
-// Infrastructure Services
-builder.Services.AddScoped<Bank.Application.Interfaces.IEmailService, Bank.Infrastructure.Services.EmailService>();
-builder.Services.AddScoped<Bank.Application.Interfaces.ISmsService, Bank.Infrastructure.Services.SmsService>();
+// 8. Background Jobs
+builder.Services.AddBackgroundJobServices(builder.Configuration);
 
-// CQRS / MediatR & FluentValidation
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Bank.Application.Commands.InitiateTransactionCommand).Assembly));
-builder.Services.AddValidatorsFromAssembly(typeof(Bank.Application.Validators.InitiateTransactionCommandValidator).Assembly);
+// 9. API Documentation
+builder.Services.AddApiDocumentationServices();
 
-// Hangfire
-builder.Services.AddHangfire(config => config
-    .UseSqlServerStorage(connectionString));
-builder.Services.AddHangfireServer();
-
-// CORS for Angular frontend
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngular", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-    });
-});
-
-// Swagger / OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Bank Payment Simulator API",
-        Version = "v1",
-        Description = "Fintech Payment System Simulator - ACH, WPS, RTGS & Batch Processing"
-    });
-
-    // JWT Bearer auth in Swagger
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter your JWT token"
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+// 10. CORS Policies
+builder.Services.AddCorsServices();
 
 var app = builder.Build();
 
-// Seed roles on startup
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    
-    string[] roles = { "Admin", "User" };
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new Role { Name = role, Description = $"{role} role" });
-        }
-    }
+// === DATA SEEDING ===
+await app.SeedInitialDataAsync();
 
-    // Seed Admin User
-    var adminEmail = "admin@finbank.com";
-    if (await userManager.FindByEmailAsync(adminEmail) == null)
-    {
-        var adminUser = new User
-        {
-            UserName = "admin",
-            Email = adminEmail,
-            EmailConfirmed = true,
-            FirstName = "System",
-            LastName = "Admin"
-        };
-        var result = await userManager.CreateAsync(adminUser, "Admin123!");
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-            
-            // Seed a default account for the admin
-            var dbContext = scope.ServiceProvider.GetRequiredService<BankDbContext>();
-            if (!dbContext.Accounts.Any(a => a.UserId == adminUser.Id))
-            {
-                dbContext.Accounts.Add(new Account
-                {
-                    UserId = adminUser.Id,
-                    AccountNumber = "DE-1000-AD",
-                    AccountHolderName = "System Admin",
-                    Balance = 50000.00m
-                });
-                await dbContext.SaveChangesAsync();
-            }
-        }
-    }
+// === MIDDLEWARE PIPELINE (Order Matters) ===
 
-    // Seed Password Policies
-    var dbContextForPolicies = scope.ServiceProvider.GetRequiredService<BankDbContext>();
-    if (!dbContextForPolicies.PasswordPolicies.Any())
-    {
-        var policies = new[]
-        {
-            Bank.Domain.Entities.PasswordPolicy.CreateBasicPolicy(),
-            Bank.Domain.Entities.PasswordPolicy.CreateStandardPolicy(),
-            Bank.Domain.Entities.PasswordPolicy.CreateStrongPolicy(),
-            Bank.Domain.Entities.PasswordPolicy.CreateEnterprisePolicy()
-        };
+// 1. Development-specific middleware
+app.ConfigureDevelopmentMiddleware();
 
-        dbContextForPolicies.PasswordPolicies.AddRange(policies);
-        await dbContextForPolicies.SaveChangesAsync();
-    }
-}
+// 2. Security & audit middleware
+app.ConfigureSecurityMiddleware();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Bank Simulator API v1");
-        options.RoutePrefix = string.Empty; // Swagger UI at root
-    });
-    app.UseHangfireDashboard();
-}
-app.UseMiddleware<Bank.Api.Middleware.GlobalExceptionMiddleware>();
-app.UseMiddleware<Bank.Api.Middleware.AuditMiddleware>();
-app.UseMiddleware<Bank.Api.Middleware.TwoFactorAuthMiddleware>();
-
-app.UseHttpsRedirection();
-app.UseCors("AllowAngular");
-app.UseSession();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+// 3. Standard ASP.NET Core middleware
+app.ConfigureStandardMiddleware();
 
 app.Run();
+
+// Make Program class accessible for testing
+public partial class Program { }

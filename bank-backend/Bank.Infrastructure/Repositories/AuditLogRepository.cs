@@ -1,6 +1,7 @@
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
+using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Repositories;
@@ -268,3 +269,4 @@ public class AuditLogRepository : IAuditLogRepository
         return await query.CountAsync(cancellationToken);
     }
 }
+

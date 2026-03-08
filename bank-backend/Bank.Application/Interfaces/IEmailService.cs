@@ -21,6 +21,11 @@ public interface IEmailService
     Task<bool> SendEmailAsync(string to, string templateId, Dictionary<string, string> parameters);
     
     /// <summary>
+    /// Send email with attachment
+    /// </summary>
+    Task<bool> SendEmailWithAttachmentAsync(string to, string subject, string body, byte[] attachment, string attachmentName, bool isHtml = false);
+    
+    /// <summary>
     /// Validate email address format
     /// </summary>
     bool IsValidEmail(string email);

@@ -3,6 +3,7 @@ using Bank.Domain.Enums;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 namespace Bank.Api.Controllers;
 
@@ -27,13 +28,20 @@ public class BatchController : ControllerBase
             return BadRequest("No file uploaded.");
 
         // Simulate file parsing (In a real app, parse CSV/JSON)
-        var totalRecords = new Random().Next(10, 100);
+        using var rng = RandomNumberGenerator.Create();
+        var randomBytes = new byte[4];
+        rng.GetBytes(randomBytes);
+        var totalRecords = Math.Abs(BitConverter.ToInt32(randomBytes, 0) % 90) + 10; // 10-100 range
         var job = await _batchService.CreateBatchJobAsync(file.FileName, totalRecords);
 
         // Mock some transactions for the batch
-        var mockTransactions = Enumerable.Range(0, totalRecords).Select(_ => new TransactionRequest(
-            Guid.NewGuid(), Guid.NewGuid(), new Random().Next(10, 1000), TransactionType.ACH, "Batch processing"
-        ));
+        var mockTransactions = Enumerable.Range(0, totalRecords).Select(_ => {
+            rng.GetBytes(randomBytes);
+            var amount = Math.Abs(BitConverter.ToInt32(randomBytes, 0) % 990) + 10; // 10-1000 range
+            return new TransactionRequest(
+                Guid.NewGuid(), Guid.NewGuid(), amount, TransactionType.ACH, "Batch processing"
+            );
+        });
 
         // Enqueue background job
         _backgroundJobClient.Enqueue<IBatchService>(x => x.ProcessBatchAsync(job.Id, mockTransactions));

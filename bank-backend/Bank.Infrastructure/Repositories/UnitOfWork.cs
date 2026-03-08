@@ -1,7 +1,7 @@
 using System.Collections;
 using Bank.Domain.Common;
 using Bank.Domain.Interfaces;
-using Bank.Infrastructure;
+using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Bank.Infrastructure.Repositories;
@@ -84,3 +84,4 @@ public class UnitOfWork : IUnitOfWork
         GC.SuppressFinalize(this);
     }
 }
+

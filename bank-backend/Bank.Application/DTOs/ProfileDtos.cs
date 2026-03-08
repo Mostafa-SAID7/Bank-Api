@@ -1,4 +1,4 @@
-namespace Bank.Api.DTOs;
+namespace Bank.Application.DTOs;
 
 // Profile
 public record ProfileResponse(Guid Id, string UserName, string Email, string FirstName, string LastName);

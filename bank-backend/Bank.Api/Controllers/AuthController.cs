@@ -1,5 +1,5 @@
 using Bank.Application.Interfaces;
-using Bank.Api.DTOs;
+using Bank.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers;

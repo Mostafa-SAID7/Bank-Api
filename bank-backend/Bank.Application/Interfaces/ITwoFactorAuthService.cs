@@ -1,3 +1,4 @@
+using Bank.Application.DTOs;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 
@@ -52,37 +53,4 @@ public interface ITwoFactorAuthService
     /// Get user's 2FA status and methods
     /// </summary>
     Task<TwoFactorStatusResult> GetTwoFactorStatusAsync(Guid userId);
-}
-
-public class TwoFactorTokenResult
-{
-    public bool Success { get; set; }
-    public string? Message { get; set; }
-    public string? TokenId { get; set; }
-    public DateTime? ExpiresAt { get; set; }
-}
-
-public class TwoFactorVerificationResult
-{
-    public bool Success { get; set; }
-    public string? Message { get; set; }
-    public bool RequiresAdditionalVerification { get; set; }
-}
-
-public class TwoFactorSetupResult
-{
-    public bool Success { get; set; }
-    public string? Message { get; set; }
-    public string? SecretKey { get; set; }
-    public string? QrCodeUrl { get; set; }
-    public List<string>? BackupCodes { get; set; }
-}
-
-public class TwoFactorStatusResult
-{
-    public bool IsEnabled { get; set; }
-    public TwoFactorStatus Status { get; set; }
-    public List<TwoFactorMethod> EnabledMethods { get; set; } = new();
-    public DateTime? SetupDate { get; set; }
-    public DateTime? LastUsed { get; set; }
 }

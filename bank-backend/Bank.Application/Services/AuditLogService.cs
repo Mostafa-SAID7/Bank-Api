@@ -209,4 +209,26 @@ public class AuditLogService : IAuditLogService
     {
         return await _auditLogRepository.GetStatisticsAsync(fromDate, toDate, cancellationToken);
     }
+
+    public async Task LogAsync(string action, string description, Guid? userId = null)
+    {
+        if (userId.HasValue)
+        {
+            await LogUserActionAsync(
+                userId.Value,
+                action,
+                "General",
+                Guid.NewGuid().ToString(),
+                null,
+                description);
+        }
+        else
+        {
+            await LogSystemEventAsync(
+                action,
+                "General",
+                Guid.NewGuid().ToString(),
+                description);
+        }
+    }
 }

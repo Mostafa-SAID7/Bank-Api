@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Bank.Domain.Common;
 using Bank.Domain.Interfaces;
-using Bank.Infrastructure;
+using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Repositories;
@@ -85,3 +85,4 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         return _dbSet.Where(e => !e.IsDeleted).AsQueryable();
     }
 }
+

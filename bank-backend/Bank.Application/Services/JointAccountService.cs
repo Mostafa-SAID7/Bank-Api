@@ -9,20 +9,23 @@ namespace Bank.Application.Services;
 public class JointAccountService : IJointAccountService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
     private readonly IAuditLogService _auditLogService;
     private readonly ILogger<JointAccountService> _logger;
 
     public JointAccountService(
         IUnitOfWork unitOfWork,
+        IUserRepository userRepository,
         IAuditLogService auditLogService,
         ILogger<JointAccountService> logger)
     {
         _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
         _auditLogService = auditLogService;
         _logger = logger;
     }
 
-    public async Task<bool> AddJointHolderAsync(int accountId, Guid userId, JointAccountRole role, int addedByUserId)
+    public async Task<bool> AddJointHolderAsync(Guid accountId, Guid userId, JointAccountRole role, Guid addedByUserId)
     {
         try
         {
@@ -41,7 +44,7 @@ public class JointAccountService : IJointAccountService
             }
 
             // Verify the user exists
-            var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
                 _logger.LogWarning("User {UserId} not found", userId);
@@ -53,7 +56,7 @@ public class JointAccountService : IJointAccountService
                 AccountId = account.Id,
                 UserId = userId,
                 Role = role,
-                AddedByUserId = Guid.Parse(addedByUserId.ToString()),
+                AddedByUserId = addedByUserId,
                 RequiresSignature = role != JointAccountRole.ViewOnly,
                 TransactionLimit = role == JointAccountRole.SecondaryHolder ? 10000 : null,
                 DailyLimit = role == JointAccountRole.SecondaryHolder ? 25000 : null
@@ -65,7 +68,7 @@ public class JointAccountService : IJointAccountService
             if (!account.IsJointAccount)
             {
                 account.IsJointAccount = true;
-                await _unitOfWork.Repository<Account>().UpdateAsync(account);
+                _unitOfWork.Repository<Account>().Update(account);
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -84,7 +87,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> RemoveJointHolderAsync(int accountId, Guid userId, int removedByUserId)
+    public async Task<bool> RemoveJointHolderAsync(Guid accountId, Guid userId, Guid removedByUserId)
     {
         try
         {
@@ -102,8 +105,8 @@ public class JointAccountService : IJointAccountService
                 return false;
             }
 
-            jointHolder.Remove(Guid.Parse(removedByUserId.ToString()));
-            await _unitOfWork.Repository<JointAccountHolder>().UpdateAsync(jointHolder);
+            jointHolder.Remove(removedByUserId);
+            _unitOfWork.Repository<JointAccountHolder>().Update(jointHolder);
 
             // Check if account should remain as joint account
             var activeJointHolders = account.JointHolders.Count(jh => jh.IsActive);
@@ -111,7 +114,7 @@ public class JointAccountService : IJointAccountService
             {
                 account.IsJointAccount = false;
                 account.RequiresMultipleSignatures = false;
-                await _unitOfWork.Repository<Account>().UpdateAsync(account);
+                _unitOfWork.Repository<Account>().Update(account);
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -129,7 +132,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> UpdateJointHolderRoleAsync(int accountId, Guid userId, JointAccountRole newRole, int updatedByUserId)
+    public async Task<bool> UpdateJointHolderRoleAsync(Guid accountId, Guid userId, JointAccountRole newRole, Guid updatedByUserId)
     {
         try
         {
@@ -172,7 +175,7 @@ public class JointAccountService : IJointAccountService
                     break;
             }
 
-            await _unitOfWork.Repository<JointAccountHolder>().UpdateAsync(jointHolder);
+            _unitOfWork.Repository<JointAccountHolder>().Update(jointHolder);
             await _unitOfWork.SaveChangesAsync();
 
             await _auditLogService.LogAsync("Joint Holder Role Updated", 
@@ -189,7 +192,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<List<JointAccountHolder>> GetJointHoldersAsync(int accountId)
+    public async Task<List<JointAccountHolder>> GetJointHoldersAsync(Guid accountId)
     {
         try
         {
@@ -209,7 +212,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> CanUserAccessAccountAsync(int accountId, Guid userId)
+    public async Task<bool> CanUserAccessAccountAsync(Guid accountId, Guid userId)
     {
         try
         {
@@ -225,7 +228,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> CanUserPerformTransactionAsync(int accountId, Guid userId, decimal amount)
+    public async Task<bool> CanUserPerformTransactionAsync(Guid accountId, Guid userId, decimal amount)
     {
         try
         {
@@ -249,7 +252,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> RequiresMultipleSignaturesAsync(int accountId, decimal amount)
+    public async Task<bool> RequiresMultipleSignaturesAsync(Guid accountId, decimal amount)
     {
         try
         {
@@ -283,7 +286,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> ConvertToJointAccountAsync(int accountId, int convertedByUserId)
+    public async Task<bool> ConvertToJointAccountAsync(Guid accountId, Guid convertedByUserId)
     {
         try
         {
@@ -304,7 +307,7 @@ public class JointAccountService : IJointAccountService
             account.RequiresMultipleSignatures = false; // Can be enabled later
             account.MultipleSignatureThreshold = 10000; // Default threshold
 
-            await _unitOfWork.Repository<Account>().UpdateAsync(account);
+            _unitOfWork.Repository<Account>().Update(account);
             await _unitOfWork.SaveChangesAsync();
 
             await _auditLogService.LogAsync("Account Converted to Joint", 
@@ -320,7 +323,7 @@ public class JointAccountService : IJointAccountService
         }
     }
 
-    public async Task<bool> ConvertToSingleAccountAsync(int accountId, Guid remainingHolderId, int convertedByUserId)
+    public async Task<bool> ConvertToSingleAccountAsync(Guid accountId, Guid remainingHolderId, Guid convertedByUserId)
     {
         try
         {
@@ -341,8 +344,8 @@ public class JointAccountService : IJointAccountService
             var activeJointHolders = account.JointHolders.Where(jh => jh.IsActive).ToList();
             foreach (var jointHolder in activeJointHolders)
             {
-                jointHolder.Remove(Guid.Parse(convertedByUserId.ToString()), "Account converted to single holder");
-                await _unitOfWork.Repository<JointAccountHolder>().UpdateAsync(jointHolder);
+                jointHolder.Remove(convertedByUserId, "Account converted to single holder");
+                _unitOfWork.Repository<JointAccountHolder>().Update(jointHolder);
             }
 
             // Update account properties
@@ -357,7 +360,7 @@ public class JointAccountService : IJointAccountService
                 account.UserId = remainingHolderId;
             }
 
-            await _unitOfWork.Repository<Account>().UpdateAsync(account);
+            _unitOfWork.Repository<Account>().Update(account);
             await _unitOfWork.SaveChangesAsync();
 
             await _auditLogService.LogAsync("Account Converted to Single", 
@@ -373,3 +376,4 @@ public class JointAccountService : IJointAccountService
         }
     }
 }
+

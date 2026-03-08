@@ -135,6 +135,49 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task<bool> SendEmailWithAttachmentAsync(string to, string subject, string body, byte[] attachment, string attachmentName, bool isHtml = false)
+    {
+        try
+        {
+            if (!IsValidEmail(to))
+            {
+                _logger.LogWarning("Invalid email address: {Email}", to);
+                return false;
+            }
+
+            var fromEmail = _configuration["Email:FromAddress"] ?? "noreply@bankapp.com";
+            var fromName = _configuration["Email:FromName"] ?? "Bank Management System";
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(fromEmail, fromName),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = isHtml
+            };
+
+            mailMessage.To.Add(to);
+
+            // Add attachment
+            if (attachment != null && attachment.Length > 0)
+            {
+                var attachmentStream = new MemoryStream(attachment);
+                var mailAttachment = new Attachment(attachmentStream, attachmentName);
+                mailMessage.Attachments.Add(mailAttachment);
+            }
+
+            await _smtpClient.SendMailAsync(mailMessage);
+            
+            _logger.LogInformation("Email with attachment sent successfully to {Email}", to);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send email with attachment to {Email}", to);
+            return false;
+        }
+    }
+
     public bool IsValidEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

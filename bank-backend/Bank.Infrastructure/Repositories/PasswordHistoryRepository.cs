@@ -1,6 +1,6 @@
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces;
-using Bank.Infrastructure;
+using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Repositories;

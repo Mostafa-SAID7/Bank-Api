@@ -7,6 +7,7 @@ public class Transaction : BaseEntity
 {
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;
+    public string? Reference { get; set; }
     public DateTime? ProcessedAt { get; set; }
     public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
     public TransactionType Type { get; set; }

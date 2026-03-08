@@ -1,5 +1,5 @@
 using Bank.Application.Interfaces;
-using Bank.Api.DTOs;
+using Bank.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

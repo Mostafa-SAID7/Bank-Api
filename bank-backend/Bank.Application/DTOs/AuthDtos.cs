@@ -1,4 +1,4 @@
-namespace Bank.Api.DTOs;
+namespace Bank.Application.DTOs;
 
 // Auth
 public record LoginRequest(string Email, string Password);
