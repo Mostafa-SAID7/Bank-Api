@@ -73,6 +73,12 @@ builder.Services.AddAuthentication(opts => {
 // Unit of Work & Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<Bank.Domain.Interfaces.IAuditLogRepository, Bank.Infrastructure.Repositories.AuditLogRepository>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.ISessionRepository, Bank.Infrastructure.Repositories.SessionRepository>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.IAccountLockoutRepository, Bank.Infrastructure.Repositories.AccountLockoutRepository>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.IIpWhitelistRepository, Bank.Infrastructure.Repositories.IpWhitelistRepository>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.IPasswordPolicyRepository, Bank.Infrastructure.Repositories.PasswordPolicyRepository>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.IPasswordHistoryRepository, Bank.Infrastructure.Repositories.PasswordHistoryRepository>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.IUserRepository, Bank.Infrastructure.Repositories.UserRepository>();
 
 // Application Services
 builder.Services.AddScoped<Bank.Application.Interfaces.IAuthService, Bank.Application.Services.AuthService>();
@@ -84,6 +90,14 @@ builder.Services.AddScoped<Bank.Application.Interfaces.IAuditLogService, Bank.Ap
 builder.Services.AddScoped<Bank.Application.Interfaces.IAuditEventPublisher, Bank.Application.Services.AuditEventPublisher>();
 builder.Services.AddScoped<Bank.Application.Interfaces.IFraudDetectionService, Bank.Application.Services.FraudDetectionService>();
 builder.Services.AddScoped<Bank.Application.Interfaces.IRateLimitingService, Bank.Infrastructure.Services.RateLimitingService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.ISessionService, Bank.Application.Services.SessionService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IAccountLockoutService, Bank.Application.Services.AccountLockoutService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IIpWhitelistService, Bank.Application.Services.IpWhitelistService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IPasswordPolicyService, Bank.Application.Services.PasswordPolicyService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IAccountLifecycleService, Bank.Application.Services.AccountLifecycleService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IFeeCalculationService, Bank.Application.Services.FeeCalculationService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IInterestCalculationService, Bank.Application.Services.InterestCalculationService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IJointAccountService, Bank.Application.Services.JointAccountService>();
 
 // Infrastructure Services
 builder.Services.AddScoped<Bank.Application.Interfaces.IEmailService, Bank.Infrastructure.Services.EmailService>();
@@ -196,6 +210,22 @@ using (var scope = app.Services.CreateScope())
                 await dbContext.SaveChangesAsync();
             }
         }
+    }
+
+    // Seed Password Policies
+    var dbContextForPolicies = scope.ServiceProvider.GetRequiredService<BankDbContext>();
+    if (!dbContextForPolicies.PasswordPolicies.Any())
+    {
+        var policies = new[]
+        {
+            Bank.Domain.Entities.PasswordPolicy.CreateBasicPolicy(),
+            Bank.Domain.Entities.PasswordPolicy.CreateStandardPolicy(),
+            Bank.Domain.Entities.PasswordPolicy.CreateStrongPolicy(),
+            Bank.Domain.Entities.PasswordPolicy.CreateEnterprisePolicy()
+        };
+
+        dbContextForPolicies.PasswordPolicies.AddRange(policies);
+        await dbContextForPolicies.SaveChangesAsync();
     }
 }
 

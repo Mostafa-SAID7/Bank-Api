@@ -42,7 +42,7 @@ The implementation follows Clean Architecture principles using .NET 9.0, Entity 
     - Create audit log repository with immutable storage
     - _Requirements: 6.3, 6.10_
 
-  - [-] 2.2 Implement session management and security controls
+  - [x] 2.2 Implement session management and security controls
     - Create SessionService with timeout and concurrent session limits
     - Implement IP whitelisting for administrative access
     - Add password complexity validation and rotation policies
@@ -59,14 +59,14 @@ The implementation follows Clean Architecture principles using .NET 9.0, Entity 
 ### Phase 2: Core Banking Enhancements
 
 - [ ] 4. Implement enhanced account management
-  - [ ] 4.1 Create account lifecycle management
+  - [x] 4.1 Create account lifecycle management
     - Extend Account entity with status, dormancy tracking, and fee management
     - Implement AccountLifecycleService for closure, dormancy, and status management
     - Create fee calculation engine with configurable fee schedules
     - Add account holds and restrictions functionality
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.8_
 
-  - [ ] 4.2 Implement interest calculation and joint accounts
+  - [-] 4.2 Implement interest calculation and joint accounts
     - Create InterestCalculationService with configurable rates and compounding
     - Implement joint account management with multiple signatories
     - Add minimum balance enforcement and penalty system

@@ -68,6 +68,10 @@ public class AccountService : IAccountService
 
     private static string GenerateAccountNumber()
     {
-        return $"BNK-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(10000000, 99999999)}";
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        var bytes = new byte[4];
+        rng.GetBytes(bytes);
+        var randomNumber = Math.Abs(BitConverter.ToInt32(bytes, 0)) % 90000000 + 10000000;
+        return $"BNK-{DateTime.UtcNow:yyyyMMdd}-{randomNumber}";
     }
 }

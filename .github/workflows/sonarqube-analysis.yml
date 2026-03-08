@@ -1,0 +1,108 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sonarqube:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for better analysis
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Cache SonarQube packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+    
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+    
+    - name: Install SonarQube Scanner
+      run: dotnet tool install --global dotnet-sonarscanner
+    
+    - name: Install ReportGenerator
+      run: dotnet tool install --global dotnet-reportgenerator-globaltool
+    
+    - name: Restore dependencies
+      run: dotnet restore bank-backend/
+    
+    - name: Begin SonarQube Analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        dotnet sonarscanner begin \
+          /k:"banking-backend" \
+          /n:"Banking Backend" \
+          /v:"1.0" \
+          /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.cs.dotcover.reportsPaths="bank-backend/TestResults/CoverageReport/SonarQube.xml" \
+          /d:sonar.cs.opencover.reportsPaths="bank-backend/TestResults/CoverageReport/OpenCover.xml" \
+          /d:sonar.exclusions="**/bin/**,**/obj/**,**/wwwroot/**,**/*.Tests/**,**/Migrations/**" \
+          /d:sonar.coverage.exclusions="**/Program.cs,**/Startup.cs,**/*Tests*/**,**/Migrations/**" \
+          /d:sonar.cpd.exclusions="**/Migrations/**" \
+          /d:sonar.sourceEncoding="UTF-8"
+    
+    - name: Build solution
+      run: dotnet build bank-backend/ --configuration Release --no-restore
+    
+    - name: Run tests with coverage
+      run: |
+        cd bank-backend
+        dotnet test --configuration Release --no-build \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults/ \
+          --logger trx \
+          --logger "console;verbosity=detailed"
+    
+    - name: Generate coverage reports
+      run: |
+        cd bank-backend
+        if [ -d "TestResults" ]; then
+          reportgenerator \
+            -reports:"TestResults/**/coverage.cobertura.xml" \
+            -targetdir:"TestResults/CoverageReport" \
+            -reporttypes:"SonarQube;OpenCover;Html"
+        fi
+    
+    - name: End SonarQube Analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        directory: bank-backend/TestResults/CoverageReport/
+        fail_ci_if_error: false
+        verbose: true
+    
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: .NET Tests
+        path: bank-backend/TestResults/*.trx
+        reporter: dotnet-trx

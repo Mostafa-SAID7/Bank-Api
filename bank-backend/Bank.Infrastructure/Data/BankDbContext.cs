@@ -20,6 +20,17 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<BatchJob> BatchJobs => Set<BatchJob>();
     public DbSet<TwoFactorToken> TwoFactorTokens => Set<TwoFactorToken>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Session> Sessions => Set<Session>();
+    public DbSet<AccountLockout> AccountLockouts => Set<AccountLockout>();
+    public DbSet<IpWhitelist> IpWhitelists => Set<IpWhitelist>();
+    public DbSet<PasswordPolicy> PasswordPolicies => Set<PasswordPolicy>();
+    public DbSet<PasswordHistory> PasswordHistories => Set<PasswordHistory>();
+    public DbSet<AccountFee> AccountFees => Set<AccountFee>();
+    public DbSet<AccountHold> AccountHolds => Set<AccountHold>();
+    public DbSet<AccountRestriction> AccountRestrictions => Set<AccountRestriction>();
+    public DbSet<AccountStatusHistory> AccountStatusHistories => Set<AccountStatusHistory>();
+    public DbSet<FeeSchedule> FeeSchedules => Set<FeeSchedule>();
+    public DbSet<JointAccountHolder> JointAccountHolders => Set<JointAccountHolder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,6 +42,17 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
         modelBuilder.Entity<BatchJob>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<TwoFactorToken>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<Session>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<AccountLockout>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<IpWhitelist>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<PasswordPolicy>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<PasswordHistory>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<AccountFee>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<AccountHold>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<AccountRestriction>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<AccountStatusHistory>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<FeeSchedule>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<JointAccountHolder>().HasQueryFilter(e => !e.IsDeleted);
 
         // AuditLog configuration - immutable, no soft delete
         modelBuilder.Entity<AuditLog>()
@@ -131,6 +153,319 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
         modelBuilder.Entity<TwoFactorToken>()
             .HasIndex(t => t.ExpiresAt)
             .HasDatabaseName("IX_TwoFactorTokens_ExpiresAt");
+
+        // Session configuration
+        modelBuilder.Entity<Session>()
+            .HasOne(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Session>()
+            .HasIndex(s => s.SessionToken)
+            .IsUnique()
+            .HasDatabaseName("IX_Sessions_SessionToken");
+
+        modelBuilder.Entity<Session>()
+            .HasIndex(s => s.RefreshToken)
+            .HasDatabaseName("IX_Sessions_RefreshToken");
+
+        modelBuilder.Entity<Session>()
+            .HasIndex(s => new { s.UserId, s.Status })
+            .HasDatabaseName("IX_Sessions_UserId_Status");
+
+        modelBuilder.Entity<Session>()
+            .HasIndex(s => s.ExpiresAt)
+            .HasDatabaseName("IX_Sessions_ExpiresAt");
+
+        modelBuilder.Entity<Session>()
+            .HasIndex(s => s.IpAddress)
+            .HasDatabaseName("IX_Sessions_IpAddress");
+
+        modelBuilder.Entity<Session>()
+            .Property(s => s.SessionToken)
+            .HasMaxLength(128)
+            .IsRequired();
+
+        modelBuilder.Entity<Session>()
+            .Property(s => s.RefreshToken)
+            .HasMaxLength(128);
+
+        modelBuilder.Entity<Session>()
+            .Property(s => s.IpAddress)
+            .HasMaxLength(45)
+            .IsRequired();
+
+        modelBuilder.Entity<Session>()
+            .Property(s => s.UserAgent)
+            .HasMaxLength(500)
+            .IsRequired();
+
+        // AccountLockout configuration
+        modelBuilder.Entity<AccountLockout>()
+            .HasOne(l => l.User)
+            .WithMany()
+            .HasForeignKey(l => l.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountLockout>()
+            .HasOne(l => l.LockedByUser)
+            .WithMany()
+            .HasForeignKey(l => l.LockedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<AccountLockout>()
+            .HasIndex(l => l.UserId)
+            .IsUnique()
+            .HasDatabaseName("IX_AccountLockouts_UserId");
+
+        modelBuilder.Entity<AccountLockout>()
+            .HasIndex(l => l.IsCurrentlyLocked)
+            .HasDatabaseName("IX_AccountLockouts_IsCurrentlyLocked");
+
+        modelBuilder.Entity<AccountLockout>()
+            .HasIndex(l => l.LockedUntil)
+            .HasDatabaseName("IX_AccountLockouts_LockedUntil");
+
+        modelBuilder.Entity<AccountLockout>()
+            .Property(l => l.IpAddress)
+            .HasMaxLength(45);
+
+        modelBuilder.Entity<AccountLockout>()
+            .Property(l => l.UserAgent)
+            .HasMaxLength(500);
+
+        // IpWhitelist configuration
+        modelBuilder.Entity<IpWhitelist>()
+            .HasOne(w => w.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(w => w.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<IpWhitelist>()
+            .HasOne(w => w.ApprovedByUser)
+            .WithMany()
+            .HasForeignKey(w => w.ApprovedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<IpWhitelist>()
+            .HasIndex(w => new { w.IpAddress, w.Type })
+            .HasDatabaseName("IX_IpWhitelists_IpAddress_Type");
+
+        modelBuilder.Entity<IpWhitelist>()
+            .HasIndex(w => new { w.Type, w.IsActive })
+            .HasDatabaseName("IX_IpWhitelists_Type_IsActive");
+
+        modelBuilder.Entity<IpWhitelist>()
+            .HasIndex(w => w.ExpiresAt)
+            .HasDatabaseName("IX_IpWhitelists_ExpiresAt");
+
+        modelBuilder.Entity<IpWhitelist>()
+            .Property(w => w.IpAddress)
+            .HasMaxLength(45)
+            .IsRequired();
+
+        modelBuilder.Entity<IpWhitelist>()
+            .Property(w => w.IpRange)
+            .HasMaxLength(50);
+
+        modelBuilder.Entity<IpWhitelist>()
+            .Property(w => w.Description)
+            .HasMaxLength(500)
+            .IsRequired();
+
+        // PasswordPolicy configuration
+        modelBuilder.Entity<PasswordPolicy>()
+            .HasIndex(p => p.IsDefault)
+            .HasDatabaseName("IX_PasswordPolicies_IsDefault");
+
+        modelBuilder.Entity<PasswordPolicy>()
+            .HasIndex(p => p.ComplexityLevel)
+            .IsUnique()
+            .HasDatabaseName("IX_PasswordPolicies_ComplexityLevel");
+
+        modelBuilder.Entity<PasswordPolicy>()
+            .HasIndex(p => p.Name)
+            .IsUnique()
+            .HasDatabaseName("IX_PasswordPolicies_Name");
+
+        modelBuilder.Entity<PasswordPolicy>()
+            .Property(p => p.Name)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<PasswordPolicy>()
+            .Property(p => p.AllowedSpecialCharacters)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<PasswordPolicy>()
+            .Property(p => p.Description)
+            .HasMaxLength(500);
+
+        // PasswordHistory configuration
+        modelBuilder.Entity<PasswordHistory>()
+            .HasOne(h => h.User)
+            .WithMany()
+            .HasForeignKey(h => h.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PasswordHistory>()
+            .HasIndex(h => new { h.UserId, h.PasswordSetAt })
+            .HasDatabaseName("IX_PasswordHistories_UserId_PasswordSetAt");
+
+        modelBuilder.Entity<PasswordHistory>()
+            .HasIndex(h => new { h.UserId, h.IsCurrentPassword })
+            .HasDatabaseName("IX_PasswordHistories_UserId_IsCurrentPassword");
+
+        modelBuilder.Entity<PasswordHistory>()
+            .Property(h => h.PasswordHash)
+            .HasMaxLength(256)
+            .IsRequired();
+
+        modelBuilder.Entity<PasswordHistory>()
+            .Property(h => h.PasswordSalt)
+            .HasMaxLength(128);
+
+        // AccountFee configuration
+        modelBuilder.Entity<AccountFee>()
+            .HasOne(f => f.Account)
+            .WithMany(a => a.Fees)
+            .HasForeignKey(f => f.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountFee>()
+            .HasOne(f => f.Transaction)
+            .WithMany()
+            .HasForeignKey(f => f.TransactionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<AccountFee>()
+            .Property(f => f.Amount)
+            .HasPrecision(18, 2);
+
+        // AccountHold configuration
+        modelBuilder.Entity<AccountHold>()
+            .HasOne(h => h.Account)
+            .WithMany(a => a.Holds)
+            .HasForeignKey(h => h.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountHold>()
+            .HasOne(h => h.PlacedByUser)
+            .WithMany()
+            .HasForeignKey(h => h.PlacedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountHold>()
+            .HasOne(h => h.ReleasedByUser)
+            .WithMany()
+            .HasForeignKey(h => h.ReleasedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<AccountHold>()
+            .Property(h => h.Amount)
+            .HasPrecision(18, 2);
+
+        // AccountRestriction configuration
+        modelBuilder.Entity<AccountRestriction>()
+            .HasOne(r => r.Account)
+            .WithMany(a => a.Restrictions)
+            .HasForeignKey(r => r.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountRestriction>()
+            .HasOne(r => r.AppliedByUser)
+            .WithMany()
+            .HasForeignKey(r => r.AppliedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountRestriction>()
+            .HasOne(r => r.RemovedByUser)
+            .WithMany()
+            .HasForeignKey(r => r.RemovedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<AccountRestriction>()
+            .Property(r => r.DailyLimit)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<AccountRestriction>()
+            .Property(r => r.MonthlyLimit)
+            .HasPrecision(18, 2);
+
+        // AccountStatusHistory configuration
+        modelBuilder.Entity<AccountStatusHistory>()
+            .HasOne(h => h.Account)
+            .WithMany(a => a.StatusHistory)
+            .HasForeignKey(h => h.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AccountStatusHistory>()
+            .HasOne(h => h.ChangedByUser)
+            .WithMany()
+            .HasForeignKey(h => h.ChangedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // FeeSchedule configuration
+        modelBuilder.Entity<FeeSchedule>()
+            .HasOne(f => f.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(f => f.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<FeeSchedule>()
+            .Property(f => f.Amount)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<FeeSchedule>()
+            .Property(f => f.MinimumBalanceThreshold)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<FeeSchedule>()
+            .Property(f => f.MaximumBalanceThreshold)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<FeeSchedule>()
+            .Property(f => f.WaiverMinimumBalance)
+            .HasPrecision(18, 2);
+
+        // JointAccountHolder configuration
+        modelBuilder.Entity<JointAccountHolder>()
+            .HasOne(j => j.Account)
+            .WithMany(a => a.JointHolders)
+            .HasForeignKey(j => j.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<JointAccountHolder>()
+            .HasOne(j => j.User)
+            .WithMany()
+            .HasForeignKey(j => j.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<JointAccountHolder>()
+            .HasOne(j => j.AddedByUser)
+            .WithMany()
+            .HasForeignKey(j => j.AddedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<JointAccountHolder>()
+            .HasOne(j => j.RemovedByUser)
+            .WithMany()
+            .HasForeignKey(j => j.RemovedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<JointAccountHolder>()
+            .Property(j => j.TransactionLimit)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<JointAccountHolder>()
+            .Property(j => j.DailyLimit)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<JointAccountHolder>()
+            .HasIndex(j => new { j.AccountId, j.UserId })
+            .HasDatabaseName("IX_JointAccountHolders_AccountId_UserId");
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

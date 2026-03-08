@@ -324,11 +324,15 @@ public class TwoFactorAuthService : ITwoFactorAuthService
 
     private static string GenerateNumericToken(int length)
     {
-        var random = new Random();
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
         var token = new StringBuilder();
+        var bytes = new byte[4];
+        
         for (int i = 0; i < length; i++)
         {
-            token.Append(random.Next(0, 10));
+            rng.GetBytes(bytes);
+            var value = Math.Abs(BitConverter.ToInt32(bytes, 0)) % 10;
+            token.Append(value);
         }
         return token.ToString();
     }
@@ -390,14 +394,18 @@ public class TwoFactorAuthService : ITwoFactorAuthService
     private static List<string> GenerateBackupCodes()
     {
         var codes = new List<string>();
-        var random = new Random();
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
         
         for (int i = 0; i < BackupCodeCount; i++)
         {
             var code = new StringBuilder();
+            var bytes = new byte[4];
+            
             for (int j = 0; j < BackupCodeLength; j++)
             {
-                code.Append(random.Next(0, 10));
+                rng.GetBytes(bytes);
+                var value = Math.Abs(BitConverter.ToInt32(bytes, 0)) % 10;
+                code.Append(value);
             }
             codes.Add(code.ToString());
         }
