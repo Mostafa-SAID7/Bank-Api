@@ -1,4 +1,5 @@
 using Bank.Application.Interfaces;
+using Bank.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers;
@@ -20,7 +21,7 @@ public class AuthController : ControllerBase
         try
         {
             var token = await _authService.LoginAsync(request.Email, request.Password);
-            return Ok(new { Token = token });
+            return Ok(new AuthResponse(token));
         }
         catch (Exception ex)
         {
@@ -34,7 +35,7 @@ public class AuthController : ControllerBase
         try
         {
             var user = await _authService.RegisterAsync(request.Username, request.Email, request.Password);
-            return Ok(user);
+            return Ok(new { user.Id, user.UserName, user.Email });
         }
         catch (Exception ex)
         {
@@ -42,6 +43,3 @@ public class AuthController : ControllerBase
         }
     }
 }
-
-public record LoginRequest(string Email, string Password);
-public record RegisterRequest(string Username, string Email, string Password);

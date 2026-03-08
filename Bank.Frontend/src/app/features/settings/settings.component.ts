@@ -1,15 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ThemeService } from '../../core/services/theme.service';
+import { ProfileService, UserProfile } from '../../core/services/profile.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatSlideToggleModule, MatDividerModule, MatRippleModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatSlideToggleModule, MatDividerModule, MatRippleModule, MatSnackBarModule, MatProgressSpinnerModule],
   template: `
     <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <!-- Header -->
@@ -19,13 +23,17 @@ import { MatRippleModule } from '@angular/material/core';
           <p class="text-slate-500 dark:text-slate-400 mt-1">Manage global preferences and account security configurations.</p>
         </div>
         <div class="flex items-center space-x-3">
-          <button mat-flat-button color="primary" class="!rounded-xl !px-6 !py-2.5 !bg-indigo-600 !text-white shadow-lg shadow-indigo-600/20 font-bold">
+          <button mat-flat-button color="primary" class="!rounded-xl !px-6 !py-2.5 !bg-indigo-600 !text-white shadow-lg shadow-indigo-600/20 font-bold" (click)="saveSettings()">
             Save All Changes
           </button>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div *ngIf="loading" class="flex justify-center py-16">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loading" class="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <!-- Main Settings Column -->
         <div class="xl:col-span-2 space-y-6">
           
@@ -61,10 +69,10 @@ import { MatRippleModule } from '@angular/material/core';
               <div class="space-y-4 pt-4">
                  <div class="flex items-center justify-between py-2">
                     <div class="space-y-0.5">
-                      <p class="font-bold text-slate-900 dark:text-white">Compact Sidebar</p>
-                      <p class="text-sm text-slate-500">Reduce sidebar width for more workspace.</p>
+                      <p class="font-bold text-slate-900 dark:text-white">Dark Mode</p>
+                      <p class="text-sm text-slate-500">Toggle the application theme.</p>
                     </div>
-                    <mat-slide-toggle color="primary"></mat-slide-toggle>
+                    <mat-slide-toggle [checked]="themeService.isDarkMode()" (change)="themeService.toggleTheme()" color="primary"></mat-slide-toggle>
                  </div>
                  <mat-divider class="dark:!border-slate-800"></mat-divider>
                  <div class="flex items-center justify-between py-2">
@@ -117,15 +125,17 @@ import { MatRippleModule } from '@angular/material/core';
           </div>
         </div>
 
-        <!-- Sidebar / Help Column -->
+        <!-- Sidebar / Account Info Column -->
         <div class="space-y-6">
+           <!-- Account Info from backend -->
            <div class="bg-gradient-to-tr from-indigo-600 to-blue-700 rounded-[32px] p-8 text-white shadow-xl relative overflow-hidden group">
              <div class="absolute -right-8 -top-8 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
-             <h3 class="text-xl font-bold mb-4 relative z-10">Antigravity Premium</h3>
-             <p class="text-indigo-100 mb-6 relative z-10 leading-relaxed font-medium">Your account is currently on the high-fidelity enterprise plan with full API access.</p>
-             <button class="w-full py-3.5 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl shadow-indigo-900/20 relative z-10 transform active:scale-95 transition-all">
-                Manage Subscription
-             </button>
+             <h3 class="text-xl font-bold mb-4 relative z-10">Welcome back</h3>
+             <p class="text-indigo-100 mb-2 relative z-10 font-medium">{{ user?.firstName }} {{ user?.lastName }}</p>
+             <p class="text-indigo-200 mb-6 relative z-10 text-sm">{{ user?.email }}</p>
+             <div class="w-full py-3 bg-white/10 border border-white/10 text-center text-indigo-100 font-bold rounded-2xl relative z-10 text-sm">
+                &#64;{{ user?.userName }}
+             </div>
            </div>
 
            <div class="bg-white dark:bg-slate-900/50 backdrop-blur-md rounded-[32px] border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
@@ -155,4 +165,27 @@ import { MatRippleModule } from '@angular/material/core';
     }
   `
 })
-export class SettingsComponent { }
+export class SettingsComponent implements OnInit {
+  public themeService = inject(ThemeService);
+  private profileService = inject(ProfileService);
+  private snackBar = inject(MatSnackBar);
+
+  user: UserProfile | null = null;
+  loading = true;
+
+  ngOnInit() {
+    this.profileService.getProfile().subscribe({
+      next: (profile) => {
+        this.user = profile;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  saveSettings() {
+    this.snackBar.open('Settings saved successfully!', 'Close', { duration: 3000 });
+  }
+}

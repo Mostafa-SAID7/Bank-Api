@@ -7,4 +7,5 @@ public interface IAuthService
     Task<string> LoginAsync(string email, string password);
     Task<User> RegisterAsync(string username, string email, string password);
     Task<User?> GetUserByEmailAsync(string email);
+    Task<IEnumerable<User>> GetAllUsersAsync();
 }

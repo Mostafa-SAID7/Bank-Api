@@ -69,4 +69,12 @@ public class BatchService : IBatchService
             .Include(j => j.Transactions)
             .FirstOrDefaultAsync(j => j.Id == jobId);
     }
+
+    public async Task<IEnumerable<BatchJob>> GetAllBatchJobsAsync()
+    {
+        return await _unitOfWork.Repository<BatchJob>().Query()
+            .OrderByDescending(j => j.CreatedAt)
+            .Take(50) // Limit to recent 50 for performance
+            .ToListAsync();
+    }
 }

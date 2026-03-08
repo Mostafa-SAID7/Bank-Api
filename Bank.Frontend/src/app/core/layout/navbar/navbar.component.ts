@@ -1,4 +1,4 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, inject, signal, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import { trigger, transition, style, animate, state } from '@angular/animations'
 import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 import { LayoutService } from '../../services/layout.service';
+import { ProfileService, UserProfile } from '../../services/profile.service';
 
 @Component({
   selector: 'app-navbar',
@@ -39,16 +40,19 @@ import { LayoutService } from '../../services/layout.service';
     ])
   ]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   themeService = inject(ThemeService);
   authService = inject(AuthService);
   layoutService = inject(LayoutService);
+  profileService = inject(ProfileService);
 
   showSearchSuggestions = signal(false);
   showNotifications = signal(false);
   showProfileMenu = signal(false);
 
   searchQuery = '';
+  user: UserProfile | null = null;
+  loadingProfile = true;
 
   suggestions = [
     { type: 'Account', title: 'Main Savings Account', detail: '...4492', icon: 'account_balance_wallet' },
@@ -61,6 +65,21 @@ export class NavbarComponent {
     { title: 'ACH Return Alert', time: '1h ago', type: 'warning', icon: 'warning' },
     { title: 'System Update', time: '3h ago', type: 'success', icon: 'check_circle' },
   ];
+
+  ngOnInit() {
+    this.profileService.getProfile().subscribe({
+      next: (profile) => {
+        this.user = profile;
+        this.loadingProfile = false;
+      },
+      error: () => this.loadingProfile = false
+    });
+  }
+
+  get userInitials() {
+    if (!this.user) return 'FB';
+    return ((this.user.firstName?.[0] || '') + (this.user.lastName?.[0] || '')).toUpperCase() || 'FB';
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {

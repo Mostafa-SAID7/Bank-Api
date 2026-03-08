@@ -33,6 +33,13 @@ public class AccountService : IAccountService
             .FindAsync(a => a.UserId == userId);
     }
 
+    public async Task<IEnumerable<Account>> GetAllAccountsAsync()
+    {
+        return await _unitOfWork.Repository<Account>().Query()
+            .Include(a => a.User)
+            .ToListAsync();
+    }
+
     public async Task<Account> CreateAccountAsync(Guid userId, string accountHolderName)
     {
         var account = new Account

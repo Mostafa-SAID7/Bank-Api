@@ -1,27 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-    selector: 'app-register',
-    standalone: true,
-    imports: [
-        CommonModule,
-        RouterModule,
-        MatIconModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatCheckboxModule,
-        ReactiveFormsModule
-    ],
-    template: `
+  selector: 'app-register',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatSnackBarModule,
+    ReactiveFormsModule
+  ],
+  template: `
     <div class="min-h-screen w-full flex items-center justify-center p-4 bg-[#0F172A] relative overflow-hidden">
       <!-- Animated Background Mesh -->
       <div class="absolute inset-0 z-0">
@@ -43,6 +46,11 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
             <p class="text-slate-400 mt-2">Join FinBank and manage your assets with premium tools.</p>
           </div>
 
+          <!-- Error Message -->
+          <div *ngIf="error" class="mb-4 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-medium text-center">
+            {{ error }}
+          </div>
+
           <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
             <!-- Full Name -->
             <div class="space-y-1.5">
@@ -59,7 +67,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
               <label class="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
               <div class="relative">
                 <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 !w-5 !h-5 !text-xl">mail</mat-icon>
-                <input type="email" formControlName="email" placeholder="name@company.com"
+                <input type="email" formControlName="email" placeholder="name&#64;company.com"
                   class="w-full pl-12 pr-4 py-3.5 bg-slate-950/50 border border-slate-800 rounded-2xl text-white placeholder-slate-600 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all">
               </div>
             </div>
@@ -100,9 +108,9 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" [disabled]="registerForm.invalid"
+            <button type="submit" [disabled]="registerForm.invalid || loading"
               class="w-full py-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transform active:scale-[0.98] transition-all duration-200">
-              Sign Up
+              {{ loading ? 'Creating Account...' : 'Sign Up' }}
             </button>
           </form>
 
@@ -120,7 +128,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
       </div>
     </div>
   `,
-    styles: `
+  styles: `
     :host {
       display: block;
     }
@@ -135,23 +143,59 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
   `
 })
 export class RegisterComponent {
-    registerForm: FormGroup;
-    hidePassword = true;
-    hideConfirmPassword = true;
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
-    constructor(private fb: FormBuilder) {
-        this.registerForm = this.fb.group({
-            fullName: ['', [Validators.required]],
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-            confirmPassword: ['', [Validators.required]],
-            terms: [false, [Validators.requiredTrue]]
-        });
-    }
+  registerForm: FormGroup;
+  hidePassword = true;
+  hideConfirmPassword = true;
+  loading = false;
+  error = '';
 
-    onSubmit() {
-        if (this.registerForm.valid) {
-            console.log('Registering...', this.registerForm.value);
+  constructor(private fb: FormBuilder) {
+    this.registerForm = this.fb.group({
+      fullName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]],
+      terms: [false, [Validators.requiredTrue]]
+    });
+  }
+
+  onSubmit() {
+    if (this.registerForm.valid) {
+      const { fullName, email, password, confirmPassword } = this.registerForm.value;
+
+      if (password !== confirmPassword) {
+        this.error = 'Passwords do not match.';
+        return;
+      }
+
+      this.loading = true;
+      this.error = '';
+
+      this.authService.register({
+        username: fullName,
+        email,
+        password
+      }).subscribe({
+        next: () => {
+          this.loading = false;
+          this.snackBar.open('Account created successfully! Please log in.', 'Close', { duration: 4000 });
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          this.loading = false;
+          if (err.error && typeof err.error === 'string') {
+            this.error = err.error;
+          } else if (err.error?.message) {
+            this.error = err.error.message;
+          } else {
+            this.error = 'Registration failed. Please try again.';
+          }
         }
+      });
     }
+  }
 }

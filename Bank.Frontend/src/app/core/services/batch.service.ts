@@ -38,4 +38,12 @@ export class BatchService {
   getBatchStatus(jobId: string) {
     return this.http.get<BatchJob>(`${this.apiUrl}/status/${jobId}`);
   }
+
+  /**
+   * GET /api/batch
+   * Returns all batch jobs, sorted by most recent.
+   */
+  getAllBatches() {
+    return this.http.get<BatchJob[]>(this.apiUrl);
+  }
 }

@@ -48,4 +48,11 @@ public class BatchController : ControllerBase
         if (job == null) return NotFound();
         return Ok(job);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllBatches()
+    {
+        var jobs = await _batchService.GetAllBatchJobsAsync();
+        return Ok(jobs);
+    }
 }

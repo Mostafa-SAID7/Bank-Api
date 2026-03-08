@@ -4,6 +4,7 @@ using System.Text;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -59,6 +60,11 @@ public class AuthService : IAuthService
 
         await _userManager.AddToRoleAsync(user, "User");
         return user;
+    }
+
+    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    {
+        return await _userManager.Users.ToListAsync();
     }
 
     private string GenerateJwtToken(User user, IList<string> roles)
