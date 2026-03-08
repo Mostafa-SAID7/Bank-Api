@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using FluentValidation;
-using Microsoft.OpenApi.Models;
 using Hangfire;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -25,6 +24,20 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Database
 builder.Services.AddDbContext<BankDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+// Redis for caching and rate limiting
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+});
+
+// Session support
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // ASP.NET Core Identity
 builder.Services.AddIdentity<User, Role>(options =>
@@ -59,12 +72,22 @@ builder.Services.AddAuthentication(opts => {
 
 // Unit of Work & Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<Bank.Domain.Interfaces.IAuditLogRepository, Bank.Infrastructure.Repositories.AuditLogRepository>();
 
 // Application Services
 builder.Services.AddScoped<Bank.Application.Interfaces.IAuthService, Bank.Application.Services.AuthService>();
 builder.Services.AddScoped<Bank.Application.Interfaces.IAccountService, Bank.Application.Services.AccountService>();
 builder.Services.AddScoped<Bank.Application.Interfaces.ITransactionService, Bank.Application.Services.TransactionService>();
 builder.Services.AddScoped<Bank.Application.Interfaces.IBatchService, Bank.Application.Services.BatchService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.ITwoFactorAuthService, Bank.Application.Services.TwoFactorAuthService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IAuditLogService, Bank.Application.Services.AuditLogService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IAuditEventPublisher, Bank.Application.Services.AuditEventPublisher>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IFraudDetectionService, Bank.Application.Services.FraudDetectionService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.IRateLimitingService, Bank.Infrastructure.Services.RateLimitingService>();
+
+// Infrastructure Services
+builder.Services.AddScoped<Bank.Application.Interfaces.IEmailService, Bank.Infrastructure.Services.EmailService>();
+builder.Services.AddScoped<Bank.Application.Interfaces.ISmsService, Bank.Infrastructure.Services.SmsService>();
 
 // CQRS / MediatR & FluentValidation
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Bank.Application.Commands.InitiateTransactionCommand).Assembly));
@@ -188,9 +211,12 @@ if (app.Environment.IsDevelopment())
     app.UseHangfireDashboard();
 }
 app.UseMiddleware<Bank.Api.Middleware.GlobalExceptionMiddleware>();
+app.UseMiddleware<Bank.Api.Middleware.AuditMiddleware>();
+app.UseMiddleware<Bank.Api.Middleware.TwoFactorAuthMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

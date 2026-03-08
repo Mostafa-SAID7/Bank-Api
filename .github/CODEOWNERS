@@ -1,0 +1,35 @@
+# Global code owners
+* @yourusername
+
+# Backend code owners
+/bank-backend/ @yourusername @backend-team
+/bank-backend/Bank.Api/Controllers/ @yourusername @api-team
+/bank-backend/Bank.Domain/ @yourusername @domain-experts
+/bank-backend/Bank.Infrastructure/ @yourusername @infrastructure-team
+
+# Frontend code owners
+/Bank.Frontend/ @yourusername @frontend-team
+/Bank.Frontend/src/app/features/ @yourusername @ui-team
+
+# DevOps and Infrastructure
+/devops/ @yourusername @devops-team
+/.github/ @yourusername @devops-team
+/docker/ @yourusername @devops-team
+
+# Documentation
+/docs/ @yourusername @documentation-team
+README.md @yourusername @documentation-team
+
+# Security-sensitive files
+/bank-backend/Bank.Api/Controllers/AuthController.cs @yourusername @security-team
+/devops/kubernetes/configmap.yaml @yourusername @security-team @devops-team
+/devops/terraform/ @yourusername @security-team @devops-team
+
+# Database and migrations
+/bank-backend/Bank.Infrastructure/Data/ @yourusername @database-team
+/devops/scripts/backup.sh @yourusername @database-team @devops-team
+
+# Configuration files
+*.json @yourusername @config-reviewers
+*.yml @yourusername @config-reviewers
+*.yaml @yourusername @config-reviewers

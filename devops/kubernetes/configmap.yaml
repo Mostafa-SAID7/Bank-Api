@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bank-config
+  namespace: bank-app
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  JwtSettings__Issuer: "BankAPI"
+  JwtSettings__Audience: "BankClients"
+  JwtSettings__ExpirationMinutes: "60"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bank-secrets
+  namespace: bank-app
+type: Opaque
+stringData:
+  ConnectionStrings__DefaultConnection: "Server=database-service;Database=BankDB;User Id=sa;Password=BankApp123!;TrustServerCertificate=true;"
+  JwtSettings__SecretKey: "your-super-secret-jwt-key-here-make-it-long-and-secure"
+  SA_PASSWORD: "BankApp123!"

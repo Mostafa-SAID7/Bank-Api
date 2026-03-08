@@ -1,0 +1,88 @@
+# Default values for bank-management-system
+replicaCount:
+  backend: 3
+  frontend: 2
+
+image:
+  registry: ghcr.io
+  repository: yourusername/bank-management-system
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: bank.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: bank-tls
+      hosts:
+        - bank.yourdomain.com
+
+resources:
+  backend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  frontend:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Database configuration
+database:
+  enabled: true
+  image: mcr.microsoft.com/mssql/server:2022-latest
+  storage: 10Gi
+  password: "BankApp123!"
+
+# Application configuration
+config:
+  environment: "Production"
+  jwt:
+    issuer: "BankAPI"
+    audience: "BankClients"
+    expirationMinutes: 60

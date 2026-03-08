@@ -1,0 +1,93 @@
+# Automatic labeling configuration for Bank Management System
+
+# Backend related changes
+backend:
+  - bank-backend/**/*
+  - "**/*.cs"
+  - "**/*.csproj"
+
+# Frontend related changes  
+frontend:
+  - Bank.Frontend/**/*
+  - "**/*.ts"
+  - "**/*.html"
+  - "**/*.css"
+  - "**/*.scss"
+  - "**/*.json"
+
+# DevOps and Infrastructure
+devops:
+  - devops/**/*
+  - .github/**/*
+  - "**/*.yml"
+  - "**/*.yaml"
+  - "**/Dockerfile*"
+  - "**/docker-compose*"
+
+# Database related
+database:
+  - "**/*migration*"
+  - "**/Data/**/*"
+  - "**/Migrations/**/*"
+  - "**/*DbContext*"
+
+# Security related
+security:
+  - "**/Auth*"
+  - "**/Security*"
+  - "**/*Security*"
+  - "**/Middleware/**/*"
+  - .github/SECURITY.md
+
+# API changes
+api:
+  - "**/Controllers/**/*"
+  - "**/DTOs/**/*"
+  - "**/*Controller.cs"
+  - "**/*Dto.cs"
+
+# Documentation
+documentation:
+  - docs/**/*
+  - "**/*.md"
+  - README.md
+
+# Configuration
+configuration:
+  - "**/appsettings*.json"
+  - "**/launchSettings.json"
+  - "**/*.config"
+  - "**/Program.cs"
+
+# Testing
+testing:
+  - "**/*Test*"
+  - "**/*test*"
+  - "**/Tests/**/*"
+
+# Dependencies
+dependencies:
+  - "**/package*.json"
+  - "**/*.csproj"
+  - "**/requirements*.txt"
+
+# Banking domain specific
+account-management:
+  - "**/Account*"
+  - "**/*Account*"
+
+transaction-processing:
+  - "**/Transaction*"
+  - "**/*Transaction*"
+
+user-management:
+  - "**/User*"
+  - "**/*User*"
+  - "**/Profile*"
+  - "**/*Profile*"
+
+reporting:
+  - "**/Report*"
+  - "**/*Report*"
+  - "**/Analytics*"
+  - "**/*Analytics*"

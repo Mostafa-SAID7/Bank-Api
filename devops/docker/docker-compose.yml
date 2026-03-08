@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # Database
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: bank-database
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BankApp123!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - bank_data:/var/opt/mssql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - bank-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P BankApp123! -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ../..
+      dockerfile: devops/docker/Dockerfile.backend
+    container_name: bank-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=database;Database=BankDB;User Id=sa;Password=BankApp123!;TrustServerCertificate=true;
+      - JwtSettings__SecretKey=your-super-secret-jwt-key-here-make-it-long-and-secure
+      - JwtSettings__Issuer=BankAPI
+      - JwtSettings__Audience=BankClients
+      - JwtSettings__ExpirationMinutes=60
+    ports:
+      - "5000:80"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - bank-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend
+  frontend:
+    build:
+      context: ../..
+      dockerfile: devops/docker/Dockerfile.frontend
+    container_name: bank-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - bank-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: bank-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bank-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  bank_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  bank-network:
+    driver: bridge
