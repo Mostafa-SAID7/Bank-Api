@@ -5,6 +5,7 @@ using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Bank.Application.Services;
@@ -133,7 +134,7 @@ public class PaymentReceiptService : IPaymentReceiptService
         }
     }
 
-    public async Task<PagedResult<PaymentReceiptDto>> GetCustomerReceiptsAsync(
+    public async Task<Domain.Common.PagedResult<PaymentReceiptDto>> GetCustomerReceiptsAsync(
         Guid customerId, 
         int pageNumber = 1, 
         int pageSize = 20,
@@ -297,7 +298,10 @@ public class PaymentReceiptService : IPaymentReceiptService
     private static string GenerateConfirmationNumber()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var random = new Random().Next(100000, 999999);
+        using var rng = RandomNumberGenerator.Create();
+        var randomBytes = new byte[4];
+        rng.GetBytes(randomBytes);
+        var random = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % 900000 + 100000;
         return $"CNF{timestamp}{random}";
     }
 

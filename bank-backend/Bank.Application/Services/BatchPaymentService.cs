@@ -30,7 +30,37 @@ public class BatchPaymentService : IBatchPaymentService
         _logger = logger;
     }
 
-    public async Task<BulkTransferResult> ProcessBatchPaymentsAsync(BulkTransferRequest request)
+    public async Task<BatchPaymentResponse> ProcessPaymentBatchAsync(List<Guid> paymentIds)
+    {
+        // Implementation placeholder
+        throw new NotImplementedException();
+    }
+
+    public async Task<BatchPaymentResponse> ProcessScheduledPaymentBatchAsync(DateTime processingDate, int batchSize = 100)
+    {
+        // Implementation placeholder
+        throw new NotImplementedException();
+    }
+
+    public async Task<BatchPaymentResponse?> GetBatchStatusAsync(string batchId)
+    {
+        // Implementation placeholder
+        throw new NotImplementedException();
+    }
+
+    public async Task<Dictionary<string, object>> GetBatchStatisticsAsync(DateTime fromDate, DateTime toDate)
+    {
+        // Implementation placeholder
+        throw new NotImplementedException();
+    }
+
+    public async Task<BatchPaymentResponse> ProcessPriorityPaymentBatchAsync(List<Guid> paymentIds)
+    {
+        // Implementation placeholder
+        throw new NotImplementedException();
+    }
+
+    public async Task<(bool IsValid, List<string> ValidationErrors)> ValidatePaymentBatchAsync(List<Guid> paymentIds)
     {
         // Implementation placeholder
         throw new NotImplementedException();

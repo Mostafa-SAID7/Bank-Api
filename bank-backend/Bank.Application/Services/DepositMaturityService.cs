@@ -2,6 +2,7 @@ using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
+using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Bank.Application.Services;

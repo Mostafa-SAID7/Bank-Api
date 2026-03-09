@@ -5,6 +5,7 @@ using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Bank.Application.Services;
@@ -512,7 +513,11 @@ public class BillerIntegrationService : IBillerIntegrationService
 
         // Simulate success/failure based on amount (higher amounts have higher chance of additional verification)
         var successRate = request.Amount > 10000 ? 0.85 : 0.95;
-        var isSuccess = new Random().NextDouble() < successRate;
+        using var rng = RandomNumberGenerator.Create();
+        var randomBytes = new byte[4];
+        rng.GetBytes(randomBytes);
+        var randomValue = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) / (double)int.MaxValue;
+        var isSuccess = randomValue < successRate;
 
         if (isSuccess)
         {
@@ -520,7 +525,7 @@ public class BillerIntegrationService : IBillerIntegrationService
             {
                 Success = true,
                 ExternalReference = $"EXT-{Guid.NewGuid():N}"[..16],
-                ConfirmationNumber = $"CNF-{DateTime.UtcNow:yyyyMMddHHmmss}-{new Random().Next(1000, 9999)}",
+                ConfirmationNumber = GenerateConfirmationNumber(),
                 Status = BillPaymentStatus.Processing,
                 ProcessedDate = DateTime.UtcNow,
                 Message = "Payment submitted successfully",
@@ -543,7 +548,11 @@ public class BillerIntegrationService : IBillerIntegrationService
     private async Task<bool> SimulateBillerHealthCheck(Biller biller, CancellationToken cancellationToken)
     {
         // Simulate network delay
-        await Task.Delay(new Random().Next(100, 1000), cancellationToken);
+        using var rng = RandomNumberGenerator.Create();
+        var delayBytes = new byte[4];
+        rng.GetBytes(delayBytes);
+        var delay = Math.Abs(BitConverter.ToInt32(delayBytes, 0)) % 900 + 100;
+        await Task.Delay(delay, cancellationToken);
 
         // Simulate health based on biller category (some are more reliable than others)
         var healthRate = biller.Category switch
@@ -556,7 +565,20 @@ public class BillerIntegrationService : IBillerIntegrationService
             _ => 0.85
         };
 
-        return new Random().NextDouble() < healthRate;
+        using var rng = RandomNumberGenerator.Create();
+        var healthBytes = new byte[4];
+        rng.GetBytes(healthBytes);
+        var healthValue = Math.Abs(BitConverter.ToInt32(healthBytes, 0)) / (double)int.MaxValue;
+        return healthValue < healthRate;
+    }
+
+    private static string GenerateConfirmationNumber()
+    {
+        using var rng = RandomNumberGenerator.Create();
+        var randomBytes = new byte[4];
+        rng.GetBytes(randomBytes);
+        var random = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % 9000 + 1000;
+        return $"CNF-{DateTime.UtcNow:yyyyMMddHHmmss}-{random}";
     }
 
     private static BillPaymentStatus SimulatePaymentStatusCheck(string externalReference)
@@ -590,14 +612,14 @@ public class BillerIntegrationService : IBillerIntegrationService
         };
     }
 
-    private static decimal? CalculateProcessingFee(decimal amount, PaymentMethod paymentMethod)
+    private static decimal? CalculateProcessingFee(decimal amount, Domain.Enums.PaymentMethod paymentMethod)
     {
         return paymentMethod switch
         {
-            PaymentMethod.ACH => Math.Max(0.50m, amount * 0.001m),
-            PaymentMethod.Wire => 15.00m,
-            PaymentMethod.Check => 2.50m,
-            PaymentMethod.RealTimePayment => Math.Max(1.00m, amount * 0.002m),
+            Domain.Enums.PaymentMethod.ACH => Math.Max(0.50m, amount * 0.001m),
+            Domain.Enums.PaymentMethod.WireTransfer => 15.00m,
+            Domain.Enums.PaymentMethod.Check => 2.50m,
+            Domain.Enums.PaymentMethod.BankTransfer => Math.Max(1.00m, amount * 0.002m),
             PaymentMethod.CreditCard => amount * 0.025m,
             PaymentMethod.DebitCard => amount * 0.015m,
             _ => 1.00m

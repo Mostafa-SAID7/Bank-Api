@@ -26,7 +26,7 @@ public interface IPaymentReceiptService
     /// <summary>
     /// Get customer payment receipts with pagination
     /// </summary>
-    Task<PagedResult<PaymentReceiptDto>> GetCustomerReceiptsAsync(
+    Task<Domain.Common.PagedResult<PaymentReceiptDto>> GetCustomerReceiptsAsync(
         Guid customerId, 
         int pageNumber = 1, 
         int pageSize = 20,

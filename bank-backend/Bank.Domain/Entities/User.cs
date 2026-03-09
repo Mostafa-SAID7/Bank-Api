@@ -21,7 +21,7 @@ public class User : IdentityUser<Guid>
     public string? DeletedBy { get; set; }
 
     // Two-Factor Authentication properties
-    public new bool TwoFactorEnabled { get; set; } = false;
+    public override bool TwoFactorEnabled { get; set; } = false;
     public TwoFactorStatus TwoFactorStatus { get; set; } = TwoFactorStatus.NotSetup;
     public string? TwoFactorSecretKey { get; set; } // For authenticator apps
     public string? TwoFactorBackupCodes { get; set; } // JSON array of backup codes
