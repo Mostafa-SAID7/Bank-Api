@@ -26,7 +26,7 @@ builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
 
 // 5. Application Services (Business Logic)
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices(builder.Configuration);
 
 // 6. Infrastructure Services (External Integrations)
 builder.Services.AddInfrastructureServices();

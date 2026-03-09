@@ -157,7 +157,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Register all application services (business logic)
     /// </summary>
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Authentication & Authorization Services
         services.AddScoped<Bank.Application.Interfaces.IAuthService, Bank.Application.Services.AuthService>();
@@ -211,11 +211,15 @@ public static class ServiceCollectionExtensions
         // Notification Services
         services.AddScoped<Bank.Application.Interfaces.INotificationService, Bank.Application.Services.NotificationService>();
         
-        // Background Services
-        services.AddHostedService<Bank.Application.Services.LoanBackgroundService>();
-        services.AddHostedService<Bank.Application.Services.BillPaymentBackgroundService>();
-        services.AddHostedService<Bank.Application.Services.BillerHealthCheckBackgroundService>();
-        services.AddHostedService<Bank.Application.Services.DepositBackgroundService>();
+        // Background Services (only if database is available)
+        var allowOfflineMode = configuration.GetValue<bool>("DatabaseSettings:AllowOfflineMode", false);
+        if (!allowOfflineMode)
+        {
+            services.AddHostedService<Bank.Application.Services.LoanBackgroundService>();
+            services.AddHostedService<Bank.Application.Services.BillPaymentBackgroundService>();
+            services.AddHostedService<Bank.Application.Services.BillerHealthCheckBackgroundService>();
+            services.AddHostedService<Bank.Application.Services.DepositBackgroundService>();
+        }
 
         // Financial Calculation Services
         services.AddScoped<Bank.Application.Interfaces.IFeeCalculationService, Bank.Application.Services.FeeCalculationService>();
@@ -270,13 +274,24 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddBackgroundJobServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        var allowOfflineMode = configuration.GetValue<bool>("DatabaseSettings:AllowOfflineMode", false);
+        
+        if (!allowOfflineMode)
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        // Hangfire for background jobs
-        services.AddHangfire(config => config
-            .UseSqlServerStorage(connectionString));
-        services.AddHangfireServer();
+            // Hangfire for background jobs
+            services.AddHangfire(config => config
+                .UseSqlServerStorage(connectionString));
+            services.AddHangfireServer();
+        }
+        else
+        {
+            // In offline mode, skip Hangfire and background services
+            var logger = services.BuildServiceProvider().GetService<ILogger<ServiceCollectionExtensions>>();
+            logger?.LogWarning("⚠️ Background job services disabled (offline mode)");
+        }
 
         return services;
     }
