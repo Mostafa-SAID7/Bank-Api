@@ -20,6 +20,8 @@ public class GenerateStatementRequest
     public List<TransactionType>? FilterByTransactionTypes { get; set; }
     public decimal? MinAmount { get; set; }
     public decimal? MaxAmount { get; set; }
+    public string? FilterByDescription { get; set; }
+    public List<string>? FilterByCategories { get; set; }
     public string? RequestReason { get; set; }
 }
 
@@ -195,6 +197,22 @@ public class StatementDeliveryStatus
 }
 
 /// <summary>
+/// Statement statistics for analytics
+/// </summary>
+public class StatementStatistics
+{
+    public Guid AccountId { get; set; }
+    public DateTime PeriodStart { get; set; }
+    public DateTime PeriodEnd { get; set; }
+    public int TransactionCount { get; set; }
+    public decimal TotalIncome { get; set; }
+    public decimal TotalExpenses { get; set; }
+    public decimal NetChange { get; set; }
+    public List<TransactionCategorySummary> CategoryBreakdown { get; set; } = new();
+    public List<MonthlyTransactionSummary> MonthlyBreakdown { get; set; } = new();
+}
+
+/// <summary>
 /// Statement template configuration
 /// </summary>
 public class StatementTemplate
@@ -209,4 +227,21 @@ public class StatementTemplate
     public bool IncludeBankBranding { get; set; } = true;
     public bool IncludeRegulatoryDisclosures { get; set; } = true;
     public string? CssStyles { get; set; }
+}
+/// <summary>
+/// Request model for delivering statements
+/// </summary>
+public class DeliverStatementRequest
+{
+    public StatementDeliveryMethod DeliveryMethod { get; set; }
+    public string DeliveryAddress { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Validation result model
+/// </summary>
+public class ValidationResult
+{
+    public bool IsValid { get; set; }
+    public List<string> Errors { get; set; } = new();
 }

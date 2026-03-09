@@ -1,3 +1,4 @@
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -174,24 +175,8 @@ public class SessionController : ControllerBase
         }
     }
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
-    }
+    private Guid GetCurrentUserId() => this.GetCurrentUserId();
 
-    private string? GetCurrentSessionToken()
-    {
-        // This would typically come from the Authorization header or a custom header
-        // For now, we'll extract it from the JWT token or a custom claim
-        return User.FindFirst("session_token")?.Value;
-    }
+    private string? GetCurrentSessionToken() => this.GetCurrentSessionToken();
 }
 
-/// <summary>
-/// Request model for refreshing session tokens
-/// </summary>
-public class RefreshTokenRequest
-{
-    public string RefreshToken { get; set; } = string.Empty;
-}

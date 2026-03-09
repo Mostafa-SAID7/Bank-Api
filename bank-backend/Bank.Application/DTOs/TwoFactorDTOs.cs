@@ -46,3 +46,23 @@ public class TwoFactorStatusResult
     public DateTime? SetupDate { get; set; }
     public DateTime? LastUsed { get; set; }
 }
+public class GenerateTokenRequest
+{
+    public TwoFactorMethod Method { get; set; }
+    public string? Destination { get; set; }
+}
+
+public class VerifyTokenRequest
+{
+    public string Token { get; set; } = string.Empty;
+}
+
+public class VerifyBackupCodeRequest
+{
+    public string BackupCode { get; set; } = string.Empty;
+}
+
+public class CompleteSetupRequest
+{
+    public string VerificationToken { get; set; } = string.Empty;
+}

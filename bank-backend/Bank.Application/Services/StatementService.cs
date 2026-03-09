@@ -635,6 +635,17 @@ public class StatementService : IStatementService
         if (request.MaxAmount.HasValue)
             query = query.Where(t => Math.Abs(t.Amount) <= request.MaxAmount.Value);
 
+        // Enhanced filtering for description (Requirement 3.7)
+        if (!string.IsNullOrWhiteSpace(request.FilterByDescription))
+            query = query.Where(t => t.Description.Contains(request.FilterByDescription));
+
+        // Enhanced filtering for categories (Requirement 3.7)
+        if (request.FilterByCategories?.Any() == true)
+        {
+            query = query.Where(t => request.FilterByCategories.Any(category => 
+                GetTransactionCategoryFromDescription(t.Description).Equals(category, StringComparison.OrdinalIgnoreCase)));
+        }
+
         return await query.OrderBy(t => t.CreatedAt).ToListAsync();
     }
 
@@ -721,21 +732,38 @@ public class StatementService : IStatementService
 
     private string GetTransactionCategory(Transaction transaction)
     {
+        return GetTransactionCategoryFromDescription(transaction.Description);
+    }
+
+    private string GetTransactionCategoryFromDescription(string description)
+    {
         // Simple categorization based on description - in a real system, this would be more sophisticated
-        var description = transaction.Description.ToLower();
+        var desc = description.ToLower();
         
-        if (description.Contains("salary") || description.Contains("payroll"))
+        if (desc.Contains("salary") || desc.Contains("payroll"))
             return "Income";
-        if (description.Contains("grocery") || description.Contains("food"))
+        if (desc.Contains("grocery") || desc.Contains("food"))
             return "Food & Dining";
-        if (description.Contains("gas") || description.Contains("fuel"))
+        if (desc.Contains("gas") || desc.Contains("fuel"))
             return "Transportation";
-        if (description.Contains("utility") || description.Contains("electric") || description.Contains("water"))
+        if (desc.Contains("utility") || desc.Contains("electric") || desc.Contains("water"))
             return "Utilities";
-        if (description.Contains("rent") || description.Contains("mortgage"))
+        if (desc.Contains("rent") || desc.Contains("mortgage"))
             return "Housing";
-        if (description.Contains("medical") || description.Contains("pharmacy"))
+        if (desc.Contains("medical") || desc.Contains("pharmacy"))
             return "Healthcare";
+        if (desc.Contains("fee") || desc.Contains("charge"))
+            return "Fees & Charges";
+        if (desc.Contains("interest"))
+            return "Interest";
+        if (desc.Contains("transfer"))
+            return "Transfers";
+        if (desc.Contains("atm") || desc.Contains("withdrawal"))
+            return "ATM & Cash";
+        if (desc.Contains("shopping") || desc.Contains("retail"))
+            return "Shopping";
+        if (desc.Contains("entertainment") || desc.Contains("movie"))
+            return "Entertainment";
         
         return "Other";
     }

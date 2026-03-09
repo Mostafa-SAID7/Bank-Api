@@ -7,6 +7,7 @@ using Bank.Domain.Entities;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Bank.Infrastructure.Repositories;
+using Bank.Application.Interfaces;
 
 namespace Bank.Api.Extensions;
 
@@ -110,6 +111,21 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPaymentTemplateRepository, PaymentTemplateRepository>();
         services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
         services.AddScoped<IStatementRepository, StatementRepository>();
+        services.AddScoped<ILoanRepository, LoanRepository>();
+        services.AddScoped<ICardRepository, CardRepository>();
+        services.AddScoped<ICardTransactionRepository, CardTransactionRepository>();
+        services.AddScoped<IBillerRepository, BillerRepository>();
+        services.AddScoped<IBillPaymentRepository, BillPaymentRepository>();
+        services.AddScoped<IPaymentRetryRepository, PaymentRetryRepository>();
+        services.AddScoped<IPaymentReceiptRepository, PaymentReceiptRepository>();
+        services.AddScoped<IBillerHealthCheckRepository, BillerHealthCheckRepository>();
+        services.AddScoped<IBillPresentmentRepository, BillPresentmentRepository>();
+        services.AddScoped<IDepositProductRepository, DepositProductRepository>();
+        services.AddScoped<IFixedDepositRepository, FixedDepositRepository>();
+        services.AddScoped<IInterestTierRepository, InterestTierRepository>();
+        services.AddScoped<IDepositTransactionRepository, DepositTransactionRepository>();
+        services.AddScoped<IDepositCertificateRepository, DepositCertificateRepository>();
+        services.AddScoped<IMaturityNoticeRepository, MaturityNoticeRepository>();
 
         return services;
     }
@@ -142,6 +158,40 @@ public static class ServiceCollectionExtensions
         // Statement Services
         services.AddScoped<Bank.Application.Interfaces.IStatementService, Bank.Application.Services.StatementService>();
         services.AddScoped<Bank.Application.Interfaces.IStatementGenerator, Bank.Application.Services.StatementGenerator>();
+
+        // Loan Services
+        services.AddScoped<Bank.Application.Interfaces.ILoanService, Bank.Application.Services.LoanService>();
+        services.AddScoped<Bank.Application.Interfaces.ILoanInterestCalculationService, Bank.Application.Services.LoanInterestCalculationService>();
+        services.AddScoped<Bank.Application.Interfaces.ILoanAnalyticsService, Bank.Application.Services.LoanAnalyticsService>();
+        
+        // Card Services
+        services.AddScoped<Bank.Application.Interfaces.ICardService, Bank.Application.Services.CardService>();
+        services.AddScoped<Bank.Application.Interfaces.ICardNetworkService, Bank.Application.Services.CardNetworkService>();
+        services.AddScoped<Bank.Application.Interfaces.IPinManagementService, Bank.Application.Services.PinManagementService>();
+        
+        // Bill Payment Services
+        services.AddScoped<Bank.Application.Interfaces.IBillPaymentService, Bank.Application.Services.BillPaymentService>();
+        services.AddScoped<Bank.Application.Interfaces.IBillerIntegrationService, Bank.Application.Services.BillerIntegrationService>();
+        services.AddScoped<Bank.Application.Interfaces.IPaymentRetryService, Bank.Application.Services.PaymentRetryService>();
+        services.AddScoped<Bank.Application.Interfaces.IPaymentReceiptService, Bank.Application.Services.PaymentReceiptService>();
+        services.AddScoped<Bank.Application.Interfaces.IBillPresentmentService, Bank.Application.Services.BillPresentmentService>();
+        
+        // Deposit Services
+        services.AddScoped<Bank.Application.Interfaces.IDepositService, Bank.Application.Services.DepositService>();
+        services.AddScoped<Bank.Application.Services.IDepositMaturityService, Bank.Application.Services.DepositMaturityService>();
+        services.AddScoped<Bank.Application.Services.IDepositWithdrawalService, Bank.Application.Services.DepositWithdrawalService>();
+        
+        // HTTP Client for external integrations
+        services.AddHttpClient<Bank.Application.Services.BillerIntegrationService>();
+        
+        // Notification Services
+        services.AddScoped<Bank.Application.Interfaces.INotificationService, Bank.Application.Services.NotificationService>();
+        
+        // Background Services
+        services.AddHostedService<Bank.Application.Services.LoanBackgroundService>();
+        services.AddHostedService<Bank.Application.Services.BillPaymentBackgroundService>();
+        services.AddHostedService<Bank.Application.Services.BillerHealthCheckBackgroundService>();
+        services.AddHostedService<Bank.Application.Services.DepositBackgroundService>();
 
         // Financial Calculation Services
         services.AddScoped<Bank.Application.Interfaces.IFeeCalculationService, Bank.Application.Services.FeeCalculationService>();

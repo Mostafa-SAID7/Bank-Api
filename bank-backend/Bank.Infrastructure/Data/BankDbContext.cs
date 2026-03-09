@@ -37,6 +37,29 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Beneficiary> Beneficiaries => Set<Beneficiary>();
     public DbSet<AccountStatement> AccountStatements => Set<AccountStatement>();
     public DbSet<StatementTransaction> StatementTransactions => Set<StatementTransaction>();
+    public DbSet<Loan> Loans => Set<Loan>();
+    public DbSet<LoanPayment> LoanPayments => Set<LoanPayment>();
+    public DbSet<LoanDocument> LoanDocuments => Set<LoanDocument>();
+    public DbSet<LoanStatusHistory> LoanStatusHistories => Set<LoanStatusHistory>();
+    public DbSet<Card> Cards => Set<Card>();
+    public DbSet<CardTransaction> CardTransactions => Set<CardTransaction>();
+    public DbSet<CardAuthorization> CardAuthorizations => Set<CardAuthorization>();
+    public DbSet<CardStatement> CardStatements => Set<CardStatement>();
+    public DbSet<CardStatusHistory> CardStatusHistories => Set<CardStatusHistory>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationPreference> NotificationPreferences => Set<NotificationPreference>();
+    public DbSet<Biller> Billers => Set<Biller>();
+    public DbSet<BillPayment> BillPayments => Set<BillPayment>();
+    public DbSet<BillPresentment> BillPresentments => Set<BillPresentment>();
+    public DbSet<PaymentReceipt> PaymentReceipts => Set<PaymentReceipt>();
+    public DbSet<PaymentRetry> PaymentRetries => Set<PaymentRetry>();
+    public DbSet<BillerHealthCheck> BillerHealthChecks => Set<BillerHealthCheck>();
+    public DbSet<DepositProduct> DepositProducts => Set<DepositProduct>();
+    public DbSet<InterestTier> InterestTiers => Set<InterestTier>();
+    public DbSet<FixedDeposit> FixedDeposits => Set<FixedDeposit>();
+    public DbSet<DepositTransaction> DepositTransactions => Set<DepositTransaction>();
+    public DbSet<DepositCertificate> DepositCertificates => Set<DepositCertificate>();
+    public DbSet<MaturityNotice> MaturityNotices => Set<MaturityNotice>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +96,29 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
         modelBuilder.Entity<Beneficiary>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<AccountStatement>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<StatementTransaction>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<Loan>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<LoanPayment>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<LoanDocument>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<LoanStatusHistory>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<Card>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<CardTransaction>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<CardAuthorization>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<CardStatement>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<CardStatusHistory>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<Notification>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<NotificationPreference>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<Biller>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<BillPayment>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<BillPresentment>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<PaymentReceipt>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<PaymentRetry>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<BillerHealthCheck>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<DepositProduct>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<InterestTier>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<FixedDeposit>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<DepositTransaction>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<DepositCertificate>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<MaturityNotice>().HasQueryFilter(e => !e.IsDeleted);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

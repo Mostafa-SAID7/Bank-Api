@@ -317,6 +317,77 @@ public class StatementController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get available transaction categories for filtering
+    /// </summary>
+    [HttpGet("categories")]
+    public async Task<ActionResult<List<string>>> GetTransactionCategories()
+    {
+        try
+        {
+            await Task.CompletedTask; // Simulate async operation
+            
+            var categories = new List<string>
+            {
+                "Income",
+                "Food & Dining",
+                "Transportation",
+                "Utilities",
+                "Housing",
+                "Healthcare",
+                "Fees & Charges",
+                "Interest",
+                "Transfers",
+                "ATM & Cash",
+                "Shopping",
+                "Entertainment",
+                "Other"
+            };
+            
+            return Ok(categories);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving transaction categories");
+            return StatusCode(500, "An error occurred while retrieving transaction categories");
+        }
+    }
+
+    /// <summary>
+    /// Get statement statistics for a specific account and period
+    /// </summary>
+    [HttpGet("statistics/{accountId:guid}")]
+    public async Task<ActionResult<StatementStatistics>> GetStatementStatistics(
+        Guid accountId,
+        [FromQuery] DateTime startDate,
+        [FromQuery] DateTime endDate)
+    {
+        try
+        {
+            var summary = await _statementService.GetStatementSummaryAsync(accountId, startDate, endDate);
+            
+            var statistics = new StatementStatistics
+            {
+                AccountId = accountId,
+                PeriodStart = startDate,
+                PeriodEnd = endDate,
+                TransactionCount = summary.TransactionCount,
+                TotalIncome = summary.TotalIncome,
+                TotalExpenses = summary.TotalExpenses,
+                NetChange = summary.NetChange,
+                CategoryBreakdown = summary.CategoryBreakdown,
+                MonthlyBreakdown = summary.MonthlyBreakdown
+            };
+            
+            return Ok(statistics);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating statement statistics for account {AccountId}", accountId);
+            return StatusCode(500, "An error occurred while generating statement statistics");
+        }
+    }
+
     #region Private Helper Methods
 
     private Guid GetCurrentUserId()
@@ -332,20 +403,3 @@ public class StatementController : ControllerBase
     #endregion
 }
 
-/// <summary>
-/// Request model for delivering statements
-/// </summary>
-public class DeliverStatementRequest
-{
-    public StatementDeliveryMethod DeliveryMethod { get; set; }
-    public string DeliveryAddress { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Validation result model
-/// </summary>
-public class ValidationResult
-{
-    public bool IsValid { get; set; }
-    public List<string> Errors { get; set; } = new();
-}

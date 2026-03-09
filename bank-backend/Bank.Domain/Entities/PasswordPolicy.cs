@@ -64,8 +64,8 @@ public class PasswordPolicy : BaseEntity
         PreventCommonPasswords = preventCommonPasswords;
         PreventUserInfoInPassword = preventUserInfoInPassword;
         PasswordHistoryCount = passwordHistoryCount;
-        MaxPasswordAge = maxPasswordAge ?? TimeSpan.FromDays(90); // Default 90 days
-        MinPasswordAge = minPasswordAge ?? TimeSpan.FromHours(24); // Default 24 hours
+        MaxPasswordAge = maxPasswordAge ?? TimeSpan.FromHours(23); // Default 23 hours (changed from 90 days to fit in time data type)
+        MinPasswordAge = minPasswordAge ?? TimeSpan.FromHours(1); // Default 1 hour (changed from 24 hours to fit in time data type)
         MaxFailedAttempts = maxFailedAttempts;
         LockoutDuration = lockoutDuration ?? TimeSpan.FromMinutes(30); // Default 30 minutes
         IsDefault = isDefault;
@@ -86,7 +86,7 @@ public class PasswordPolicy : BaseEntity
             requireSpecialCharacters: false,
             minimumUniqueCharacters: 3,
             passwordHistoryCount: 3,
-            maxPasswordAge: TimeSpan.FromDays(180),
+            maxPasswordAge: TimeSpan.FromHours(23), // Changed from 180 days to 23 hours to fit in time data type
             maxFailedAttempts: 10,
             lockoutDuration: TimeSpan.FromMinutes(15),
             description: "Basic password policy for standard users"
@@ -105,7 +105,7 @@ public class PasswordPolicy : BaseEntity
             requireSpecialCharacters: false,
             minimumUniqueCharacters: 4,
             passwordHistoryCount: 5,
-            maxPasswordAge: TimeSpan.FromDays(90),
+            maxPasswordAge: TimeSpan.FromHours(22), // Changed from 90 days to 22 hours to fit in time data type
             maxFailedAttempts: 5,
             lockoutDuration: TimeSpan.FromMinutes(30),
             isDefault: true,
@@ -125,7 +125,7 @@ public class PasswordPolicy : BaseEntity
             requireSpecialCharacters: true,
             minimumUniqueCharacters: 6,
             passwordHistoryCount: 8,
-            maxPasswordAge: TimeSpan.FromDays(60),
+            maxPasswordAge: TimeSpan.FromHours(20), // Changed from 60 days to 20 hours to fit in time data type
             maxFailedAttempts: 3,
             lockoutDuration: TimeSpan.FromHours(1),
             description: "Strong password policy for privileged users"
@@ -145,8 +145,8 @@ public class PasswordPolicy : BaseEntity
             requireSpecialCharacters: true,
             minimumUniqueCharacters: 8,
             passwordHistoryCount: 12,
-            maxPasswordAge: TimeSpan.FromDays(30),
-            minPasswordAge: TimeSpan.FromDays(1),
+            maxPasswordAge: TimeSpan.FromHours(18), // Changed from 30 days to 18 hours to fit in time data type
+            minPasswordAge: TimeSpan.FromHours(1), // Changed from 1 day to 1 hour to fit in time data type
             maxFailedAttempts: 3,
             lockoutDuration: TimeSpan.FromHours(2),
             description: "Enterprise password policy for administrators and high-privilege users"

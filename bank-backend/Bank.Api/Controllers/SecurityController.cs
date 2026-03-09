@@ -1,3 +1,4 @@
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -484,45 +485,6 @@ public class SecurityController : ControllerBase
 
     #endregion
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
-    }
+    private Guid GetCurrentUserId() => this.GetCurrentUserId();
 }
 
-#region Request Models
-
-public class AddIpWhitelistRequest
-{
-    public string IpAddress { get; set; } = string.Empty;
-    public IpWhitelistType Type { get; set; }
-    public string Description { get; set; } = string.Empty;
-    public string? IpRange { get; set; }
-    public DateTime? ExpiresAt { get; set; }
-}
-
-public class ApproveIpWhitelistRequest
-{
-    public string? Notes { get; set; }
-}
-
-public class ValidatePasswordRequest
-{
-    public string Password { get; set; } = string.Empty;
-    public PasswordComplexityLevel? ComplexityLevel { get; set; }
-}
-
-public class GeneratePasswordRequest
-{
-    public PasswordComplexityLevel ComplexityLevel { get; set; } = PasswordComplexityLevel.Standard;
-}
-
-public class LockAccountRequest
-{
-    public AccountLockoutReason Reason { get; set; }
-    public TimeSpan? LockoutDuration { get; set; }
-    public string? Notes { get; set; }
-}
-
-#endregion

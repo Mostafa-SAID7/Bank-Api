@@ -34,3 +34,10 @@ public class SessionInfo
     public bool IsAdminSession { get; set; }
     public DateTime CreatedAt { get; set; }
 }
+/// <summary>
+/// Request model for refreshing session tokens
+/// </summary>
+public class RefreshTokenRequest
+{
+    public string RefreshToken { get; set; } = string.Empty;
+}

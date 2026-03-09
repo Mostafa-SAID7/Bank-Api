@@ -177,3 +177,12 @@ public class BeneficiaryStatistics
     public decimal TotalTransferAmount { get; set; }
     public int TotalTransfers { get; set; }
 }
+/// <summary>
+/// Request to update transfer limits
+/// </summary>
+public class UpdateTransferLimitsRequest
+{
+    public decimal? DailyLimit { get; set; }
+    public decimal? MonthlyLimit { get; set; }
+    public decimal? SingleLimit { get; set; }
+}

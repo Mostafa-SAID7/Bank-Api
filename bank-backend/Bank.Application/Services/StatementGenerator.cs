@@ -277,12 +277,48 @@ public class StatementGenerator : IStatementGenerator
         html.AppendLine($"<tr><td>Opening Balance:</td><td>${statement.OpeningBalance:N2}</td></tr>");
         html.AppendLine($"<tr><td>Closing Balance:</td><td>${statement.ClosingBalance:N2}</td></tr>");
         html.AppendLine($"<tr><td>Average Balance:</td><td>${statement.AverageBalance:N2}</td></tr>");
+        html.AppendLine($"<tr><td>Minimum Balance:</td><td>${statement.MinimumBalance:N2}</td></tr>");
+        html.AppendLine($"<tr><td>Maximum Balance:</td><td>${statement.MaximumBalance:N2}</td></tr>");
         html.AppendLine($"<tr><td>Total Credits:</td><td>${statement.TotalCredits:N2}</td></tr>");
         html.AppendLine($"<tr><td>Total Debits:</td><td>${statement.TotalDebits:N2}</td></tr>");
         html.AppendLine($"<tr><td>Total Fees:</td><td>${statement.TotalFees:N2}</td></tr>");
         html.AppendLine($"<tr><td>Interest Earned:</td><td>${statement.InterestEarned:N2}</td></tr>");
+        html.AppendLine($"<tr><td>Interest Charged:</td><td>${statement.InterestCharged:N2}</td></tr>");
         html.AppendLine("</table>");
         html.AppendLine("</div>");
+        
+        // Account Statistics (Requirement 3.8)
+        if (statement.Transactions?.Any() == true)
+        {
+            var monthlyStats = CalculateMonthlyStatistics(statement);
+            html.AppendLine("<div class='monthly-statistics'>");
+            html.AppendLine("<h3>Monthly Statistics</h3>");
+            html.AppendLine("<table>");
+            html.AppendLine($"<tr><td>Average Monthly Credits:</td><td>${monthlyStats.AverageMonthlyCredits:N2}</td></tr>");
+            html.AppendLine($"<tr><td>Average Monthly Debits:</td><td>${monthlyStats.AverageMonthlyDebits:N2}</td></tr>");
+            html.AppendLine($"<tr><td>Average Transaction Amount:</td><td>${monthlyStats.AverageTransactionAmount:N2}</td></tr>");
+            html.AppendLine($"<tr><td>Largest Credit:</td><td>${monthlyStats.LargestCredit:N2}</td></tr>");
+            html.AppendLine($"<tr><td>Largest Debit:</td><td>${monthlyStats.LargestDebit:N2}</td></tr>");
+            html.AppendLine($"<tr><td>Days with Activity:</td><td>{monthlyStats.DaysWithActivity}</td></tr>");
+            html.AppendLine("</table>");
+            html.AppendLine("</div>");
+        }
+        
+        // Fee Summary (Requirement 3.9)
+        if (statement.TotalFees > 0)
+        {
+            var feeSummary = CalculateFeeSummary(statement);
+            html.AppendLine("<div class='fee-summary'>");
+            html.AppendLine("<h3>Fee Summary</h3>");
+            html.AppendLine("<table>");
+            foreach (var fee in feeSummary)
+            {
+                html.AppendLine($"<tr><td>{fee.Key}:</td><td>${fee.Value:N2}</td></tr>");
+            }
+            html.AppendLine($"<tr class='total-row'><td><strong>Total Fees:</strong></td><td><strong>${statement.TotalFees:N2}</strong></td></tr>");
+            html.AppendLine("</table>");
+            html.AppendLine("</div>");
+        }
         
         // Transaction Details
         if (statement.Transactions?.Any() == true)
@@ -318,8 +354,40 @@ public class StatementGenerator : IStatementGenerator
         {
             html.AppendLine("<div class='disclosures'>");
             html.AppendLine("<h3>Important Disclosures</h3>");
-            html.AppendLine("<p><small>This statement is provided for informational purposes. Please review all transactions carefully and report any discrepancies within 30 days.</small></p>");
+            html.AppendLine("<div class='disclosure-section'>");
+            html.AppendLine("<h4>Account Information</h4>");
+            html.AppendLine("<p><small>This statement is provided for informational purposes. Please review all transactions carefully and report any discrepancies within 30 days of the statement date.</small></p>");
+            html.AppendLine("<p><small>For questions about your account, please contact customer service at 1-800-BANK-123 or visit our website.</small></p>");
+            html.AppendLine("</div>");
+            
+            html.AppendLine("<div class='disclosure-section'>");
+            html.AppendLine("<h4>Regulatory Information</h4>");
             html.AppendLine("<p><small>FDIC Insured - Equal Housing Lender - Member FDIC</small></p>");
+            html.AppendLine("<p><small>Your deposits are insured up to $250,000 per depositor, per insured bank, for each account ownership category.</small></p>");
+            html.AppendLine("<p><small>This institution is an Equal Opportunity Lender and complies with all applicable federal civil rights laws.</small></p>");
+            html.AppendLine("</div>");
+            
+            html.AppendLine("<div class='disclosure-section'>");
+            html.AppendLine("<h4>Privacy Notice</h4>");
+            html.AppendLine("<p><small>We are committed to protecting your privacy. We do not sell customer information to third parties.</small></p>");
+            html.AppendLine("<p><small>For our complete privacy policy, visit our website or request a copy by calling customer service.</small></p>");
+            html.AppendLine("</div>");
+            
+            html.AppendLine("<div class='disclosure-section'>");
+            html.AppendLine("<h4>Electronic Statements</h4>");
+            html.AppendLine("<p><small>Electronic statements are available through online banking and mobile app.</small></p>");
+            html.AppendLine("<p><small>You may opt out of electronic statements at any time by contacting customer service.</small></p>");
+            html.AppendLine("</div>");
+            
+            if (statement.TotalFees > 0)
+            {
+                html.AppendLine("<div class='disclosure-section'>");
+                html.AppendLine("<h4>Fee Information</h4>");
+                html.AppendLine("<p><small>Fees charged during this statement period are detailed in the Fee Summary section above.</small></p>");
+                html.AppendLine("<p><small>For a complete fee schedule, please refer to your account agreement or visit our website.</small></p>");
+                html.AppendLine("</div>");
+            }
+            
             html.AppendLine("</div>");
         }
         
@@ -332,18 +400,24 @@ public class StatementGenerator : IStatementGenerator
     private string GetDefaultCssStyles()
     {
         return @"
-            body { font-family: Arial, sans-serif; margin: 20px; }
+            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
             .bank-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
             .statement-header { margin-bottom: 20px; }
-            .account-info, .balance-summary { margin-bottom: 20px; }
+            .account-info, .balance-summary, .monthly-statistics, .fee-summary { margin-bottom: 20px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
             th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
             th { background-color: #f2f2f2; font-weight: bold; }
             .transaction-table { margin-top: 10px; }
             .credit { color: green; font-weight: bold; }
             .debit { color: red; font-weight: bold; }
+            .total-row { border-top: 2px solid #333; font-weight: bold; }
             .disclosures { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 12px; }
+            .disclosure-section { margin-bottom: 15px; }
+            .disclosure-section h4 { margin-bottom: 5px; color: #555; font-size: 13px; }
+            .monthly-statistics table, .fee-summary table { background-color: #f9f9f9; }
+            .monthly-statistics h3, .fee-summary h3 { color: #2c5aa0; }
             h1, h2, h3 { color: #333; }
+            h4 { color: #555; margin-top: 15px; margin-bottom: 5px; }
         ";
     }
 
@@ -591,6 +665,107 @@ public class StatementGenerator : IStatementGenerator
         html.AppendLine("</html>");
         
         return html.ToString();
+    }
+
+    #endregion
+
+    #region Advanced Statistics Helper Methods
+
+    private MonthlyStatistics CalculateMonthlyStatistics(AccountStatement statement)
+    {
+        if (statement.Transactions?.Any() != true)
+        {
+            return new MonthlyStatistics();
+        }
+
+        var transactions = statement.Transactions.ToList();
+        var periodMonths = ((statement.PeriodEndDate.Year - statement.PeriodStartDate.Year) * 12) + 
+                          statement.PeriodEndDate.Month - statement.PeriodStartDate.Month + 1;
+
+        var credits = transactions.Where(t => t.Amount > 0).ToList();
+        var debits = transactions.Where(t => t.Amount < 0).ToList();
+
+        return new MonthlyStatistics
+        {
+            AverageMonthlyCredits = credits.Any() ? credits.Sum(t => t.Amount) / Math.Max(1, periodMonths) : 0,
+            AverageMonthlyDebits = debits.Any() ? Math.Abs(debits.Sum(t => t.Amount)) / Math.Max(1, periodMonths) : 0,
+            AverageTransactionAmount = transactions.Any() ? transactions.Average(t => Math.Abs(t.Amount)) : 0,
+            LargestCredit = credits.Any() ? credits.Max(t => t.Amount) : 0,
+            LargestDebit = debits.Any() ? Math.Abs(debits.Min(t => t.Amount)) : 0,
+            DaysWithActivity = transactions.Select(t => t.TransactionDate.Date).Distinct().Count()
+        };
+    }
+
+    private Dictionary<string, decimal> CalculateFeeSummary(AccountStatement statement)
+    {
+        var feeSummary = new Dictionary<string, decimal>();
+
+        if (statement.Transactions?.Any() != true)
+        {
+            return feeSummary;
+        }
+
+        // Group fees by category based on transaction description
+        var feeTransactions = statement.Transactions
+            .Where(t => t.Amount < 0 && (t.Description.ToLower().Contains("fee") || 
+                                       t.Description.ToLower().Contains("charge") ||
+                                       t.Description.ToLower().Contains("penalty")))
+            .ToList();
+
+        foreach (var transaction in feeTransactions)
+        {
+            var feeType = DetermineFeeType(transaction.Description);
+            if (feeSummary.ContainsKey(feeType))
+            {
+                feeSummary[feeType] += Math.Abs(transaction.Amount);
+            }
+            else
+            {
+                feeSummary[feeType] = Math.Abs(transaction.Amount);
+            }
+        }
+
+        return feeSummary;
+    }
+
+    private string DetermineFeeType(string description)
+    {
+        var desc = description.ToLower();
+        
+        if (desc.Contains("maintenance") || desc.Contains("monthly"))
+            return "Monthly Maintenance Fee";
+        if (desc.Contains("overdraft") || desc.Contains("nsf"))
+            return "Overdraft Fee";
+        if (desc.Contains("atm") || desc.Contains("withdrawal"))
+            return "ATM/Withdrawal Fee";
+        if (desc.Contains("transfer") || desc.Contains("wire"))
+            return "Transfer Fee";
+        if (desc.Contains("foreign") || desc.Contains("international"))
+            return "Foreign Transaction Fee";
+        if (desc.Contains("minimum") || desc.Contains("balance"))
+            return "Minimum Balance Fee";
+        if (desc.Contains("dormancy") || desc.Contains("inactive"))
+            return "Dormancy Fee";
+        if (desc.Contains("stop") || desc.Contains("payment"))
+            return "Stop Payment Fee";
+        if (desc.Contains("check") || desc.Contains("returned"))
+            return "Returned Check Fee";
+        
+        return "Other Fees";
+    }
+
+    #endregion
+
+    #region Helper Classes
+
+    private class MonthlyStatistics
+    {
+        public decimal AverageMonthlyCredits { get; set; }
+        public decimal AverageMonthlyDebits { get; set; }
+        public decimal AverageTransactionAmount { get; set; }
+        public decimal LargestCredit { get; set; }
+        public decimal LargestDebit { get; set; }
+        public int DaysWithActivity { get; set; }
     }
 
     #endregion

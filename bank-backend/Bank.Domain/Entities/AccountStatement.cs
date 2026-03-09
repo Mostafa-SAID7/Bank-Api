@@ -96,6 +96,40 @@ public class AccountStatement : BaseEntity
             CreditTransactions = Transactions.Count(t => t.Amount > 0);
             TotalDebits = Math.Abs(Transactions.Where(t => t.Amount < 0).Sum(t => t.Amount));
             TotalCredits = Transactions.Where(t => t.Amount > 0).Sum(t => t.Amount);
+            
+            // Calculate min/max balances from running balances (Requirement 3.8)
+            var balances = Transactions.Select(t => t.RunningBalance).ToList();
+            balances.Add(OpeningBalance); // Include opening balance
+            
+            MinimumBalance = balances.Min();
+            MaximumBalance = balances.Max();
+            
+            // Calculate average balance (weighted by time)
+            AverageBalance = balances.Average();
+            
+            // Calculate fee totals from fee transactions
+            TotalFees = Math.Abs(Transactions
+                .Where(t => t.Amount < 0 && (t.Description.ToLower().Contains("fee") || 
+                                           t.Description.ToLower().Contains("charge") ||
+                                           t.Description.ToLower().Contains("penalty")))
+                .Sum(t => t.Amount));
+                
+            // Calculate interest earned
+            InterestEarned = Transactions
+                .Where(t => t.Amount > 0 && t.Description.ToLower().Contains("interest"))
+                .Sum(t => t.Amount);
+                
+            // Calculate interest charged
+            InterestCharged = Math.Abs(Transactions
+                .Where(t => t.Amount < 0 && t.Description.ToLower().Contains("interest"))
+                .Sum(t => t.Amount));
+        }
+        else
+        {
+            // Set defaults when no transactions
+            MinimumBalance = OpeningBalance;
+            MaximumBalance = OpeningBalance;
+            AverageBalance = OpeningBalance;
         }
     }
 }

@@ -1,3 +1,4 @@
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -352,19 +353,6 @@ public class BeneficiaryController : ControllerBase
         }
     }
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
-    }
+    private Guid GetCurrentUserId() => this.GetCurrentUserId();
 }
 
-/// <summary>
-/// Request to update transfer limits
-/// </summary>
-public class UpdateTransferLimitsRequest
-{
-    public decimal? DailyLimit { get; set; }
-    public decimal? MonthlyLimit { get; set; }
-    public decimal? SingleLimit { get; set; }
-}
