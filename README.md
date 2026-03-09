@@ -1,5 +1,17 @@
 # Bank Management System
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=alert_status&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=bugs&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=code_smells&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=coverage&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=duplicated_lines_density&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=ncloc&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=sqale_rating&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=reliability_rating&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=security_rating&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=sqale_index&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Mostafa-SAID7_Bank-Api&metric=vulnerabilities&token=64cd308bb15671223d91856900d4d1e23843ad91)](https://sonarcloud.io/summary/new_code?id=Mostafa-SAID7_Bank-Api)
+
 A comprehensive banking API built with .NET 9.0 and Clean Architecture principles.
 
 ## Features
