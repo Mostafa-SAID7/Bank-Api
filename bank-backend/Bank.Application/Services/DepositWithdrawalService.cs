@@ -32,7 +32,7 @@ public class DepositWithdrawalService : IDepositWithdrawalService
     public async Task<DetailedWithdrawalCalculation> CalculateDetailedWithdrawalAsync(Guid depositId, decimal withdrawalAmount)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.DepositProduct));
+            .GetByIdAsync(depositId);
         
         if (deposit == null)
             throw new InvalidOperationException($"Fixed deposit {depositId} not found");
@@ -95,7 +95,7 @@ public class DepositWithdrawalService : IDepositWithdrawalService
             }
 
             var deposit = await _unitOfWork.Repository<FixedDeposit>()
-                .GetByIdAsync(depositId, include: q => q.Include(d => d.LinkedAccount));
+                .GetByIdAsync(depositId);
 
             // Process the withdrawal
             await ProcessWithdrawalTransactionsAsync(deposit!, calculation, request, processedByUserId);
@@ -109,7 +109,7 @@ public class DepositWithdrawalService : IDepositWithdrawalService
                 processedByUserId,
                 "FixedDeposit",
                 "EarlyWithdrawal",
-                depositId,
+                depositId.ToString(),
                 $"Processed early withdrawal of {request.WithdrawalAmount:C} from deposit {deposit!.DepositNumber}, penalty {calculation.TotalPenalty:C}");
         }
         catch (Exception ex)
@@ -128,7 +128,7 @@ public class DepositWithdrawalService : IDepositWithdrawalService
     public async Task<PenaltyFreePeriodsDto> GetPenaltyFreePeriodsAsync(Guid depositId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.DepositProduct));
+            .GetByIdAsync(depositId);
         
         if (deposit == null)
             throw new InvalidOperationException($"Fixed deposit {depositId} not found");
@@ -161,14 +161,12 @@ public class DepositWithdrawalService : IDepositWithdrawalService
     public async Task<IEnumerable<WithdrawalHistoryDto>> GetWithdrawalHistoryAsync(Guid depositId)
     {
         var transactions = await _unitOfWork.Repository<DepositTransaction>()
-            .GetAllAsync(
-                predicate: t => t.FixedDepositId == depositId && 
-                               (t.TransactionType == DepositTransactionType.EarlyWithdrawal ||
-                                t.TransactionType == DepositTransactionType.PartialWithdrawal ||
-                                t.TransactionType == DepositTransactionType.MaturityPayout),
-                orderBy: q => q.OrderByDescending(t => t.TransactionDate));
+            .FindAsync(t => t.FixedDepositId == depositId && 
+                           (t.TransactionType == DepositTransactionType.EarlyWithdrawal ||
+                            t.TransactionType == DepositTransactionType.PartialWithdrawal ||
+                            t.TransactionType == DepositTransactionType.MaturityPayout));
 
-        return transactions.Select(t => new WithdrawalHistoryDto
+        return transactions.OrderByDescending(t => t.TransactionDate).Select(t => new WithdrawalHistoryDto
         {
             TransactionId = t.Id,
             TransactionReference = t.TransactionReference,

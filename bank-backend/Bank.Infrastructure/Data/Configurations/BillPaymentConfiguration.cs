@@ -208,7 +208,7 @@ public class BillPresentmentConfiguration : IEntityTypeConfiguration<BillPresent
         // Enum configurations
         builder.Property(bp => bp.Status)
             .HasConversion<int>()
-            .HasDefaultValue(Bank.Application.DTOs.BillPresentmentStatus.Pending);
+            .HasDefaultValue(Bank.Domain.Enums.BillPresentmentStatus.Pending);
 
         // Relationships
         builder.HasOne(bp => bp.Customer)

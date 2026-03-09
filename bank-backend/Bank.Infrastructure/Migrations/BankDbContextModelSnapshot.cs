@@ -55,6 +55,9 @@ namespace Bank.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -963,6 +966,390 @@ namespace Bank.Infrastructure.Migrations
                     b.ToTable("Beneficiaries");
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.BillPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("BillerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)")
+                        .HasDefaultValue("USD");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasDefaultValue("");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ProcessedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("RecurringPaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillerId")
+                        .HasDatabaseName("IX_BillPayments_BillerId");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_BillPayments_CustomerId");
+
+                    b.HasIndex("RecurringPaymentId")
+                        .HasDatabaseName("IX_BillPayments_RecurringPaymentId");
+
+                    b.HasIndex("ScheduledDate")
+                        .HasDatabaseName("IX_BillPayments_ScheduledDate");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_BillPayments_Status");
+
+                    b.HasIndex("CustomerId", "Status")
+                        .HasDatabaseName("IX_BillPayments_CustomerId_Status");
+
+                    b.HasIndex("Status", "ScheduledDate")
+                        .HasDatabaseName("IX_BillPayments_Status_ScheduledDate");
+
+                    b.ToTable("BillPayments", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.BillPresentment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BillNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("BillerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)")
+                        .HasDefaultValue("USD");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalBillId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LineItemsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("MinimumPayment")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StatementDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillerId")
+                        .HasDatabaseName("IX_BillPresentments_BillerId");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_BillPresentments_CustomerId");
+
+                    b.HasIndex("DueDate")
+                        .HasDatabaseName("IX_BillPresentments_DueDate");
+
+                    b.HasIndex("ExternalBillId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_BillPresentments_ExternalBillId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_BillPresentments_Status");
+
+                    b.HasIndex("CustomerId", "Status")
+                        .HasDatabaseName("IX_BillPresentments_CustomerId_Status");
+
+                    b.ToTable("BillPresentments", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.Biller", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("MaxAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(10000.00m);
+
+                    b.Property<decimal>("MinAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0.01m);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ProcessingDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("RoutingNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SupportedPaymentMethods")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasDefaultValue("[]");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category")
+                        .HasDatabaseName("IX_Billers_Category");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_Billers_IsActive");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Billers_Name");
+
+                    b.HasIndex("AccountNumber", "RoutingNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Billers_AccountNumber_RoutingNumber");
+
+                    b.ToTable("Billers", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.BillerHealthCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BillerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CheckDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ConsecutiveFailures")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("HealthMetricsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHealthy")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("LastSuccessfulCheck")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("ResponseTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillerId")
+                        .HasDatabaseName("IX_BillerHealthChecks_BillerId");
+
+                    b.HasIndex("CheckDate")
+                        .HasDatabaseName("IX_BillerHealthChecks_CheckDate");
+
+                    b.HasIndex("IsHealthy")
+                        .HasDatabaseName("IX_BillerHealthChecks_IsHealthy");
+
+                    b.HasIndex("BillerId", "CheckDate")
+                        .HasDatabaseName("IX_BillerHealthChecks_BillerId_CheckDate");
+
+                    b.ToTable("BillerHealthChecks", (string)null);
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.Card", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1115,6 +1502,198 @@ namespace Bank.Infrastructure.Migrations
                     b.ToTable("Cards", (string)null);
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.CardAuthorization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("AuthorizationCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CaptureDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("CapturedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsContactless")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsInternational")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MerchantCategory")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MerchantCountry")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NetworkTransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProcessorResponse")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("VoidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VoidReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardId");
+
+                    b.ToTable("CardAuthorizations");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.CardStatement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("CurrentBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DeliveryMethod")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Format")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GeneratedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("GeneratedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("MinimumPayment")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PaymentDueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PreviousBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ToDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalFees")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalSpent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TransactionCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardId");
+
+                    b.ToTable("CardStatements");
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.CardStatusHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1198,9 +1777,6 @@ namespace Bank.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
@@ -1208,13 +1784,10 @@ namespace Bank.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime?>("AuthorizationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("BalanceAfterTransaction")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<Guid>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CardId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1223,7 +1796,7 @@ namespace Bank.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CurrencyCode")
+                    b.Property<string>("Currency")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(3)
@@ -1244,20 +1817,12 @@ namespace Bank.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<decimal?>("ExchangeRate")
-                        .HasColumnType("decimal(10,6)");
+                    b.Property<string>("FeeBreakdown")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<decimal>("Fee")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0m);
-
-                    b.Property<string>("FeeDescription")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal?>("FraudScore")
-                        .HasColumnType("decimal(5,4)");
+                    b.Property<decimal?>("Fees")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsContactless")
                         .ValueGeneratedOnAdd()
@@ -1266,11 +1831,6 @@ namespace Bank.Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("IsFraudulent")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsInternational")
                         .ValueGeneratedOnAdd()
@@ -1282,46 +1842,33 @@ namespace Bank.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<int?>("MerchantCategory")
+                    b.Property<int>("MerchantCategory")
                         .HasColumnType("int");
 
-                    b.Property<string>("MerchantCity")
+                    b.Property<string>("MerchantCountry")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("MerchantCountryCode")
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
 
                     b.Property<string>("MerchantId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("MerchantName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Metadata")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasComment("Additional transaction metadata in JSON format");
-
-                    b.Property<string>("NetworkTransactionId")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<decimal?>("OriginalAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("MerchantName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("OriginalCurrencyCode")
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
+                    b.Property<Guid?>("OriginalTransactionId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("PinUsed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Property<string>("ProcessorResponse")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Reference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("SettlementDate")
                         .HasColumnType("datetime2");
@@ -1329,19 +1876,12 @@ namespace Bank.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TerminalId")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime>("TransactionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("TransactionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Type")
+                    b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1352,22 +1892,19 @@ namespace Bank.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .HasDatabaseName("IX_CardTransactions_AccountId");
+                    b.HasIndex("AuthorizationCode")
+                        .HasDatabaseName("IX_CardTransactions_AuthorizationCode")
+                        .HasFilter("[AuthorizationCode] IS NOT NULL");
 
                     b.HasIndex("CardId")
                         .HasDatabaseName("IX_CardTransactions_CardId");
 
-                    b.HasIndex("FraudScore")
-                        .HasDatabaseName("IX_CardTransactions_FraudScore")
-                        .HasFilter("[FraudScore] IS NOT NULL");
+                    b.HasIndex("CardId1");
 
                     b.HasIndex("MerchantId")
                         .HasDatabaseName("IX_CardTransactions_MerchantId");
 
-                    b.HasIndex("NetworkTransactionId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_CardTransactions_NetworkTransactionId");
+                    b.HasIndex("OriginalTransactionId");
 
                     b.HasIndex("SettlementDate")
                         .HasDatabaseName("IX_CardTransactions_SettlementDate");
@@ -1378,10 +1915,8 @@ namespace Bank.Infrastructure.Migrations
                     b.HasIndex("TransactionDate")
                         .HasDatabaseName("IX_CardTransactions_TransactionDate");
 
-                    b.HasIndex("TransactionId");
-
-                    b.HasIndex("Type")
-                        .HasDatabaseName("IX_CardTransactions_Type");
+                    b.HasIndex("TransactionType")
+                        .HasDatabaseName("IX_CardTransactions_TransactionType");
 
                     b.HasIndex("CardId", "Status")
                         .HasDatabaseName("IX_CardTransactions_CardId_Status");
@@ -1390,6 +1925,370 @@ namespace Bank.Infrastructure.Migrations
                         .HasDatabaseName("IX_CardTransactions_CardId_TransactionDate");
 
                     b.ToTable("CardTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.DepositCertificate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CertificateContent")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("CertificateNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte[]>("CertificatePdf")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("CertificateTemplate")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeliveryAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DeliveryReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DigitalSignature")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("FixedDepositId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("GeneratedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("IssuedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PdfFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ProcessingNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid?>("ReplacedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacedCertificateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReplacementReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SecurityHash")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("VerificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateNumber")
+                        .IsUnique();
+
+                    b.HasIndex("FixedDepositId");
+
+                    b.HasIndex("GeneratedByUserId");
+
+                    b.HasIndex("IssueDate");
+
+                    b.HasIndex("IssuedByUserId");
+
+                    b.HasIndex("ReplacedByUserId");
+
+                    b.HasIndex("ReplacedCertificateId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("DepositCertificates", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.DepositProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AllowAutoRenewal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AllowPartialWithdrawals")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("AutoRenewalNoticeDays")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("BaseInterestRate")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("CompoundingFrequency")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DefaultMaturityAction")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DefaultTermDays")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("HasTieredRates")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("InterestCalculationMethod")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("MaximumBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("MaximumTermDays")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("MinimumBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinimumOpeningBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("MinimumTermDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("PenaltyAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PenaltyFreeDays")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("PenaltyPercentage")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("PenaltyType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("PromotionalRate")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<DateTime?>("PromotionalRateEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PromotionalRateStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("ProductType");
+
+                    b.HasIndex("ProductType", "IsActive");
+
+                    b.ToTable("DepositProducts", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.DepositTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AccountTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("FixedDepositId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("InterestDays")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("InterestPeriodEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("InterestPeriodStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("InterestRate")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PenaltyReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("PenaltyType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ProcessedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ProcessedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProcessingNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid?>("RelatedTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransactionReference")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountTransactionId");
+
+                    b.HasIndex("FixedDepositId");
+
+                    b.HasIndex("ProcessedByUserId");
+
+                    b.HasIndex("RelatedTransactionId");
+
+                    b.HasIndex("TransactionDate");
+
+                    b.HasIndex("TransactionReference")
+                        .IsUnique();
+
+                    b.HasIndex("TransactionType");
+
+                    b.HasIndex("FixedDepositId", "TransactionDate");
+
+                    b.HasIndex("FixedDepositId", "TransactionType");
+
+                    b.ToTable("DepositTransactions", (string)null);
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.FeeSchedule", b =>
@@ -1481,6 +2380,239 @@ namespace Bank.Infrastructure.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.ToTable("FeeSchedules");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.FixedDeposit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AccruedInterest")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("AutoRenewalEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ClosedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ClosureDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ClosureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("CompoundingFrequency")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("CustomerConsentReceived")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DepositNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid>("DepositProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("InterestCalculationMethod")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastInterestCalculationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkedAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MaturityAction")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("MaturityDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("NetAmountPaid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PenaltyAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PenaltyApplied")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PenaltyPercentage")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("PenaltyType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PrincipalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RenewalCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RenewalNoticeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RenewalTermDays")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("RenewedFromDepositId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RenewedToDepositId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TermDays")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClosedByUserId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("DepositNumber")
+                        .IsUnique();
+
+                    b.HasIndex("DepositProductId");
+
+                    b.HasIndex("LinkedAccountId");
+
+                    b.HasIndex("MaturityDate");
+
+                    b.HasIndex("RenewedFromDepositId")
+                        .IsUnique()
+                        .HasFilter("[RenewedFromDepositId] IS NOT NULL");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("CustomerId", "Status");
+
+                    b.HasIndex("Status", "MaturityDate");
+
+                    b.ToTable("FixedDeposits", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.InterestTier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DepositProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EffectiveFromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveToDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPromotional")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("MaximumBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinimumBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TierBasis")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TierName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepositProductId");
+
+                    b.HasIndex("DisplayOrder");
+
+                    b.HasIndex("DepositProductId", "IsActive");
+
+                    b.HasIndex("DepositProductId", "MinimumBalance");
+
+                    b.ToTable("InterestTiers", (string)null);
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.IpWhitelist", b =>
@@ -2012,6 +3144,377 @@ namespace Bank.Infrastructure.Migrations
                     b.ToTable("LoanStatusHistories", (string)null);
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.MaturityNotice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("ConsentReceived")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CustomerChoice")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustomerInstructions")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("CustomerResponseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeliveryAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("DeliveryAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DeliveryChannel")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("FixedDepositId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("FollowUpDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("GeneratedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("MaturityDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("NoticeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoticeNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("NoticeType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProcessedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProcessingNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("RemindersSent")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RequiresFollowUp")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TemplateUsed")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FixedDepositId");
+
+                    b.HasIndex("GeneratedByUserId");
+
+                    b.HasIndex("MaturityDate");
+
+                    b.HasIndex("NoticeNumber")
+                        .IsUnique();
+
+                    b.HasIndex("NoticeType");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("Status", "NoticeDate");
+
+                    b.ToTable("MaturityNotices", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Channel")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalReferenceId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("en");
+
+                    b.Property<int>("MaxRetries")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(3);
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RetryCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("ScheduledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TemplateId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("ScheduledAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("Type");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "Status");
+
+                    b.ToTable("Notifications", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.NotificationPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AccountUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("AllowCriticalDuringQuietHours")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("CardAlerts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("en");
+
+                    b.Property<bool>("LoanAlerts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("LowBalanceAlerts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal>("LowBalanceThreshold")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(100m);
+
+                    b.Property<bool>("MarketingNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("PaymentReminders")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PreferredChannels")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasDefaultValue("[1,2]");
+
+                    b.Property<TimeSpan?>("QuietHoursEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("QuietHoursStart")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("SecurityAlerts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("UTC");
+
+                    b.Property<decimal>("TransactionAlertThreshold")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<bool>("TransactionAlerts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("NotificationPreferences", (string)null);
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.PasswordHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2174,6 +3677,197 @@ namespace Bank.Infrastructure.Migrations
                         .HasDatabaseName("IX_PasswordPolicies_Name");
 
                     b.ToTable("PasswordPolicies");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.PaymentReceipt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BillerName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ConfirmationNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)")
+                        .HasDefaultValue("USD");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ProcessedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("ProcessingFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ReceiptDataJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiptNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConfirmationNumber")
+                        .HasDatabaseName("IX_PaymentReceipts_ConfirmationNumber");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_PaymentReceipts_CustomerId");
+
+                    b.HasIndex("PaymentId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PaymentReceipts_PaymentId");
+
+                    b.HasIndex("ReceiptNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PaymentReceipts_ReceiptNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PaymentReceipts_Status");
+
+                    b.ToTable("PaymentReceipts", (string)null);
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.PaymentRetry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AttemptDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AttemptNumber")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("BackoffDelay")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FailureReason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsMaxRetriesReached")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("NextRetryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RetryMetadataJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsMaxRetriesReached")
+                        .HasDatabaseName("IX_PaymentRetries_IsMaxRetriesReached");
+
+                    b.HasIndex("NextRetryDate")
+                        .HasDatabaseName("IX_PaymentRetries_NextRetryDate");
+
+                    b.HasIndex("PaymentId")
+                        .HasDatabaseName("IX_PaymentRetries_PaymentId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PaymentRetries_Status");
+
+                    b.HasIndex("PaymentId", "AttemptNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PaymentRetries_PaymentId_AttemptNumber");
+
+                    b.ToTable("PaymentRetries", (string)null);
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.PaymentTemplate", b =>
@@ -3182,6 +4876,69 @@ namespace Bank.Infrastructure.Migrations
                     b.Navigation("VerifiedByUser");
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.BillPayment", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Biller", "Biller")
+                        .WithMany("BillPayments")
+                        .HasForeignKey("BillerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.RecurringPayment", "RecurringPayment")
+                        .WithMany()
+                        .HasForeignKey("RecurringPaymentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Biller");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("RecurringPayment");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.BillPresentment", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Biller", "Biller")
+                        .WithMany()
+                        .HasForeignKey("BillerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.BillPayment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Biller");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.BillerHealthCheck", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Biller", "Biller")
+                        .WithMany()
+                        .HasForeignKey("BillerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Biller");
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.Card", b =>
                 {
                     b.HasOne("Bank.Domain.Entities.Account", "Account")
@@ -3199,6 +4956,28 @@ namespace Bank.Infrastructure.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.CardAuthorization", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Card", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Card");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.CardStatement", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Card", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Card");
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.CardStatusHistory", b =>
@@ -3221,28 +5000,95 @@ namespace Bank.Infrastructure.Migrations
 
             modelBuilder.Entity("Bank.Domain.Entities.CardTransaction", b =>
                 {
-                    b.HasOne("Bank.Domain.Entities.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Bank.Domain.Entities.Card", "Card")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Bank.Domain.Entities.Transaction", "Transaction")
-                        .WithMany()
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.HasOne("Bank.Domain.Entities.Card", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("CardId1");
 
-                    b.Navigation("Account");
+                    b.HasOne("Bank.Domain.Entities.CardTransaction", "OriginalTransaction")
+                        .WithMany("RelatedTransactions")
+                        .HasForeignKey("OriginalTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Card");
 
-                    b.Navigation("Transaction");
+                    b.Navigation("OriginalTransaction");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.DepositCertificate", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.FixedDeposit", "FixedDeposit")
+                        .WithMany("Certificates")
+                        .HasForeignKey("FixedDepositId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.User", "GeneratedByUser")
+                        .WithMany()
+                        .HasForeignKey("GeneratedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bank.Domain.Entities.User", "IssuedByUser")
+                        .WithMany()
+                        .HasForeignKey("IssuedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bank.Domain.Entities.User", "ReplacedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReplacedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bank.Domain.Entities.DepositCertificate", "ReplacedCertificate")
+                        .WithMany()
+                        .HasForeignKey("ReplacedCertificateId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("FixedDeposit");
+
+                    b.Navigation("GeneratedByUser");
+
+                    b.Navigation("IssuedByUser");
+
+                    b.Navigation("ReplacedByUser");
+
+                    b.Navigation("ReplacedCertificate");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.DepositTransaction", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Transaction", "AccountTransaction")
+                        .WithMany()
+                        .HasForeignKey("AccountTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bank.Domain.Entities.FixedDeposit", "FixedDeposit")
+                        .WithMany("Transactions")
+                        .HasForeignKey("FixedDepositId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.User", "ProcessedByUser")
+                        .WithMany()
+                        .HasForeignKey("ProcessedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bank.Domain.Entities.DepositTransaction", "RelatedTransaction")
+                        .WithMany()
+                        .HasForeignKey("RelatedTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AccountTransaction");
+
+                    b.Navigation("FixedDeposit");
+
+                    b.Navigation("ProcessedByUser");
+
+                    b.Navigation("RelatedTransaction");
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.FeeSchedule", b =>
@@ -3254,6 +5100,58 @@ namespace Bank.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.FixedDeposit", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.User", "ClosedByUser")
+                        .WithMany()
+                        .HasForeignKey("ClosedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bank.Domain.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.DepositProduct", "DepositProduct")
+                        .WithMany("FixedDeposits")
+                        .HasForeignKey("DepositProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.Account", "LinkedAccount")
+                        .WithMany()
+                        .HasForeignKey("LinkedAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.FixedDeposit", "RenewedFromDeposit")
+                        .WithOne("RenewedToDeposit")
+                        .HasForeignKey("Bank.Domain.Entities.FixedDeposit", "RenewedFromDepositId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ClosedByUser");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("DepositProduct");
+
+                    b.Navigation("LinkedAccount");
+
+                    b.Navigation("RenewedFromDeposit");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.InterestTier", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.DepositProduct", "DepositProduct")
+                        .WithMany("InterestTiers")
+                        .HasForeignKey("DepositProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DepositProduct");
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.IpWhitelist", b =>
@@ -3380,6 +5278,46 @@ namespace Bank.Infrastructure.Migrations
                     b.Navigation("Loan");
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.MaturityNotice", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.FixedDeposit", "FixedDeposit")
+                        .WithMany("MaturityNotices")
+                        .HasForeignKey("FixedDepositId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.User", "GeneratedByUser")
+                        .WithMany()
+                        .HasForeignKey("GeneratedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("FixedDeposit");
+
+                    b.Navigation("GeneratedByUser");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.NotificationPreference", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.PasswordHistory", b =>
                 {
                     b.HasOne("Bank.Domain.Entities.User", "User")
@@ -3389,6 +5327,36 @@ namespace Bank.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.PaymentReceipt", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bank.Domain.Entities.BillPayment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.PaymentRetry", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.BillPayment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.PaymentTemplate", b =>
@@ -3615,9 +5583,37 @@ namespace Bank.Infrastructure.Migrations
                     b.Navigation("Transactions");
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.Biller", b =>
+                {
+                    b.Navigation("BillPayments");
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.Card", b =>
                 {
                     b.Navigation("StatusHistory");
+
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.CardTransaction", b =>
+                {
+                    b.Navigation("RelatedTransactions");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.DepositProduct", b =>
+                {
+                    b.Navigation("FixedDeposits");
+
+                    b.Navigation("InterestTiers");
+                });
+
+            modelBuilder.Entity("Bank.Domain.Entities.FixedDeposit", b =>
+                {
+                    b.Navigation("Certificates");
+
+                    b.Navigation("MaturityNotices");
+
+                    b.Navigation("RenewedToDeposit");
 
                     b.Navigation("Transactions");
                 });

@@ -1,4 +1,6 @@
 using Bank.Api.Extensions;
+using Bank.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,9 @@ builder.Services.AddApiDocumentationServices();
 builder.Services.AddCorsServices();
 
 var app = builder.Build();
+
+// === DATABASE MIGRATION ===
+await app.ApplyDatabaseMigrationsAsync();
 
 // === DATA SEEDING ===
 await app.SeedInitialDataAsync();

@@ -1,5 +1,6 @@
 using Bank.Application.Interfaces;
 using Bank.Application.DTOs;
+using Bank.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers;
@@ -21,11 +22,11 @@ public class AuthController : ControllerBase
         try
         {
             var token = await _authService.LoginAsync(request.Email, request.Password);
-            return Ok(new AuthResponse(token));
+            return this.CreateSuccessResponse("Login successful", new AuthResponse(token));
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return this.CreateErrorResponse(ex.Message, 400);
         }
     }
 
@@ -35,11 +36,11 @@ public class AuthController : ControllerBase
         try
         {
             var user = await _authService.RegisterAsync(request.Username, request.Email, request.Password);
-            return Ok(new { user.Id, user.UserName, user.Email });
+            return this.CreateSuccessResponse("Registration successful", new { user.Id, user.UserName, user.Email });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return this.CreateErrorResponse(ex.Message, 400);
         }
     }
 }

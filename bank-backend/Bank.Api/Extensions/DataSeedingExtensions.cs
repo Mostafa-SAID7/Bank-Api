@@ -1,14 +1,58 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Bank.Domain.Entities;
 using Bank.Infrastructure.Data;
 
 namespace Bank.Api.Extensions;
 
 /// <summary>
-/// Extension methods for data seeding
+/// Extension methods for data seeding and database management
 /// </summary>
 public static class DataSeedingExtensions
 {
+    /// <summary>
+    /// Apply pending database migrations
+    /// </summary>
+    public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        try
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<BankDbContext>();
+            
+            logger.LogInformation("Checking for pending database migrations...");
+            
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+            
+            if (pendingMigrations.Any())
+            {
+                logger.LogInformation("Found {Count} pending migrations. Applying...", pendingMigrations.Count());
+                
+                foreach (var migration in pendingMigrations)
+                {
+                    logger.LogInformation("Pending migration: {Migration}", migration);
+                }
+                
+                await dbContext.Database.MigrateAsync();
+                logger.LogInformation("✅ Database migrations applied successfully!");
+            }
+            else
+            {
+                logger.LogInformation("✅ No pending migrations - database is up to date!");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "❌ Error applying database migrations: {Message}", ex.Message);
+            
+            // Don't throw - let the application start even if migrations fail
+            // This allows for manual migration troubleshooting
+            logger.LogWarning("⚠️ Application will continue without applying migrations. Please check database connectivity and apply migrations manually if needed.");
+        }
+    }
+
     /// <summary>
     /// Seed initial data (roles, admin user, policies)
     /// </summary>

@@ -44,9 +44,9 @@ public class PaymentRetryService : IPaymentRetryService
         _logger = logger;
 
         // Load configuration with defaults
-        _maxRetryAttempts = configuration.GetValue("PaymentRetry:MaxAttempts", 3);
-        _baseRetryDelay = TimeSpan.FromMinutes(configuration.GetValue("PaymentRetry:BaseDelayMinutes", 5));
-        _maxRetryDelay = TimeSpan.FromHours(configuration.GetValue("PaymentRetry:MaxDelayHours", 24));
+        _maxRetryAttempts = int.TryParse(_configuration["PaymentRetry:MaxAttempts"], out var maxAttempts) ? maxAttempts : 3;
+        _baseRetryDelay = TimeSpan.FromMinutes(int.TryParse(_configuration["PaymentRetry:BaseDelayMinutes"], out var baseDelay) ? baseDelay : 5);
+        _maxRetryDelay = TimeSpan.FromHours(int.TryParse(_configuration["PaymentRetry:MaxDelayHours"], out var maxDelay) ? maxDelay : 24);
     }
 
     public async Task<PaymentRetryResult> SchedulePaymentRetryAsync(PaymentRetryRequest request)

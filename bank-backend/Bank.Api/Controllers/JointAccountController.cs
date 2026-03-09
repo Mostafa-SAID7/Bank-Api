@@ -1,3 +1,4 @@
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Interfaces;
@@ -40,13 +41,13 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserIdRequired();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
             if (!hasAccess)
             {
-                return Forbid("You don't have access to this account");
+                return this.CreateForbiddenResponse("You don't have access to this account");
             }
 
             var success = await _jointAccountService.AddJointHolderAsync(
@@ -54,15 +55,15 @@ public class JointAccountController : ControllerBase
 
             if (success)
             {
-                return Ok(new { Success = true, Message = "Joint holder added successfully" });
+                return this.CreateSuccessResponse("Joint holder added successfully");
             }
 
-            return BadRequest(new { Success = false, Message = "Failed to add joint holder" });
+            return this.CreateErrorResponse("Failed to add joint holder", 400);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error adding joint holder to account {AccountId}", request.AccountId);
-            return StatusCode(500, new { Success = false, Message = "An error occurred while adding joint holder" });
+            return this.CreateErrorResponse("An error occurred while adding joint holder");
         }
     }
 
@@ -74,13 +75,13 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserIdRequired();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
             if (!hasAccess)
             {
-                return Forbid("You don't have access to this account");
+                return this.CreateForbiddenResponse("You don't have access to this account");
             }
 
             var success = await _jointAccountService.RemoveJointHolderAsync(
@@ -88,15 +89,15 @@ public class JointAccountController : ControllerBase
 
             if (success)
             {
-                return Ok(new { Success = true, Message = "Joint holder removed successfully" });
+                return this.CreateSuccessResponse("Joint holder removed successfully");
             }
 
-            return BadRequest(new { Success = false, Message = "Failed to remove joint holder" });
+            return this.CreateErrorResponse("Failed to remove joint holder", 400);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error removing joint holder from account {AccountId}", request.AccountId);
-            return StatusCode(500, new { Success = false, Message = "An error occurred while removing joint holder" });
+            return this.CreateErrorResponse("An error occurred while removing joint holder");
         }
     }
 
@@ -108,7 +109,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
@@ -142,7 +143,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(accountId, currentUserId);
@@ -199,7 +200,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             
             // Only allow checking permissions for current user or if user is admin
             if (request.UserId != currentUserId && !User.IsInRole("Admin"))
@@ -239,7 +240,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             var accounts = await _jointAccountService.GetAccountsForUserAsync(currentUserId);
             
             var accountDtos = accounts.Select(a => new AccountDto
@@ -259,7 +260,7 @@ public class JointAccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving accounts for user {UserId}", GetCurrentUserId());
+            _logger.LogError(ex, "Error retrieving accounts for user {UserId}", this.GetCurrentUserId());
             return StatusCode(500, "An error occurred while retrieving accounts");
         }
     }
@@ -272,7 +273,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
@@ -319,7 +320,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
@@ -353,7 +354,7 @@ public class JointAccountController : ControllerBase
     {
         try
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = this.GetCurrentUserId();
             
             // Verify current user has access to the account
             var hasAccess = await _accountService.CanUserAccessAccountAsync(accountId, currentUserId);
@@ -410,13 +411,7 @@ public class JointAccountController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving joint account summary for account {AccountId}", accountId);
-            return StatusCode(500, "An error occurred while retrieving joint account summary");
+            return this.CreateErrorResponse("An error occurred while retrieving joint account summary");
         }
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
     }
 }

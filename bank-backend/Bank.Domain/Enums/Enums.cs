@@ -585,14 +585,17 @@ public enum BillerCategory
 {
     Utilities = 1,       // Electric, Gas, Water, Sewer
     Telecommunications = 2, // Phone, Internet, Cable TV
+    Telecom = 2,         // Alias for Telecommunications
     Insurance = 3,       // Auto, Home, Life, Health Insurance
     Credit = 4,          // Credit Cards, Loans
+    CreditCard = 4,      // Alias for Credit
     Government = 5,      // Taxes, Fees, Fines
     Healthcare = 6,      // Medical, Dental, Vision
     Education = 7,       // Tuition, Student Loans
     Retail = 8,          // Store Cards, Subscriptions
     Transportation = 9,  // Auto Loans, Transit Passes
-    Other = 10          // Miscellaneous billers
+    Mortgage = 10,       // Home Mortgages
+    Other = 11          // Miscellaneous billers
 }
 /// <summary>
 /// Bill payment status

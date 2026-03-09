@@ -5,6 +5,8 @@ using Bank.Domain.Entities;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using DomainBillPresentmentStatus = Bank.Domain.Enums.BillPresentmentStatus;
+using DTOBillPresentmentStatus = Bank.Application.DTOs.BillPresentmentStatus;
 
 namespace Bank.Application.Services;
 
@@ -33,7 +35,7 @@ public class BillPresentmentService : IBillPresentmentService
         _logger = logger;
     }
 
-    public async Task<List<BillPresentmentDto>> GetCustomerBillPresentmentsAsync(Guid customerId, BillPresentmentStatus? status = null)
+    public async Task<List<BillPresentmentDto>> GetCustomerBillPresentmentsAsync(Guid customerId, DomainBillPresentmentStatus? status = null)
     {
         try
         {
@@ -125,7 +127,7 @@ public class BillPresentmentService : IBillPresentmentService
                 StatementDate = request.StatementDate,
                 BillNumber = request.BillNumber,
                 ExternalBillId = request.ExternalBillId,
-                Status = BillPresentmentStatus.Available,
+                Status = DomainBillPresentmentStatus.Presented,
                 LineItemsJson = JsonSerializer.Serialize(request.LineItems)
             };
 
@@ -148,7 +150,7 @@ public class BillPresentmentService : IBillPresentmentService
         }
     }
 
-    public async Task<bool> UpdateBillPresentmentStatusAsync(Guid presentmentId, BillPresentmentStatus status)
+    public async Task<bool> UpdateBillPresentmentStatusAsync(Guid presentmentId, DomainBillPresentmentStatus status)
     {
         try
         {
@@ -253,7 +255,7 @@ public class BillPresentmentService : IBillPresentmentService
 
             foreach (var presentment in overduePresentments)
             {
-                if (presentment.Status == BillPresentmentStatus.Available && presentment.IsOverdue())
+                if (presentment.Status == DomainBillPresentmentStatus.Presented && presentment.IsOverdue())
                 {
                     presentment.MarkAsOverdue();
                     _billPresentmentRepository.Update(presentment);
@@ -362,11 +364,25 @@ public class BillPresentmentService : IBillPresentmentService
             DueDate = presentment.DueDate,
             StatementDate = presentment.StatementDate,
             Currency = presentment.Currency,
-            Status = presentment.Status,
+            Status = ConvertToDto(presentment.Status),
             BillNumber = presentment.BillNumber,
             LineItems = lineItems,
             CreatedAt = presentment.CreatedAt,
             PaidDate = presentment.PaidDate
+        };
+    }
+
+    private static DTOBillPresentmentStatus ConvertToDto(DomainBillPresentmentStatus domainStatus)
+    {
+        return domainStatus switch
+        {
+            DomainBillPresentmentStatus.Pending => DTOBillPresentmentStatus.Pending,
+            DomainBillPresentmentStatus.Presented => DTOBillPresentmentStatus.Available,
+            DomainBillPresentmentStatus.Viewed => DTOBillPresentmentStatus.Available,
+            DomainBillPresentmentStatus.Paid => DTOBillPresentmentStatus.Paid,
+            DomainBillPresentmentStatus.Overdue => DTOBillPresentmentStatus.Overdue,
+            DomainBillPresentmentStatus.Cancelled => DTOBillPresentmentStatus.Cancelled,
+            _ => DTOBillPresentmentStatus.Pending
         };
     }
 

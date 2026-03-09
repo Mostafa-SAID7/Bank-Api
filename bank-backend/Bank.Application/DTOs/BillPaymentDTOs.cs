@@ -2,6 +2,18 @@ using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs;
 
+/// <summary>
+/// Bill presentment status for DTOs
+/// </summary>
+public enum BillPresentmentStatus
+{
+    Pending = 1,
+    Available = 2,
+    Paid = 3,
+    Overdue = 4,
+    Cancelled = 5
+}
+
 // Biller DTOs
 public record CreateBillerRequest(
     string Name,

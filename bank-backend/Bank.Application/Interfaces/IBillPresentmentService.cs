@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Domain.Common;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.Interfaces;
 
@@ -11,7 +12,7 @@ public interface IBillPresentmentService
     /// <summary>
     /// Get bill presentments for a customer
     /// </summary>
-    Task<List<BillPresentmentDto>> GetCustomerBillPresentmentsAsync(Guid customerId, BillPresentmentStatus? status = null);
+    Task<List<BillPresentmentDto>> GetCustomerBillPresentmentsAsync(Guid customerId, Bank.Domain.Enums.BillPresentmentStatus? status = null);
 
     /// <summary>
     /// Get bill presentments by biller
@@ -36,7 +37,7 @@ public interface IBillPresentmentService
     /// <summary>
     /// Update bill presentment status
     /// </summary>
-    Task<bool> UpdateBillPresentmentStatusAsync(Guid presentmentId, BillPresentmentStatus status);
+    Task<bool> UpdateBillPresentmentStatusAsync(Guid presentmentId, Bank.Domain.Enums.BillPresentmentStatus status);
 
     /// <summary>
     /// Mark bill presentment as paid
@@ -82,6 +83,6 @@ public class BillPresentmentSyncResult
     public string ExternalBillId { get; set; } = string.Empty;
     public bool Success { get; set; }
     public string Message { get; set; } = string.Empty;
-    public BillPresentmentStatus Status { get; set; }
+    public Bank.Domain.Enums.BillPresentmentStatus Status { get; set; }
     public DateTime SyncDate { get; set; }
 }

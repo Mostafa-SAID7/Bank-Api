@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text.Json;
+using DomainPaymentMethod = Bank.Domain.Enums.PaymentMethod;
+using DomainBillPresentmentStatus = Bank.Domain.Enums.BillPresentmentStatus;
 
 namespace Bank.Application.Services;
 
@@ -110,7 +113,7 @@ public class BillerIntegrationService : IBillerIntegrationService
                 ExternalReference = externalReference,
                 Status = status,
                 LastUpdated = DateTime.UtcNow,
-                StatusMessage = GetStatusMessage(status),
+                StatusMessage = ValidationHelper.GetBillPaymentStatusMessage(status),
                 DeliveredDate = status == BillPaymentStatus.Delivered ? DateTime.UtcNow.AddHours(-1) : null
             };
         }
@@ -257,10 +260,10 @@ public class BillerIntegrationService : IBillerIntegrationService
             return biller.Category switch
             {
                 BillerCategory.Utilities => new List<string> { "ACH", "Check", "RealTimePayment" },
-                BillerCategory.CreditCard => new List<string> { "ACH", "Wire", "RealTimePayment" },
+                BillerCategory.Credit => new List<string> { "ACH", "Wire", "RealTimePayment" },
                 BillerCategory.Insurance => new List<string> { "ACH", "Check" },
-                BillerCategory.Mortgage => new List<string> { "ACH", "Wire", "Check" },
-                BillerCategory.Telecom => new List<string> { "ACH", "CreditCard", "DebitCard" },
+                BillerCategory.Transportation => new List<string> { "ACH", "Wire", "Check" },
+                BillerCategory.Telecommunications => new List<string> { "ACH", "CreditCard", "DebitCard" },
                 _ => new List<string> { "ACH", "Check" }
             };
         }
@@ -402,8 +405,8 @@ public class BillerIntegrationService : IBillerIntegrationService
             return new PaymentRoutingPreferences
             {
                 BillerId = billerId,
-                PreferredMethod = PaymentMethod.ACH,
-                SupportedMethods = new List<PaymentMethod> { PaymentMethod.ACH }
+                PreferredMethod = DomainPaymentMethod.ACH,
+                SupportedMethods = new List<DomainPaymentMethod> { DomainPaymentMethod.ACH }
             };
         }
 
@@ -413,18 +416,18 @@ public class BillerIntegrationService : IBillerIntegrationService
             BillerCategory.Utilities => new PaymentRoutingPreferences
             {
                 BillerId = billerId,
-                PreferredMethod = PaymentMethod.ACH,
-                SupportedMethods = new List<PaymentMethod> { PaymentMethod.ACH, PaymentMethod.Check, PaymentMethod.RealTimePayment },
+                PreferredMethod = DomainPaymentMethod.ACH,
+                SupportedMethods = new List<DomainPaymentMethod> { DomainPaymentMethod.ACH, DomainPaymentMethod.Check, DomainPaymentMethod.WireTransfer },
                 ProcessingWindow = TimeSpan.FromHours(2),
                 MaxDailyAmount = 50000m,
                 MaxDailyTransactions = 1000,
                 RequiresPreAuthorization = false
             },
-            BillerCategory.CreditCard => new PaymentRoutingPreferences
+            BillerCategory.Credit => new PaymentRoutingPreferences
             {
                 BillerId = billerId,
-                PreferredMethod = PaymentMethod.RealTimePayment,
-                SupportedMethods = new List<PaymentMethod> { PaymentMethod.ACH, PaymentMethod.Wire, PaymentMethod.RealTimePayment },
+                PreferredMethod = DomainPaymentMethod.ACH,
+                SupportedMethods = new List<DomainPaymentMethod> { DomainPaymentMethod.ACH, DomainPaymentMethod.WireTransfer, DomainPaymentMethod.CreditCard },
                 ProcessingWindow = TimeSpan.FromMinutes(30),
                 MaxDailyAmount = 100000m,
                 MaxDailyTransactions = 500,
@@ -433,8 +436,8 @@ public class BillerIntegrationService : IBillerIntegrationService
             _ => new PaymentRoutingPreferences
             {
                 BillerId = billerId,
-                PreferredMethod = PaymentMethod.ACH,
-                SupportedMethods = new List<PaymentMethod> { PaymentMethod.ACH, PaymentMethod.Check },
+                PreferredMethod = DomainPaymentMethod.ACH,
+                SupportedMethods = new List<DomainPaymentMethod> { DomainPaymentMethod.ACH, DomainPaymentMethod.Check },
                 ProcessingWindow = TimeSpan.FromHours(4),
                 MaxDailyAmount = 25000m,
                 MaxDailyTransactions = 200,
@@ -502,10 +505,10 @@ public class BillerIntegrationService : IBillerIntegrationService
         var processingDelay = biller.Category switch
         {
             BillerCategory.Utilities => 100,
-            BillerCategory.CreditCard => 50,
+            BillerCategory.Credit => 50,
             BillerCategory.Insurance => 200,
-            BillerCategory.Mortgage => 300,
-            BillerCategory.Telecom => 75,
+            BillerCategory.Transportation => 300,
+            BillerCategory.Telecommunications => 75,
             _ => 150
         };
 
@@ -513,23 +516,19 @@ public class BillerIntegrationService : IBillerIntegrationService
 
         // Simulate success/failure based on amount (higher amounts have higher chance of additional verification)
         var successRate = request.Amount > 10000 ? 0.85 : 0.95;
-        using var rng = RandomNumberGenerator.Create();
-        var randomBytes = new byte[4];
-        rng.GetBytes(randomBytes);
-        var randomValue = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) / (double)int.MaxValue;
-        var isSuccess = randomValue < successRate;
+        var isSuccess = ValidationHelper.GenerateRandomBoolean(successRate);
 
         if (isSuccess)
         {
             return new BillerPaymentResponse
             {
                 Success = true,
-                ExternalReference = $"EXT-{Guid.NewGuid():N}"[..16],
-                ConfirmationNumber = GenerateConfirmationNumber(),
+                ExternalReference = TokenGenerationHelper.GenerateExternalReference(),
+                ConfirmationNumber = TokenGenerationHelper.GenerateConfirmationNumber(),
                 Status = BillPaymentStatus.Processing,
                 ProcessedDate = DateTime.UtcNow,
                 Message = "Payment submitted successfully",
-                ProcessingFee = CalculateProcessingFee(request.Amount, request.PaymentMethod),
+                ProcessingFee = CalculationHelper.CalculateProcessingFee(request.Amount, request.PaymentMethod),
                 ExpectedDeliveryDate = DateTime.UtcNow.AddDays(biller.ProcessingDays)
             };
         }
@@ -548,37 +547,21 @@ public class BillerIntegrationService : IBillerIntegrationService
     private async Task<bool> SimulateBillerHealthCheck(Biller biller, CancellationToken cancellationToken)
     {
         // Simulate network delay
-        using var rng = RandomNumberGenerator.Create();
-        var delayBytes = new byte[4];
-        rng.GetBytes(delayBytes);
-        var delay = Math.Abs(BitConverter.ToInt32(delayBytes, 0)) % 900 + 100;
+        var delay = ValidationHelper.GenerateRandomNumber(100, 1000);
         await Task.Delay(delay, cancellationToken);
 
         // Simulate health based on biller category (some are more reliable than others)
         var healthRate = biller.Category switch
         {
             BillerCategory.Utilities => 0.95,
-            BillerCategory.CreditCard => 0.98,
+            BillerCategory.Credit => 0.98,
             BillerCategory.Insurance => 0.90,
-            BillerCategory.Mortgage => 0.92,
-            BillerCategory.Telecom => 0.88,
+            BillerCategory.Transportation => 0.92,
+            BillerCategory.Telecommunications => 0.88,
             _ => 0.85
         };
 
-        using var rng = RandomNumberGenerator.Create();
-        var healthBytes = new byte[4];
-        rng.GetBytes(healthBytes);
-        var healthValue = Math.Abs(BitConverter.ToInt32(healthBytes, 0)) / (double)int.MaxValue;
-        return healthValue < healthRate;
-    }
-
-    private static string GenerateConfirmationNumber()
-    {
-        using var rng = RandomNumberGenerator.Create();
-        var randomBytes = new byte[4];
-        rng.GetBytes(randomBytes);
-        var random = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % 9000 + 1000;
-        return $"CNF-{DateTime.UtcNow:yyyyMMddHHmmss}-{random}";
+        return ValidationHelper.GenerateRandomBoolean(healthRate);
     }
 
     private static BillPaymentStatus SimulatePaymentStatusCheck(string externalReference)
@@ -594,35 +577,6 @@ public class BillerIntegrationService : IBillerIntegrationService
             2 => BillPaymentStatus.Delivered,
             3 => BillPaymentStatus.Failed,
             _ => BillPaymentStatus.Processing
-        };
-    }
-
-    private static string GetStatusMessage(BillPaymentStatus status)
-    {
-        return status switch
-        {
-            BillPaymentStatus.Pending => "Payment is pending processing",
-            BillPaymentStatus.Processing => "Payment is being processed",
-            BillPaymentStatus.Processed => "Payment has been processed successfully",
-            BillPaymentStatus.Delivered => "Payment has been delivered to the biller",
-            BillPaymentStatus.Failed => "Payment processing failed",
-            BillPaymentStatus.Cancelled => "Payment was cancelled",
-            BillPaymentStatus.Returned => "Payment was returned by the biller",
-            _ => "Unknown status"
-        };
-    }
-
-    private static decimal? CalculateProcessingFee(decimal amount, Domain.Enums.PaymentMethod paymentMethod)
-    {
-        return paymentMethod switch
-        {
-            Domain.Enums.PaymentMethod.ACH => Math.Max(0.50m, amount * 0.001m),
-            Domain.Enums.PaymentMethod.WireTransfer => 15.00m,
-            Domain.Enums.PaymentMethod.Check => 2.50m,
-            Domain.Enums.PaymentMethod.BankTransfer => Math.Max(1.00m, amount * 0.002m),
-            PaymentMethod.CreditCard => amount * 0.025m,
-            PaymentMethod.DebitCard => amount * 0.015m,
-            _ => 1.00m
         };
     }
 
@@ -654,7 +608,7 @@ public class BillerIntegrationService : IBillerIntegrationService
             DueDate = presentment.DueDate,
             StatementDate = presentment.StatementDate,
             Currency = presentment.Currency,
-            Status = presentment.Status,
+            Status = (Bank.Application.DTOs.BillPresentmentStatus)presentment.Status,
             BillNumber = presentment.BillNumber,
             LineItems = lineItems,
             CreatedAt = presentment.CreatedAt,

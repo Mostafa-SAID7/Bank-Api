@@ -1,6 +1,6 @@
-using Bank.Application.DTOs;
 using Bank.Domain.Common;
 using Bank.Domain.Entities;
+using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +60,7 @@ public class BillPresentmentRepository : Repository<BillPresentment>, IBillPrese
         return await _dbSet
             .Include(bp => bp.Customer)
             .Include(bp => bp.Biller)
-            .Where(bp => bp.Status == BillPresentmentStatus.Available && 
+            .Where(bp => bp.Status == BillPresentmentStatus.Presented && 
                         bp.DueDate.Date < today &&
                         !bp.IsDeleted)
             .OrderBy(bp => bp.DueDate)
@@ -96,7 +96,7 @@ public class BillPresentmentRepository : Repository<BillPresentment>, IBillPrese
         return await _dbSet
             .Include(bp => bp.Customer)
             .Include(bp => bp.Biller)
-            .Where(bp => bp.Status == BillPresentmentStatus.Available &&
+            .Where(bp => bp.Status == BillPresentmentStatus.Presented &&
                         bp.DueDate.Date <= targetDate &&
                         bp.DueDate.Date >= DateTime.UtcNow.Date &&
                         !bp.IsDeleted)

@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -385,9 +386,6 @@ public class SessionService : ISessionService
 
     private static string GenerateSecureToken()
     {
-        using var rng = RandomNumberGenerator.Create();
-        var tokenBytes = new byte[32];
-        rng.GetBytes(tokenBytes);
-        return Convert.ToBase64String(tokenBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
+        return TokenGenerationHelper.GenerateSecureToken(32);
     }
 }

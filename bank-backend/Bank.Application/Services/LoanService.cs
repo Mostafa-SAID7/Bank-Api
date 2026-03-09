@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -643,16 +644,7 @@ public class LoanService : ILoanService
             _ => 10.0m
         };
 
-        var scoreAdjustment = creditScore switch
-        {
-            >= 800 => -2.0m,
-            >= 740 => -1.0m,
-            >= 670 => 0.0m,
-            >= 580 => 1.5m,
-            _ => 3.0m
-        };
-
-        return Math.Max(3.0m, baseRate + scoreAdjustment);
+        return CalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate / 100, 0.25m) * 100;
     }
 
     private static decimal CalculateMaxLoanAmount(int creditScore, decimal requestedAmount)
@@ -731,42 +723,12 @@ public class LoanService : ILoanService
     private static (decimal principalAmount, decimal interestAmount) CalculatePaymentAllocation(Loan loan, decimal paymentAmount)
     {
         var monthlyInterestRate = loan.InterestRate / 100 / 12;
-        var interestAmount = loan.OutstandingBalance * monthlyInterestRate;
-        var principalAmount = Math.Max(0, paymentAmount - interestAmount);
-
-        // Ensure we don't pay more principal than outstanding
-        principalAmount = Math.Min(principalAmount, loan.OutstandingBalance);
-
-        return (Math.Round(principalAmount, 2), Math.Round(interestAmount, 2));
+        return CalculationHelper.CalculatePaymentAllocation(loan.OutstandingBalance, paymentAmount, monthlyInterestRate);
     }
 
     private static LoanDto MapToLoanDto(Loan loan)
     {
-        return new LoanDto
-        {
-            Id = loan.Id,
-            LoanNumber = loan.LoanNumber,
-            Type = loan.Type,
-            TypeName = loan.Type.ToString(),
-            PrincipalAmount = loan.PrincipalAmount,
-            InterestRate = loan.InterestRate,
-            TermInMonths = loan.TermInMonths,
-            Status = loan.Status,
-            StatusName = loan.Status.ToString(),
-            ApplicationDate = loan.ApplicationDate,
-            ApprovalDate = loan.ApprovalDate,
-            DisbursementDate = loan.DisbursementDate,
-            MaturityDate = loan.MaturityDate,
-            OutstandingBalance = loan.OutstandingBalance,
-            MonthlyPaymentAmount = loan.MonthlyPaymentAmount,
-            NextPaymentDueDate = loan.NextPaymentDueDate,
-            DaysOverdue = loan.DaysOverdue,
-            TotalInterestPaid = loan.TotalInterestPaid,
-            TotalPrincipalPaid = loan.TotalPrincipalPaid,
-            Purpose = loan.Purpose,
-            CreditScore = loan.CreditScore,
-            CreditScoreRange = loan.CreditScoreRange
-        };
+        return MappingHelper.MapToLoanDto(loan);
     }
 
     #endregion

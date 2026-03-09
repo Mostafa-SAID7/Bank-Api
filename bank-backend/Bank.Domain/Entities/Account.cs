@@ -9,7 +9,8 @@ public class Account : BaseEntity
     public string AccountHolderName { get; set; } = string.Empty;
     public decimal Balance { get; set; }
     
-    // Existing properties
+    // Customer relationship
+    public Guid CustomerId { get; set; } // Add CustomerId for compatibility
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 

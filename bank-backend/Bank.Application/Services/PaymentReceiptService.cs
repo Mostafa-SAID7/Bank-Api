@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Common;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -79,7 +80,7 @@ public class PaymentReceiptService : IPaymentReceiptService
                 ProcessedDate = payment.ProcessedDate ?? DateTime.UtcNow,
                 ConfirmationNumber = GenerateConfirmationNumber(),
                 Reference = payment.Reference,
-                PaymentMethod = PaymentMethod.ACH, // Default, could be enhanced to track actual method
+                PaymentMethod = Bank.Domain.Enums.PaymentMethod.ACH, // Default, could be enhanced to track actual method
                 Status = payment.Status,
                 ReceiptDataJson = JsonSerializer.Serialize(new
                 {
@@ -148,7 +149,7 @@ public class PaymentReceiptService : IPaymentReceiptService
 
             var receiptDtos = result.Items.Select(MapToPaymentReceiptDto).ToList();
 
-            return new PagedResult<PaymentReceiptDto>
+            return new Bank.Domain.Common.PagedResult<PaymentReceiptDto>
             {
                 Items = receiptDtos,
                 TotalCount = result.TotalCount,
@@ -159,7 +160,7 @@ public class PaymentReceiptService : IPaymentReceiptService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting customer receipts for customer {CustomerId}", customerId);
-            return new PagedResult<PaymentReceiptDto>
+            return new Bank.Domain.Common.PagedResult<PaymentReceiptDto>
             {
                 Items = new List<PaymentReceiptDto>(),
                 TotalCount = 0,
@@ -297,12 +298,7 @@ public class PaymentReceiptService : IPaymentReceiptService
 
     private static string GenerateConfirmationNumber()
     {
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        using var rng = RandomNumberGenerator.Create();
-        var randomBytes = new byte[4];
-        rng.GetBytes(randomBytes);
-        var random = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % 900000 + 100000;
-        return $"CNF{timestamp}{random}";
+        return TokenGenerationHelper.GenerateConfirmationNumber();
     }
 
     private static byte[] GenerateMockPdfContent(PaymentReceipt receipt)

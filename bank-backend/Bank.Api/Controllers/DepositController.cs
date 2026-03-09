@@ -1,6 +1,7 @@
 using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Services;
 using Bank.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -93,7 +94,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var product = await _depositService.CreateDepositProductAsync(request, userId);
             return CreatedAtAction(nameof(GetDepositProduct), new { productId = product.Id }, product);
         }
@@ -113,7 +114,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var product = await _depositService.UpdateDepositProductAsync(productId, request, userId);
             return Ok(product);
         }
@@ -137,7 +138,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var success = await _depositService.DeactivateDepositProductAsync(productId, userId);
             if (!success)
                 return NotFound($"Deposit product {productId} not found");
@@ -182,7 +183,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var tier = await _depositService.CreateInterestTierAsync(productId, request, userId);
             return CreatedAtAction(nameof(GetInterestTiers), new { productId }, tier);
         }
@@ -206,7 +207,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var tier = await _depositService.UpdateInterestTierAsync(tierId, request, userId);
             return Ok(tier);
         }
@@ -230,7 +231,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var success = await _depositService.DeleteInterestTierAsync(tierId, userId);
             if (!success)
                 return NotFound($"Interest tier {tierId} not found");
@@ -255,7 +256,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var customerId = this.GetUserId();
+            var customerId = this.GetCurrentUserId();
             var deposit = await _depositService.CreateFixedDepositAsync(request, customerId);
             return CreatedAtAction(nameof(GetFixedDeposit), new { depositId = deposit.Id }, deposit);
         }
@@ -283,7 +284,7 @@ public class DepositController : ControllerBase
                 return NotFound($"Fixed deposit {depositId} not found");
 
             // Ensure user can only access their own deposits (unless admin)
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             if (userRole != "Admin" && deposit.CustomerId != userId)
                 return Forbid("You can only access your own deposits");
@@ -310,7 +311,7 @@ public class DepositController : ControllerBase
                 return NotFound($"Fixed deposit {depositNumber} not found");
 
             // Ensure user can only access their own deposits (unless admin)
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             if (userRole != "Admin" && deposit.CustomerId != userId)
                 return Forbid("You can only access your own deposits");
@@ -332,7 +333,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var customerId = this.GetUserId();
+            var customerId = this.GetCurrentUserId();
             var deposits = await _depositService.GetCustomerFixedDepositsAsync(customerId);
             return Ok(deposits);
         }
@@ -380,7 +381,7 @@ public class DepositController : ControllerBase
             var details = await _depositService.GetMaturityDetailsAsync(depositId);
             
             // Ensure user can only access their own deposits (unless admin)
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var deposit = await _depositService.GetFixedDepositAsync(depositId);
             if (userRole != "Admin" && deposit?.CustomerId != userId)
@@ -407,7 +408,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only process their own deposits (unless admin)
@@ -439,7 +440,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only renew their own deposits (unless admin)
@@ -476,7 +477,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only access their own deposits (unless admin)
@@ -509,7 +510,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only withdraw from their own deposits (unless admin)
@@ -545,7 +546,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only withdraw from their own deposits (unless admin)
@@ -584,7 +585,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only generate certificates for their own deposits (unless admin)
@@ -622,7 +623,7 @@ public class DepositController : ControllerBase
                 return NotFound($"Certificate {certificateId} not found");
 
             // Ensure user can only access certificates for their own deposits (unless admin)
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             if (userRole != "Admin")
             {
@@ -653,7 +654,7 @@ public class DepositController : ControllerBase
                 return NotFound($"Certificate {certificateId} not found");
 
             // Ensure user can only download certificates for their own deposits (unless admin)
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             if (userRole != "Admin")
             {
@@ -688,7 +689,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var customerId = this.GetUserId();
+            var customerId = this.GetCurrentUserId();
             var summary = await _depositService.GetDepositSummaryAsync(customerId);
             return Ok(summary);
         }
@@ -710,7 +711,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only access transactions for their own deposits (unless admin)
@@ -739,7 +740,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var customerId = this.GetUserId();
+            var customerId = this.GetCurrentUserId();
             var portfolio = await _depositService.GetCustomerDepositPortfolioAsync(customerId);
             return Ok(portfolio);
         }
@@ -763,7 +764,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var success = await _depositService.ProcessInterestCreditAsync(depositId, userId);
             if (!success)
                 return BadRequest("Unable to process interest");
@@ -835,7 +836,7 @@ public class DepositController : ControllerBase
     }
 
     #endregion
-}
+
     #region Enhanced Withdrawal Management
 
     /// <summary>
@@ -846,7 +847,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only access their own deposits (unless admin)
@@ -881,7 +882,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only access their own deposits (unless admin)
@@ -915,7 +916,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only access their own deposits (unless admin)
@@ -949,7 +950,7 @@ public class DepositController : ControllerBase
     {
         try
         {
-            var userId = this.GetUserId();
+            var userId = this.GetCurrentUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             
             // Ensure user can only process consent for their own deposits (unless admin)
@@ -1099,3 +1100,4 @@ public class DepositController : ControllerBase
     }
 
     #endregion
+}

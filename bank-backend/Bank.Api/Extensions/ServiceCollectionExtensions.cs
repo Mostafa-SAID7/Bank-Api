@@ -204,6 +204,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Bank.Application.Interfaces.IPasswordPolicyService, Bank.Application.Services.PasswordPolicyService>();
         services.AddScoped<Bank.Application.Interfaces.IIpWhitelistService, Bank.Application.Services.IpWhitelistService>();
 
+        // Utility Services
+        services.AddScoped<Bank.Application.Interfaces.ITokenGenerationService, Bank.Application.Services.TokenGenerationService>();
+        services.AddScoped<Bank.Application.Interfaces.ICalculationService, Bank.Application.Services.CalculationService>();
+        services.AddScoped<Bank.Application.Interfaces.IValidationService, Bank.Application.Services.ValidationService>();
+
         return services;
     }
 

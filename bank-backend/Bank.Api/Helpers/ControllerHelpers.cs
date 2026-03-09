@@ -114,4 +114,99 @@ public static class ControllerHelpers
         }
         return controller.Ok(response);
     }
+
+    /// <summary>
+    /// Creates a standardized validation error response
+    /// </summary>
+    /// <param name="controller">The controller instance</param>
+    /// <param name="errors">Dictionary of validation errors</param>
+    /// <returns>A BadRequestObjectResult with validation errors</returns>
+    public static BadRequestObjectResult CreateValidationErrorResponse(this ControllerBase controller, 
+        Dictionary<string, List<string>> errors)
+    {
+        var allErrors = errors.SelectMany(kvp => kvp.Value).ToList();
+        return controller.BadRequest(new 
+        { 
+            Success = false, 
+            Message = "Validation failed", 
+            Errors = allErrors,
+            ValidationErrors = errors 
+        });
+    }
+
+    /// <summary>
+    /// Creates a standardized not found response
+    /// </summary>
+    /// <param name="controller">The controller instance</param>
+    /// <param name="message">The not found message</param>
+    /// <returns>A NotFoundObjectResult</returns>
+    public static NotFoundObjectResult CreateNotFoundResponse(this ControllerBase controller, string message)
+    {
+        return controller.NotFound(new { Success = false, Message = message });
+    }
+
+    /// <summary>
+    /// Creates a standardized forbidden response
+    /// </summary>
+    /// <param name="controller">The controller instance</param>
+    /// <param name="message">The forbidden message</param>
+    /// <returns>An ObjectResult with 403 status</returns>
+    public static ObjectResult CreateForbiddenResponse(this ControllerBase controller, string message)
+    {
+        return controller.StatusCode(403, new { Success = false, Message = message });
+    }
+
+    /// <summary>
+    /// Creates a standardized unauthorized response
+    /// </summary>
+    /// <param name="controller">The controller instance</param>
+    /// <param name="message">The unauthorized message</param>
+    /// <returns>An UnauthorizedObjectResult</returns>
+    public static UnauthorizedObjectResult CreateUnauthorizedResponse(this ControllerBase controller, string message)
+    {
+        return controller.Unauthorized(new { Success = false, Message = message });
+    }
+
+    /// <summary>
+    /// Creates a standardized conflict response
+    /// </summary>
+    /// <param name="controller">The controller instance</param>
+    /// <param name="message">The conflict message</param>
+    /// <returns>A ConflictObjectResult</returns>
+    public static ConflictObjectResult CreateConflictResponse(this ControllerBase controller, string message)
+    {
+        return controller.Conflict(new { Success = false, Message = message });
+    }
+
+    /// <summary>
+    /// Creates a standardized paged response
+    /// </summary>
+    /// <param name="controller">The controller instance</param>
+    /// <param name="data">The paged data</param>
+    /// <param name="totalCount">Total number of items</param>
+    /// <param name="pageNumber">Current page number</param>
+    /// <param name="pageSize">Page size</param>
+    /// <param name="message">Optional message</param>
+    /// <returns>An OkObjectResult with paged response</returns>
+    public static OkObjectResult CreatePagedResponse<T>(this ControllerBase controller, 
+        IEnumerable<T> data, int totalCount, int pageNumber, int pageSize, string message = "Data retrieved successfully")
+    {
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+        
+        return controller.Ok(new 
+        { 
+            Success = true, 
+            Message = message,
+            Data = new
+            {
+                Items = data,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                HasNextPage = pageNumber < totalPages,
+                HasPreviousPage = pageNumber > 1
+            }
+        });
+    }
 }

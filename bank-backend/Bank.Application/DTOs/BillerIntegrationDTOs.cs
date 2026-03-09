@@ -170,22 +170,5 @@ public class PaymentRetryResult
     public bool IsMaxRetriesReached { get; set; }
 }
 
-// Enums for Integration
-public enum PaymentMethod
-{
-    ACH = 1,
-    Wire = 2,
-    Check = 3,
-    RealTimePayment = 4,
-    CreditCard = 5,
-    DebitCard = 6
-}
-
-public enum BillPresentmentStatus
-{
-    Pending = 1,
-    Available = 2,
-    Paid = 3,
-    Overdue = 4,
-    Cancelled = 5
-}
+// Note: Using enums from Bank.Domain.Enums namespace
+// PaymentMethod and BillPresentmentStatus are defined in Bank.Domain.Enums

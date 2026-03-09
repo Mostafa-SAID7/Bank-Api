@@ -20,6 +20,7 @@ public class TwoFactorAuthService : ITwoFactorAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ISmsService _smsService;
     private readonly IEmailService _emailService;
+    private readonly ITokenGenerationService _tokenGenerationService;
     private readonly ILogger<TwoFactorAuthService> _logger;
     
     private const int TokenLength = 6;
@@ -32,12 +33,14 @@ public class TwoFactorAuthService : ITwoFactorAuthService
         IUnitOfWork unitOfWork,
         ISmsService smsService,
         IEmailService emailService,
+        ITokenGenerationService tokenGenerationService,
         ILogger<TwoFactorAuthService> logger)
     {
         _userManager = userManager;
         _unitOfWork = unitOfWork;
         _smsService = smsService;
         _emailService = emailService;
+        _tokenGenerationService = tokenGenerationService;
         _logger = logger;
     }
 
@@ -323,36 +326,20 @@ public class TwoFactorAuthService : ITwoFactorAuthService
 
     #region Private Methods
 
-    private static string GenerateNumericToken(int length)
-    {
-        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        var token = new StringBuilder();
-        var bytes = new byte[4];
-        
-        for (int i = 0; i < length; i++)
+    private string GenerateNumericToken(int length)
         {
-            rng.GetBytes(bytes);
-            var value = Math.Abs(BitConverter.ToInt32(bytes, 0)) % 10;
-            token.Append(value);
+            return _tokenGenerationService.GenerateNumericToken(length);
         }
-        return token.ToString();
+
+
+    private string GenerateSecretKey()
+    {
+        return _tokenGenerationService.GenerateSecretKey();
     }
 
-    private static string GenerateSecretKey()
+    private string GenerateQrCodeUrl(string email, string secretKey)
     {
-        var key = new byte[20];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(key);
-        }
-        return ToBase32String(key);
-    }
-
-    private static string GenerateQrCodeUrl(string email, string secretKey)
-    {
-        var issuer = "Bank Management System";
-        var label = $"{issuer}:{email}";
-        return $"otpauth://totp/{Uri.EscapeDataString(label)}?secret={secretKey}&issuer={Uri.EscapeDataString(issuer)}";
+        return _tokenGenerationService.GenerateQrCodeUrl("Bank Management System", email, secretKey);
     }
 
     private static string ToBase32String(byte[] input)
@@ -392,26 +379,9 @@ public class TwoFactorAuthService : ITwoFactorAuthService
         return !string.IsNullOrEmpty(token) && token.Length == 6;
     }
 
-    private static List<string> GenerateBackupCodes()
+    private List<string> GenerateBackupCodes()
     {
-        var codes = new List<string>();
-        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        
-        for (int i = 0; i < BackupCodeCount; i++)
-        {
-            var code = new StringBuilder();
-            var bytes = new byte[4];
-            
-            for (int j = 0; j < BackupCodeLength; j++)
-            {
-                rng.GetBytes(bytes);
-                var value = Math.Abs(BitConverter.ToInt32(bytes, 0)) % 10;
-                code.Append(value);
-            }
-            codes.Add(code.ToString());
-        }
-        
-        return codes;
+        return _tokenGenerationService.GenerateBackupCodes(BackupCodeCount, BackupCodeLength);
     }
 
     private async Task<bool> SendTokenAsync(TwoFactorMethod method, string destination, string token, string userName)

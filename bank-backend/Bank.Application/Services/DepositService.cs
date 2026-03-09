@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -15,6 +16,7 @@ namespace Bank.Application.Services;
 public class DepositService : IDepositService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
     private readonly IInterestCalculationService _interestCalculationService;
     private readonly INotificationService _notificationService;
     private readonly IAuditLogService _auditLogService;
@@ -22,12 +24,14 @@ public class DepositService : IDepositService
 
     public DepositService(
         IUnitOfWork unitOfWork,
+        IUserRepository userRepository,
         IInterestCalculationService interestCalculationService,
         INotificationService notificationService,
         IAuditLogService auditLogService,
         ILogger<DepositService> logger)
     {
         _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
         _interestCalculationService = interestCalculationService;
         _notificationService = notificationService;
         _auditLogService = auditLogService;
@@ -38,18 +42,14 @@ public class DepositService : IDepositService
 
     public async Task<DepositProductDto?> GetDepositProductAsync(Guid productId)
     {
-        var product = await _unitOfWork.Repository<DepositProduct>()
-            .GetByIdAsync(productId, include: q => q.Include(p => p.InterestTiers));
-
+        var product = await _unitOfWork.Repository<DepositProduct>().GetByIdAsync(productId);
         return product == null ? null : MapToDepositProductDto(product);
     }
 
     public async Task<IEnumerable<DepositProductDto>> GetActiveDepositProductsAsync()
     {
         var products = await _unitOfWork.Repository<DepositProduct>()
-            .GetAllAsync(
-                predicate: p => p.IsActive,
-                include: q => q.Include(p => p.InterestTiers));
+            .FindAsync(p => p.IsActive);
 
         return products.Select(MapToDepositProductDto);
     }
@@ -57,9 +57,7 @@ public class DepositService : IDepositService
     public async Task<IEnumerable<DepositProductDto>> GetDepositProductsByTypeAsync(DepositProductType productType)
     {
         var products = await _unitOfWork.Repository<DepositProduct>()
-            .GetAllAsync(
-                predicate: p => p.IsActive && p.ProductType == productType,
-                include: q => q.Include(p => p.InterestTiers));
+            .FindAsync(p => p.IsActive && p.ProductType == productType);
 
         return products.Select(MapToDepositProductDto);
     }
@@ -100,7 +98,7 @@ public class DepositService : IDepositService
             createdByUserId,
             "DepositProduct",
             "Create",
-            product.Id,
+            product.Id.ToString(),
             $"Created deposit product: {product.Name}");
 
         _logger.LogInformation("Created deposit product {ProductId} by user {UserId}", product.Id, createdByUserId);
@@ -152,7 +150,7 @@ public class DepositService : IDepositService
             updatedByUserId,
             "DepositProduct",
             "Update",
-            product.Id,
+            product.Id.ToString(),
             $"Updated deposit product: {originalName} -> {product.Name}");
 
         _logger.LogInformation("Updated deposit product {ProductId} by user {UserId}", productId, updatedByUserId);
@@ -174,7 +172,7 @@ public class DepositService : IDepositService
             deactivatedByUserId,
             "DepositProduct",
             "Deactivate",
-            product.Id,
+            product.Id.ToString(),
             $"Deactivated deposit product: {product.Name}");
 
         _logger.LogInformation("Deactivated deposit product {ProductId} by user {UserId}", productId, deactivatedByUserId);
@@ -212,7 +210,7 @@ public class DepositService : IDepositService
             createdByUserId,
             "InterestTier",
             "Create",
-            tier.Id,
+            tier.Id.ToString(),
             $"Created interest tier: {tier.TierName} for product {product.Name}");
 
         return MapToInterestTierDto(tier);
@@ -244,7 +242,7 @@ public class DepositService : IDepositService
             updatedByUserId,
             "InterestTier",
             "Update",
-            tier.Id,
+            tier.Id.ToString(),
             $"Updated interest tier: {tier.TierName}");
 
         return MapToInterestTierDto(tier);
@@ -256,14 +254,14 @@ public class DepositService : IDepositService
         if (tier == null)
             return false;
 
-        _unitOfWork.Repository<InterestTier>().Delete(tier);
+        _unitOfWork.Repository<InterestTier>().Remove(tier);
         await _unitOfWork.SaveChangesAsync();
 
         await _auditLogService.LogUserActionAsync(
             deletedByUserId,
             "InterestTier",
             "Delete",
-            tier.Id,
+            tier.Id.ToString(),
             $"Deleted interest tier: {tier.TierName}");
 
         return true;
@@ -272,10 +270,9 @@ public class DepositService : IDepositService
     public async Task<IEnumerable<InterestTierDto>> GetInterestTiersAsync(Guid productId)
     {
         var tiers = await _unitOfWork.Repository<InterestTier>()
-            .GetAllAsync(predicate: t => t.DepositProductId == productId,
-                        orderBy: q => q.OrderBy(t => t.DisplayOrder));
+            .FindAsync(t => t.DepositProductId == productId);
 
-        return tiers.Select(MapToInterestTierDto);
+        return tiers.OrderBy(t => t.DisplayOrder).Select(MapToInterestTierDto);
     }
 
     #endregion
@@ -284,7 +281,7 @@ public class DepositService : IDepositService
     public async Task<FixedDepositDto> CreateFixedDepositAsync(CreateFixedDepositRequest request, Guid customerId)
     {
         var product = await _unitOfWork.Repository<DepositProduct>()
-            .GetByIdAsync(request.DepositProductId, include: q => q.Include(p => p.InterestTiers));
+            .GetByIdAsync(request.DepositProductId);
         
         if (product == null || !product.IsActive)
             throw new InvalidOperationException($"Deposit product {request.DepositProductId} not found or inactive");
@@ -355,7 +352,7 @@ public class DepositService : IDepositService
             customerId,
             "FixedDeposit",
             "Create",
-            deposit.Id,
+            deposit.Id.ToString(),
             $"Created fixed deposit: {deposit.DepositNumber} for {request.PrincipalAmount:C}");
 
         _logger.LogInformation("Created fixed deposit {DepositId} for customer {CustomerId}", deposit.Id, customerId);
@@ -366,10 +363,7 @@ public class DepositService : IDepositService
     public async Task<FixedDepositDto?> GetFixedDepositAsync(Guid depositId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q
-                .Include(d => d.Customer)
-                .Include(d => d.DepositProduct)
-                .Include(d => d.LinkedAccount));
+            .GetByIdAsync(depositId);
 
         return deposit == null ? null : await MapToFixedDepositDtoAsync(deposit);
     }
@@ -377,12 +371,7 @@ public class DepositService : IDepositService
     public async Task<FixedDepositDto?> GetFixedDepositByNumberAsync(string depositNumber)
     {
         var deposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(
-                predicate: d => d.DepositNumber == depositNumber,
-                include: q => q
-                    .Include(d => d.Customer)
-                    .Include(d => d.DepositProduct)
-                    .Include(d => d.LinkedAccount));
+            .FindAsync(d => d.DepositNumber == depositNumber);
 
         var deposit = deposits.FirstOrDefault();
         return deposit == null ? null : await MapToFixedDepositDtoAsync(deposit);
@@ -391,16 +380,10 @@ public class DepositService : IDepositService
     public async Task<IEnumerable<FixedDepositDto>> GetCustomerFixedDepositsAsync(Guid customerId)
     {
         var deposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(
-                predicate: d => d.CustomerId == customerId,
-                include: q => q
-                    .Include(d => d.Customer)
-                    .Include(d => d.DepositProduct)
-                    .Include(d => d.LinkedAccount),
-                orderBy: q => q.OrderByDescending(d => d.CreatedAt));
+            .FindAsync(d => d.CustomerId == customerId);
 
         var result = new List<FixedDepositDto>();
-        foreach (var deposit in deposits)
+        foreach (var deposit in deposits.OrderByDescending(d => d.CreatedAt))
         {
             result.Add(await MapToFixedDepositDtoAsync(deposit));
         }
@@ -410,18 +393,12 @@ public class DepositService : IDepositService
     public async Task<IEnumerable<FixedDepositDto>> GetMaturingDepositsAsync(DateTime fromDate, DateTime toDate)
     {
         var deposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(
-                predicate: d => d.Status == FixedDepositStatus.Active && 
-                               d.MaturityDate >= fromDate && 
-                               d.MaturityDate <= toDate,
-                include: q => q
-                    .Include(d => d.Customer)
-                    .Include(d => d.DepositProduct)
-                    .Include(d => d.LinkedAccount),
-                orderBy: q => q.OrderBy(d => d.MaturityDate));
+            .FindAsync(d => d.Status == FixedDepositStatus.Active && 
+                           d.MaturityDate >= fromDate && 
+                           d.MaturityDate <= toDate);
 
         var result = new List<FixedDepositDto>();
-        foreach (var deposit in deposits)
+        foreach (var deposit in deposits.OrderBy(d => d.MaturityDate))
         {
             result.Add(await MapToFixedDepositDtoAsync(deposit));
         }
@@ -444,18 +421,14 @@ public class DepositService : IDepositService
 
         return deposit.InterestCalculationMethod switch
         {
-            InterestCalculationMethod.Simple => principal * rate * years,
-            InterestCalculationMethod.CompoundDaily => CalculateCompoundInterest(principal, rate, 365, years),
-            InterestCalculationMethod.CompoundMonthly => CalculateCompoundInterest(principal, rate, 12, years),
-            _ => principal * rate * years
+            InterestCalculationMethod.Simple => CalculationHelper.CalculateSimpleInterest(principal, rate, years),
+            InterestCalculationMethod.CompoundDaily => CalculationHelper.CalculateCompoundInterest(principal, rate, 365, years),
+            InterestCalculationMethod.CompoundMonthly => CalculationHelper.CalculateCompoundInterest(principal, rate, 12, years),
+            _ => CalculationHelper.CalculateSimpleInterest(principal, rate, years)
         };
     }
 
-    private static decimal CalculateCompoundInterest(decimal principal, decimal rate, int compoundingPerYear, decimal years)
-    {
-        var amount = principal * (decimal)Math.Pow((double)(1 + rate / compoundingPerYear), (double)(compoundingPerYear * years));
-        return amount - principal;
-    }
+
 
     public async Task<bool> ProcessInterestCreditAsync(Guid depositId, Guid processedByUserId)
     {
@@ -500,7 +473,7 @@ public class DepositService : IDepositService
         await _auditLogService.LogSystemEventAsync(
             "DepositInterest",
             "Credit",
-            depositId,
+            depositId.ToString(),
             $"Credited interest {interestAmount:C} to deposit {deposit.DepositNumber}");
 
         return true;
@@ -509,7 +482,7 @@ public class DepositService : IDepositService
     public async Task<bool> ProcessDailyInterestAsync()
     {
         var activeDeposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active);
 
         var processedCount = 0;
         foreach (var deposit in activeDeposits)
@@ -541,7 +514,7 @@ public class DepositService : IDepositService
     public async Task<MaturityDetailsDto> GetMaturityDetailsAsync(Guid depositId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.DepositProduct));
+            .GetByIdAsync(depositId);
         
         if (deposit == null)
             throw new InvalidOperationException($"Fixed deposit {depositId} not found");
@@ -583,7 +556,7 @@ public class DepositService : IDepositService
     public async Task<bool> ProcessMaturityAsync(Guid depositId, MaturityAction action, Guid processedByUserId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.LinkedAccount));
+            .GetByIdAsync(depositId);
         
         if (deposit == null || deposit.Status != FixedDepositStatus.Active)
             return false;
@@ -613,7 +586,11 @@ public class DepositService : IDepositService
         deposit.NetAmountPaid = maturityAmount;
 
         // Credit the linked account
-        deposit.LinkedAccount.Balance += maturityAmount;
+        var linkedAccount = await _unitOfWork.Repository<Account>().GetByIdAsync(deposit.LinkedAccountId);
+        if (linkedAccount != null)
+        {
+            linkedAccount.Balance += maturityAmount;
+        }
 
         var transaction = new DepositTransaction
         {
@@ -637,7 +614,7 @@ public class DepositService : IDepositService
             processedByUserId,
             "FixedDeposit",
             "Maturity",
-            deposit.Id,
+            deposit.Id.ToString(),
             $"Processed maturity for deposit {deposit.DepositNumber}, paid {maturityAmount:C}");
 
         return true;
@@ -670,7 +647,7 @@ public class DepositService : IDepositService
             processedByUserId,
             "FixedDeposit",
             "Hold",
-            deposit.Id,
+            deposit.Id.ToString(),
             $"Deposit {deposit.DepositNumber} held pending customer instructions");
 
         return true;
@@ -679,7 +656,7 @@ public class DepositService : IDepositService
     public async Task<FixedDepositDto> RenewFixedDepositAsync(Guid depositId, RenewDepositRequest request, Guid processedByUserId)
     {
         var originalDeposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.DepositProduct));
+            .GetByIdAsync(depositId);
         
         if (originalDeposit == null)
             throw new InvalidOperationException($"Fixed deposit {depositId} not found");
@@ -727,7 +704,7 @@ public class DepositService : IDepositService
             processedByUserId,
             "FixedDeposit",
             "Renew",
-            renewedDeposit.Id,
+            renewedDeposit.Id.ToString(),
             $"Renewed deposit {originalDeposit.DepositNumber} to {renewedDeposit.DepositNumber}");
 
         return await MapToFixedDepositDtoAsync(renewedDeposit);
@@ -736,10 +713,10 @@ public class DepositService : IDepositService
     public async Task<bool> ProcessAutoRenewalsAsync()
     {
         var maturingDeposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.MaturityDate <= DateTime.UtcNow &&
-                                        d.AutoRenewalEnabled &&
-                                        d.CustomerConsentReceived);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.MaturityDate <= DateTime.UtcNow &&
+                           d.AutoRenewalEnabled &&
+                           d.CustomerConsentReceived);
 
         var processedCount = 0;
         foreach (var deposit in maturingDeposits)
@@ -803,7 +780,7 @@ public class DepositService : IDepositService
     public async Task<bool> ProcessEarlyWithdrawalAsync(Guid depositId, EarlyWithdrawalRequest request, Guid processedByUserId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.LinkedAccount));
+            .GetByIdAsync(depositId);
         
         if (deposit == null || deposit.Status != FixedDepositStatus.Active)
             return false;
@@ -876,7 +853,7 @@ public class DepositService : IDepositService
             processedByUserId,
             "FixedDeposit",
             "EarlyWithdrawal",
-            depositId,
+            depositId.ToString(),
             $"Processed early withdrawal of {request.WithdrawalAmount:C} from deposit {deposit.DepositNumber}, penalty {penaltyAmount:C}");
 
         return true;
@@ -885,7 +862,7 @@ public class DepositService : IDepositService
     public async Task<bool> ProcessPartialWithdrawalAsync(Guid depositId, PartialWithdrawalRequest request, Guid processedByUserId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.DepositProduct).Include(d => d.LinkedAccount));
+            .GetByIdAsync(depositId);
         
         if (deposit == null || deposit.Status != FixedDepositStatus.Active)
             return false;
@@ -938,7 +915,7 @@ public class DepositService : IDepositService
             processedByUserId,
             "FixedDeposit",
             "PartialWithdrawal",
-            depositId,
+            depositId.ToString(),
             $"Processed partial withdrawal of {request.WithdrawalAmount:C} from deposit {deposit.DepositNumber}");
 
         return true;
@@ -950,9 +927,7 @@ public class DepositService : IDepositService
     public async Task<DepositCertificateDto> GenerateCertificateAsync(Guid depositId, Guid generatedByUserId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q
-                .Include(d => d.Customer)
-                .Include(d => d.DepositProduct));
+            .GetByIdAsync(depositId);
         
         if (deposit == null)
             throw new InvalidOperationException($"Fixed deposit {depositId} not found");
@@ -977,7 +952,7 @@ public class DepositService : IDepositService
             generatedByUserId,
             "DepositCertificate",
             "Generate",
-            certificate.Id,
+            certificate.Id.ToString(),
             $"Generated certificate {certificate.CertificateNumber} for deposit {deposit.DepositNumber}");
 
         return MapToDepositCertificateDto(certificate);
@@ -1034,7 +1009,7 @@ This certificate confirms the deposit details above.
             deliveredByUserId,
             "DepositCertificate",
             "Deliver",
-            certificateId,
+            certificateId.ToString(),
             $"Delivered certificate {certificate.CertificateNumber} via {deliveryMethod}");
 
         return true;
@@ -1047,7 +1022,7 @@ This certificate confirms the deposit details above.
     public async Task<MaturityNoticeDto> GenerateMaturityNoticeAsync(Guid depositId, MaturityNoticeType noticeType, Guid generatedByUserId)
     {
         var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId, include: q => q.Include(d => d.Customer));
+            .GetByIdAsync(depositId);
         
         if (deposit == null)
             throw new InvalidOperationException($"Fixed deposit {depositId} not found");
@@ -1075,7 +1050,7 @@ This certificate confirms the deposit details above.
             generatedByUserId,
             "MaturityNotice",
             "Generate",
-            notice.Id,
+            notice.Id.ToString(),
             $"Generated {noticeType} notice {notice.NoticeNumber} for deposit {deposit.DepositNumber}");
 
         return MapToMaturityNoticeDto(notice);
@@ -1119,9 +1094,9 @@ Bank Customer Service
     {
         // Get deposits maturing in the next 30 days that haven't received notices
         var maturingDeposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.MaturityDate <= DateTime.UtcNow.AddDays(30) &&
-                                        d.MaturityDate > DateTime.UtcNow);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.MaturityDate <= DateTime.UtcNow.AddDays(30) &&
+                           d.MaturityDate > DateTime.UtcNow);
 
         var processedCount = 0;
         foreach (var deposit in maturingDeposits)
@@ -1130,7 +1105,7 @@ Bank Customer Service
             {
                 // Check if notice already sent
                 var existingNotices = await _unitOfWork.Repository<MaturityNotice>()
-                    .GetAllAsync(predicate: n => n.FixedDepositId == deposit.Id);
+                    .FindAsync(n => n.FixedDepositId == deposit.Id);
 
                 if (!existingNotices.Any())
                 {
@@ -1172,7 +1147,7 @@ Bank Customer Service
             processedByUserId,
             "MaturityNotice",
             "CustomerResponse",
-            noticeId,
+            noticeId.ToString(),
             $"Recorded customer response: {customerChoice} for notice {notice.NoticeNumber}");
 
         return true;
@@ -1184,7 +1159,7 @@ Bank Customer Service
     public async Task<DepositSummaryDto> GetDepositSummaryAsync(Guid customerId)
     {
         var deposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.CustomerId == customerId);
+            .FindAsync(d => d.CustomerId == customerId);
 
         var activeDeposits = deposits.Where(d => d.Status == FixedDepositStatus.Active).ToList();
         var maturingThisMonth = activeDeposits.Where(d => d.MaturityDate <= DateTime.UtcNow.AddDays(30)).Count();
@@ -1204,23 +1179,17 @@ Bank Customer Service
 
     public async Task<IEnumerable<DepositTransactionDto>> GetDepositTransactionsAsync(Guid depositId, DateTime? fromDate = null, DateTime? toDate = null)
     {
-        var predicate = PredicateBuilder.New<DepositTransaction>(t => t.FixedDepositId == depositId);
-        
-        if (fromDate.HasValue)
-            predicate = predicate.And(t => t.TransactionDate >= fromDate.Value);
-        
-        if (toDate.HasValue)
-            predicate = predicate.And(t => t.TransactionDate <= toDate.Value);
-
         var transactions = await _unitOfWork.Repository<DepositTransaction>()
-            .GetAllAsync(predicate: predicate, orderBy: q => q.OrderByDescending(t => t.TransactionDate));
+            .FindAsync(t => t.FixedDepositId == depositId &&
+                           (!fromDate.HasValue || t.TransactionDate >= fromDate.Value) &&
+                           (!toDate.HasValue || t.TransactionDate <= toDate.Value));
 
-        return transactions.Select(MapToDepositTransactionDto);
+        return transactions.OrderByDescending(t => t.TransactionDate).Select(MappingHelper.MapToDepositTransactionDto);
     }
 
     public async Task<DepositPortfolioDto> GetCustomerDepositPortfolioAsync(Guid customerId)
     {
-        var customer = await _unitOfWork.Repository<User>().GetByIdAsync(customerId);
+        var customer = await _userRepository.GetByIdAsync(customerId);
         if (customer == null)
             throw new InvalidOperationException($"Customer {customerId} not found");
 
@@ -1260,8 +1229,8 @@ Bank Customer Service
     public async Task<bool> ProcessPendingMaturityActionsAsync()
     {
         var maturingDeposits = await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.MaturityDate <= DateTime.UtcNow);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.MaturityDate <= DateTime.UtcNow);
 
         var processedCount = 0;
         foreach (var deposit in maturingDeposits)
@@ -1352,10 +1321,7 @@ Bank Customer Service
         if (deposit.Customer == null)
         {
             deposit = await _unitOfWork.Repository<FixedDeposit>()
-                .GetByIdAsync(deposit.Id, include: q => q
-                    .Include(d => d.Customer)
-                    .Include(d => d.DepositProduct)
-                    .Include(d => d.LinkedAccount)) ?? deposit;
+                .GetByIdAsync(deposit.Id) ?? deposit;
         }
 
         var daysToMaturity = (deposit.MaturityDate - DateTime.UtcNow).Days;
@@ -1440,27 +1406,6 @@ Bank Customer Service
             CustomerChoice = notice.CustomerChoice,
             CustomerInstructions = notice.CustomerInstructions,
             ConsentReceived = notice.ConsentReceived
-        };
-    }
-
-    private static DepositTransactionDto MapToDepositTransactionDto(DepositTransaction transaction)
-    {
-        return new DepositTransactionDto
-        {
-            Id = transaction.Id,
-            FixedDepositId = transaction.FixedDepositId,
-            TransactionReference = transaction.TransactionReference,
-            TransactionType = transaction.TransactionType,
-            Amount = transaction.Amount,
-            Description = transaction.Description,
-            TransactionDate = transaction.TransactionDate,
-            Status = transaction.Status,
-            InterestPeriodStart = transaction.InterestPeriodStart,
-            InterestPeriodEnd = transaction.InterestPeriodEnd,
-            InterestRate = transaction.InterestRate,
-            InterestDays = transaction.InterestDays,
-            PenaltyType = transaction.PenaltyType,
-            PenaltyReason = transaction.PenaltyReason
         };
     }
 

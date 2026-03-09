@@ -3,6 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs;
 
+public class CardDto
+{
+    public Guid Id { get; set; }
+    public string CardNumber { get; set; } = string.Empty;
+    public CardType CardType { get; set; }
+    public CardStatus Status { get; set; }
+    public DateTime ExpiryDate { get; set; }
+    public Guid AccountId { get; set; }
+    public Guid CustomerId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public bool IsActive { get; set; }
+}
+
 #region Request DTOs
 
 /// <summary>
@@ -531,17 +545,11 @@ public class PagedRequest
 }
 
 /// <summary>
-/// Paged result wrapper
+/// Paged result wrapper - using Domain PagedResult
 /// </summary>
-public class PagedResult<T>
+public class PagedResult<T> : Bank.Domain.Common.PagedResult<T>
 {
-    public List<T> Items { get; set; } = new();
-    public int TotalCount { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-    public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
-    public bool HasNextPage => Page < TotalPages;
-    public bool HasPreviousPage => Page > 1;
+    // Inherits from Domain PagedResult to avoid duplication
 }
 
 /// <summary>

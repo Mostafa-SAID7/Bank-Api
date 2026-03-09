@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -938,34 +939,22 @@ public class CardService : ICardService
 
     public async Task<string> GenerateSecurityCodeAsync()
     {
-        // Generate a 3-digit CVV using cryptographically secure random
+        // Generate a 3-digit CVV using centralized helper
         await Task.CompletedTask; // Placeholder for async operation
-        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        var bytes = new byte[2];
-        rng.GetBytes(bytes);
-        var value = (bytes[0] << 8) | bytes[1];
-        return (100 + (value % 900)).ToString();
+        return TokenGenerationHelper.GenerateNumericToken(3);
     }
 
     // Private helper methods
     private string GenerateActivationCode()
     {
-        // Generate 6-digit activation code using cryptographically secure random
-        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        var bytes = new byte[4];
-        rng.GetBytes(bytes);
-        var value = BitConverter.ToUInt32(bytes, 0);
-        return (100000 + (value % 900000)).ToString();
+        // Generate 6-digit activation code using centralized helper
+        return TokenGenerationHelper.GenerateNumericToken(6);
     }
 
     private string GenerateRandomPin()
     {
-        // Generate 4-digit PIN using cryptographically secure random
-        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        var bytes = new byte[2];
-        rng.GetBytes(bytes);
-        var value = (bytes[0] << 8) | bytes[1];
-        return (1000 + (value % 9000)).ToString();
+        // Generate 4-digit PIN using centralized helper
+        return TokenGenerationHelper.GenerateRandomPin(4);
     }
 
     private string HashSecurityCode(string securityCode)

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Bank.Domain.Enums;
 using Bank.Domain.ValueObjects;
+using Bank.Domain.Common;
 
 namespace Bank.Domain.Entities;
 

@@ -126,7 +126,7 @@ public class DepositMaturityService : IDepositMaturityService
                 deposit.CustomerId,
                 "FixedDeposit",
                 "ConsentUpdate",
-                depositId,
+                depositId.ToString(),
                 $"Customer consent {(consentGiven ? "given" : "withdrawn")} for deposit {deposit.DepositNumber}");
 
             return true;
@@ -221,16 +221,16 @@ public class DepositMaturityService : IDepositMaturityService
         var sevenDaysFromNow = DateTime.UtcNow.AddDays(7);
         
         return await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.MaturityDate >= DateTime.UtcNow &&
-                                        d.MaturityDate <= thirtyDaysFromNow);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.MaturityDate >= DateTime.UtcNow &&
+                           d.MaturityDate <= thirtyDaysFromNow);
     }
 
     private async Task<IEnumerable<FixedDeposit>> GetMaturedDepositsAsync()
     {
         return await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.MaturityDate <= DateTime.UtcNow);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.MaturityDate <= DateTime.UtcNow);
     }
 
     private async Task<IEnumerable<FixedDeposit>> GetDepositsNeedingRenewalRemindersAsync()
@@ -238,20 +238,20 @@ public class DepositMaturityService : IDepositMaturityService
         var sevenDaysFromNow = DateTime.UtcNow.AddDays(7);
         
         return await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.AutoRenewalEnabled &&
-                                        !d.CustomerConsentReceived &&
-                                        d.MaturityDate <= sevenDaysFromNow &&
-                                        d.MaturityDate > DateTime.UtcNow);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.AutoRenewalEnabled &&
+                           !d.CustomerConsentReceived &&
+                           d.MaturityDate <= sevenDaysFromNow &&
+                           d.MaturityDate > DateTime.UtcNow);
     }
 
     private async Task<IEnumerable<FixedDeposit>> GetDepositsForAutoRenewalAsync()
     {
         return await _unitOfWork.Repository<FixedDeposit>()
-            .GetAllAsync(predicate: d => d.Status == FixedDepositStatus.Active &&
-                                        d.MaturityDate <= DateTime.UtcNow &&
-                                        d.AutoRenewalEnabled &&
-                                        d.CustomerConsentReceived);
+            .FindAsync(d => d.Status == FixedDepositStatus.Active &&
+                           d.MaturityDate <= DateTime.UtcNow &&
+                           d.AutoRenewalEnabled &&
+                           d.CustomerConsentReceived);
     }
 
     private async Task ProcessSingleDepositMaturityNoticesAsync(FixedDeposit deposit, MaturityProcessingResult result)
@@ -260,7 +260,7 @@ public class DepositMaturityService : IDepositMaturityService
         
         // Check if notices have already been sent
         var existingNotices = await _unitOfWork.Repository<MaturityNotice>()
-            .GetAllAsync(predicate: n => n.FixedDepositId == deposit.Id);
+            .FindAsync(n => n.FixedDepositId == deposit.Id);
 
         var hasInitialNotice = existingNotices.Any(n => n.NoticeType == MaturityNoticeType.Initial);
         var hasReminderNotice = existingNotices.Any(n => n.NoticeType == MaturityNoticeType.Reminder);

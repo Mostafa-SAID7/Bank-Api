@@ -1,5 +1,6 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -502,16 +503,6 @@ public class PinManagementService : IPinManagementService
 
     private static string GenerateRandomCode(int length)
     {
-        using var rng = RandomNumberGenerator.Create();
-        var code = new StringBuilder();
-        
-        for (int i = 0; i < length; i++)
-        {
-            var bytes = new byte[1];
-            rng.GetBytes(bytes);
-            code.Append(bytes[0] % 10);
-        }
-        
-        return code.ToString();
+        return TokenGenerationHelper.GenerateNumericToken(length);
     }
 }

@@ -202,7 +202,7 @@ public class BillerManagementController : ControllerBase
                 return BadRequest("Cannot delete biller with pending payments. Please wait for all payments to complete or cancel them first.");
             }
 
-            await _billerRepository.DeleteAsync(billerId);
+            _billerRepository.Remove(biller);
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Biller deleted: {BillerId} - {BillerName}", biller.Id, biller.Name);

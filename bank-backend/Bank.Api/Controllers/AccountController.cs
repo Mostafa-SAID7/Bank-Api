@@ -1,5 +1,6 @@
 using Bank.Application.Interfaces;
 using Bank.Application.DTOs;
+using Bank.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -24,9 +25,9 @@ public class AccountController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMyAccounts()
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userId = this.GetCurrentUserIdRequired();
         var accounts = await _accountService.GetUserAccountsAsync(userId);
-        return Ok(accounts);
+        return this.CreateSuccessResponse("Accounts retrieved successfully", accounts);
     }
 
     /// <summary>
@@ -36,8 +37,8 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> GetAccountById(Guid id)
     {
         var account = await _accountService.GetAccountByIdAsync(id);
-        if (account == null) return NotFound();
-        return Ok(account);
+        if (account == null) return this.CreateNotFoundResponse("Account not found");
+        return this.CreateSuccessResponse("Account retrieved successfully", account);
     }
 
     /// <summary>
@@ -46,9 +47,10 @@ public class AccountController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userId = this.GetCurrentUserIdRequired();
         var account = await _accountService.CreateAccountAsync(userId, request.AccountHolderName);
-        return CreatedAtAction(nameof(GetAccountById), new { id = account.Id }, account);
+        return CreatedAtAction(nameof(GetAccountById), new { id = account.Id }, 
+            new { Success = true, Message = "Account created successfully", Data = account });
     }
 
     /// <summary>
@@ -58,15 +60,15 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> UpdateAccount(Guid id, [FromBody] UpdateAccountRequest request)
     {
         var account = await _accountService.GetAccountByIdAsync(id);
-        if (account == null) return NotFound();
+        if (account == null) return this.CreateNotFoundResponse("Account not found");
 
         // Verify ownership
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        if (account.UserId != userId) return Forbid();
+        var userId = this.GetCurrentUserIdRequired();
+        if (account.UserId != userId) return this.CreateForbiddenResponse("Access denied");
 
         account.AccountHolderName = request.AccountHolderName;
         // In a real app, persist via service  
-        return Ok(account);
+        return this.CreateSuccessResponse("Account updated successfully", account);
     }
 
     /// <summary>
@@ -76,10 +78,10 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> DeleteAccount(Guid id)
     {
         var account = await _accountService.GetAccountByIdAsync(id);
-        if (account == null) return NotFound();
+        if (account == null) return this.CreateNotFoundResponse("Account not found");
 
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        if (account.UserId != userId) return Forbid();
+        var userId = this.GetCurrentUserIdRequired();
+        if (account.UserId != userId) return this.CreateForbiddenResponse("Access denied");
 
         // In a real app, delete via service
         return NoContent();

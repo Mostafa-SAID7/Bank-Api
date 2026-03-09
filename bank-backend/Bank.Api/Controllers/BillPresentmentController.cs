@@ -34,7 +34,20 @@ public class BillPresentmentController : ControllerBase
         try
         {
             var customerId = this.GetCurrentUserId();
-            var presentments = await _billPresentmentService.GetCustomerBillPresentmentsAsync(customerId, status);
+            
+            // Convert DTO enum to Domain enum
+            Bank.Domain.Enums.BillPresentmentStatus? domainStatus = status switch
+            {
+                BillPresentmentStatus.Pending => Bank.Domain.Enums.BillPresentmentStatus.Pending,
+                BillPresentmentStatus.Available => Bank.Domain.Enums.BillPresentmentStatus.Presented,
+                BillPresentmentStatus.Paid => Bank.Domain.Enums.BillPresentmentStatus.Paid,
+                BillPresentmentStatus.Overdue => Bank.Domain.Enums.BillPresentmentStatus.Overdue,
+                BillPresentmentStatus.Cancelled => Bank.Domain.Enums.BillPresentmentStatus.Cancelled,
+                null => null,
+                _ => null
+            };
+            
+            var presentments = await _billPresentmentService.GetCustomerBillPresentmentsAsync(customerId, domainStatus);
             return Ok(presentments);
         }
         catch (Exception ex)
@@ -153,7 +166,18 @@ public class BillPresentmentController : ControllerBase
     {
         try
         {
-            var success = await _billPresentmentService.UpdateBillPresentmentStatusAsync(presentmentId, request.Status);
+            // Convert DTO enum to Domain enum
+            var domainStatus = request.Status switch
+            {
+                BillPresentmentStatus.Pending => Bank.Domain.Enums.BillPresentmentStatus.Pending,
+                BillPresentmentStatus.Available => Bank.Domain.Enums.BillPresentmentStatus.Presented,
+                BillPresentmentStatus.Paid => Bank.Domain.Enums.BillPresentmentStatus.Paid,
+                BillPresentmentStatus.Overdue => Bank.Domain.Enums.BillPresentmentStatus.Overdue,
+                BillPresentmentStatus.Cancelled => Bank.Domain.Enums.BillPresentmentStatus.Cancelled,
+                _ => throw new ArgumentException($"Invalid status: {request.Status}")
+            };
+            
+            var success = await _billPresentmentService.UpdateBillPresentmentStatusAsync(presentmentId, domainStatus);
             if (!success)
             {
                 return NotFound("Bill presentment not found");
