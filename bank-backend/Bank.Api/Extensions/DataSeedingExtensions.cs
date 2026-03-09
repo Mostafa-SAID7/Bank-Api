@@ -11,7 +11,7 @@ namespace Bank.Api.Extensions;
 public static class DataSeedingExtensions
 {
     /// <summary>
-    /// Apply pending database migrations
+    /// Apply pending database migrations with enhanced error handling and retry logic
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -22,19 +22,56 @@ public static class DataSeedingExtensions
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<BankDbContext>();
             
-            logger.LogInformation("Checking for pending database migrations...");
+            logger.LogInformation("🔍 Checking database connectivity...");
+            
+            // Test database connectivity first with retry logic
+            var maxRetries = 3;
+            var retryDelay = TimeSpan.FromSeconds(5);
+            
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    logger.LogInformation("📡 Testing database connection (attempt {Attempt}/{MaxRetries})...", attempt, maxRetries);
+                    
+                    // Simple connectivity test
+                    await dbContext.Database.CanConnectAsync();
+                    logger.LogInformation("✅ Database connection successful!");
+                    break;
+                }
+                catch (Exception connEx) when (attempt < maxRetries)
+                {
+                    logger.LogWarning("⚠️ Database connection attempt {Attempt} failed: {Message}. Retrying in {Delay} seconds...", 
+                        attempt, connEx.Message, retryDelay.TotalSeconds);
+                    await Task.Delay(retryDelay);
+                    retryDelay = TimeSpan.FromSeconds(retryDelay.TotalSeconds * 2); // Exponential backoff
+                }
+                catch (Exception connEx) when (attempt == maxRetries)
+                {
+                    logger.LogError(connEx, "❌ Failed to connect to database after {MaxRetries} attempts", maxRetries);
+                    logger.LogWarning("⚠️ Application will start without database connectivity. Please check:");
+                    logger.LogWarning("   • Network connectivity to: db43977.public.databaseasp.net");
+                    logger.LogWarning("   • Database server availability");
+                    logger.LogWarning("   • Connection string credentials");
+                    logger.LogWarning("   • Firewall settings");
+                    return;
+                }
+            }
+            
+            logger.LogInformation("🔍 Checking for pending database migrations...");
             
             var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
             
             if (pendingMigrations.Any())
             {
-                logger.LogInformation("Found {Count} pending migrations. Applying...", pendingMigrations.Count());
+                logger.LogInformation("📋 Found {Count} pending migrations:", pendingMigrations.Count());
                 
                 foreach (var migration in pendingMigrations)
                 {
-                    logger.LogInformation("Pending migration: {Migration}", migration);
+                    logger.LogInformation("   • {Migration}", migration);
                 }
                 
+                logger.LogInformation("🚀 Applying database migrations...");
                 await dbContext.Database.MigrateAsync();
                 logger.LogInformation("✅ Database migrations applied successfully!");
             }
@@ -43,26 +80,50 @@ public static class DataSeedingExtensions
                 logger.LogInformation("✅ No pending migrations - database is up to date!");
             }
         }
+        catch (Microsoft.Data.SqlClient.SqlException sqlEx) when (sqlEx.Number == 64)
+        {
+            logger.LogError("❌ Network connectivity issue: {Message}", sqlEx.Message);
+            logger.LogWarning("💡 Troubleshooting suggestions:");
+            logger.LogWarning("   • Check if the database server 'db43977.public.databaseasp.net' is accessible");
+            logger.LogWarning("   • Verify your internet connection");
+            logger.LogWarning("   • Check if the database service is running");
+            logger.LogWarning("   • Try running the improved-migration.sql script manually");
+            logger.LogWarning("⚠️ Application will continue without applying migrations.");
+        }
         catch (Exception ex)
         {
-            logger.LogError(ex, "❌ Error applying database migrations: {Message}", ex.Message);
-            
-            // Don't throw - let the application start even if migrations fail
-            // This allows for manual migration troubleshooting
-            logger.LogWarning("⚠️ Application will continue without applying migrations. Please check database connectivity and apply migrations manually if needed.");
+            logger.LogError(ex, "❌ Unexpected error applying database migrations: {Message}", ex.Message);
+            logger.LogWarning("💡 Consider running the migration script manually:");
+            logger.LogWarning("   • Use bank-backend/Bank.Infrastructure/improved-migration.sql");
+            logger.LogWarning("   • Connect to your database management tool");
+            logger.LogWarning("   • Execute the script to create missing tables");
+            logger.LogWarning("⚠️ Application will continue without applying migrations.");
         }
     }
 
     /// <summary>
-    /// Seed initial data (roles, admin user, policies)
+    /// Seed initial data (roles, admin user, policies) with error handling
     /// </summary>
     public static async Task SeedInitialDataAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         
-        await SeedRolesAsync(scope.ServiceProvider);
-        await SeedAdminUserAsync(scope.ServiceProvider);
-        await SeedPasswordPoliciesAsync(scope.ServiceProvider);
+        try
+        {
+            logger.LogInformation("🌱 Starting data seeding...");
+            
+            await SeedRolesAsync(scope.ServiceProvider);
+            await SeedAdminUserAsync(scope.ServiceProvider);
+            await SeedPasswordPoliciesAsync(scope.ServiceProvider);
+            
+            logger.LogInformation("✅ Data seeding completed successfully!");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "❌ Error during data seeding: {Message}", ex.Message);
+            logger.LogWarning("⚠️ Application will continue without seeding data. Database may not be accessible.");
+        }
     }
 
     /// <summary>

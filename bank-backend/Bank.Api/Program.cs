@@ -46,10 +46,27 @@ builder.Services.AddCorsServices();
 var app = builder.Build();
 
 // === DATABASE MIGRATION ===
-await app.ApplyDatabaseMigrationsAsync();
+var skipMigrations = builder.Configuration.GetValue<bool>("DatabaseSettings:SkipMigrations", false);
+var skipSeeding = builder.Configuration.GetValue<bool>("DatabaseSettings:SkipSeeding", false);
+
+if (!skipMigrations)
+{
+    await app.ApplyDatabaseMigrationsAsync();
+}
+else
+{
+    app.Logger.LogWarning("⚠️ Database migrations skipped (development mode)");
+}
 
 // === DATA SEEDING ===
-await app.SeedInitialDataAsync();
+if (!skipSeeding)
+{
+    await app.SeedInitialDataAsync();
+}
+else
+{
+    app.Logger.LogWarning("⚠️ Data seeding skipped (development mode)");
+}
 
 // === MIDDLEWARE PIPELINE (Order Matters) ===
 

@@ -24,8 +24,32 @@ public static class ServiceCollectionExtensions
         var connectionString = configuration.GetConnectionString("DefaultConnection") 
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+        var allowOfflineMode = configuration.GetValue<bool>("DatabaseSettings:AllowOfflineMode", false);
+
         services.AddDbContext<BankDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        {
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                // Enable retry on failure for transient network issues
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: allowOfflineMode ? 2 : 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(allowOfflineMode ? 10 : 30),
+                    errorNumbersToAdd: null);
+                
+                // Set command timeout for long-running operations
+                sqlOptions.CommandTimeout(allowOfflineMode ? 30 : 60);
+                
+                // Enable connection resiliency
+                sqlOptions.MigrationsAssembly("Bank.Infrastructure");
+            });
+
+            // In development, enable sensitive data logging
+            if (allowOfflineMode)
+            {
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+            }
+        });
 
         return services;
     }
