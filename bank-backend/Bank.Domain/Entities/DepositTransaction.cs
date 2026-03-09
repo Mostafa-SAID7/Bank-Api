@@ -1,5 +1,6 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using System.Security.Cryptography;
 
 namespace Bank.Domain.Entities;
 
@@ -47,23 +48,10 @@ public class DepositTransaction : BaseEntity
     public void GenerateTransactionReference()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var random = new Random().Next(100, 999);
+        using var rng = RandomNumberGenerator.Create();
+        var randomBytes = new byte[4];
+        rng.GetBytes(randomBytes);
+        var random = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % 900 + 100;
         TransactionReference = $"DT{timestamp}{random}";
     }
-}
-
-/// <summary>
-/// Types of deposit transactions
-/// </summary>
-public enum DepositTransactionType
-{
-    InterestCredit = 1,      // Interest credited to deposit
-    PenaltyCharge = 2,       // Early withdrawal penalty
-    MaturityPayout = 3,      // Maturity amount payout
-    PartialWithdrawal = 4,   // Partial withdrawal from deposit
-    EarlyWithdrawal = 5,     // Early withdrawal (full)
-    RenewalCredit = 6,       // Credit for renewal
-    FeeCharge = 7,           // Fee charged on deposit
-    Adjustment = 8,          // Manual adjustment
-    Reversal = 9             // Transaction reversal
 }

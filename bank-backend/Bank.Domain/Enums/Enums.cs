@@ -609,6 +609,34 @@ public enum BillPaymentStatus
 }
 
 /// <summary>
+/// Bill presentment status
+/// </summary>
+public enum BillPresentmentStatus
+{
+    Pending = 1,         // Bill presentment pending
+    Presented = 2,       // Bill presented to customer
+    Viewed = 3,          // Bill viewed by customer
+    Paid = 4,            // Bill paid
+    Overdue = 5,         // Bill overdue
+    Cancelled = 6        // Bill cancelled
+}
+
+/// <summary>
+/// Payment methods supported by the system
+/// </summary>
+public enum PaymentMethod
+{
+    BankTransfer = 1,    // Bank transfer
+    DebitCard = 2,       // Debit card
+    CreditCard = 3,      // Credit card
+    DigitalWallet = 4,   // Digital wallet
+    Check = 5,           // Check payment
+    Cash = 6,            // Cash payment
+    ACH = 7,             // ACH transfer
+    WireTransfer = 8     // Wire transfer
+}
+
+/// <summary>
 /// Deposit product types
 /// </summary>
 public enum DepositProductType
@@ -678,4 +706,32 @@ public enum MaturityAction
     TransferToPrimary = 2,   // Transfer to primary account
     HoldForInstructions = 3, // Hold pending customer instructions
     PartialRenew = 4         // Renew part, transfer remainder
+}
+
+/// <summary>
+/// Types of deposit transactions
+/// </summary>
+public enum DepositTransactionType
+{
+    InterestCredit = 1,      // Interest credited to deposit
+    PenaltyCharge = 2,       // Early withdrawal penalty
+    MaturityPayout = 3,      // Maturity amount payout
+    PartialWithdrawal = 4,   // Partial withdrawal from deposit
+    EarlyWithdrawal = 5,     // Early withdrawal (full)
+    RenewalCredit = 6,       // Credit for renewal
+    FeeCharge = 7,           // Fee charged on deposit
+    Adjustment = 8,          // Manual adjustment
+    Reversal = 9             // Transaction reversal
+}
+
+/// <summary>
+/// Types of maturity notices
+/// </summary>
+public enum MaturityNoticeType
+{
+    Initial = 1,         // Initial maturity notice
+    Reminder = 2,        // Reminder notice
+    Final = 3,           // Final notice before auto-action
+    AutoRenewal = 4,     // Auto-renewal confirmation
+    MaturityConfirmation = 5 // Maturity processing confirmation
 }

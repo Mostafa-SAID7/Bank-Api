@@ -1,5 +1,6 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using System.Security.Cryptography;
 
 namespace Bank.Domain.Entities;
 
@@ -53,7 +54,10 @@ public class MaturityNotice : BaseEntity
     public void GenerateNoticeNumber()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMdd");
-        var random = new Random().Next(1000, 9999);
+        using var rng = RandomNumberGenerator.Create();
+        var bytes = new byte[2];
+        rng.GetBytes(bytes);
+        var random = Math.Abs(BitConverter.ToInt16(bytes, 0)) % 9000 + 1000;
         var typeCode = NoticeType switch
         {
             MaturityNoticeType.Initial => "IN",
@@ -102,16 +106,4 @@ public class MaturityNotice : BaseEntity
             FollowUpDate = DateTime.UtcNow.AddDays(1);
         }
     }
-}
-
-/// <summary>
-/// Types of maturity notices
-/// </summary>
-public enum MaturityNoticeType
-{
-    Initial = 1,         // Initial maturity notice
-    Reminder = 2,        // Reminder notice
-    Final = 3,           // Final notice before auto-action
-    AutoRenewal = 4,     // Auto-renewal confirmation
-    MaturityConfirmation = 5 // Maturity processing confirmation
 }

@@ -1,6 +1,6 @@
-using Bank.Application.DTOs;
 using Bank.Domain.Common;
 using Bank.Domain.Entities;
+using Bank.Domain.Enums;
 
 namespace Bank.Domain.Interfaces;
 

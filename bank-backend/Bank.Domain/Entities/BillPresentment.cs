@@ -1,5 +1,5 @@
-using Bank.Application.DTOs;
 using Bank.Domain.Common;
+using Bank.Domain.Enums;
 
 namespace Bank.Domain.Entities;
 
@@ -43,7 +43,7 @@ public class BillPresentment : BaseEntity
     /// </summary>
     public void MarkAsOverdue()
     {
-        if (Status == BillPresentmentStatus.Available && DueDate < DateTime.UtcNow.Date)
+        if (Status == BillPresentmentStatus.Presented && DueDate < DateTime.UtcNow.Date)
         {
             Status = BillPresentmentStatus.Overdue;
         }
@@ -69,7 +69,7 @@ public class BillPresentment : BaseEntity
     /// </summary>
     public bool IsOverdue()
     {
-        return Status == BillPresentmentStatus.Available && DueDate < DateTime.UtcNow.Date;
+        return Status == BillPresentmentStatus.Presented && DueDate < DateTime.UtcNow.Date;
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public class BillPresentment : BaseEntity
     /// </summary>
     public bool CanBePaid()
     {
-        return Status is BillPresentmentStatus.Available or BillPresentmentStatus.Overdue;
+        return Status is BillPresentmentStatus.Presented or BillPresentmentStatus.Overdue;
     }
 
     /// <summary>

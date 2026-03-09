@@ -1,5 +1,6 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using System.Security.Cryptography;
 
 namespace Bank.Domain.Entities;
 
@@ -148,7 +149,10 @@ public class FixedDeposit : BaseEntity
     public void GenerateDepositNumber()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMdd");
-        var random = new Random().Next(1000, 9999);
+        using var rng = RandomNumberGenerator.Create();
+        var randomBytes = new byte[4];
+        rng.GetBytes(randomBytes);
+        var random = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % 9000 + 1000;
         DepositNumber = $"FD{timestamp}{random}";
     }
 }

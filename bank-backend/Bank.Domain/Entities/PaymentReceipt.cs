@@ -1,6 +1,6 @@
-using Bank.Application.DTOs;
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using System.Security.Cryptography;
 
 namespace Bank.Domain.Entities;
 
@@ -35,7 +35,10 @@ public class PaymentReceipt : BaseEntity
     public static string GenerateReceiptNumber()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var random = new Random().Next(1000, 9999);
+        using var rng = RandomNumberGenerator.Create();
+        var bytes = new byte[2];
+        rng.GetBytes(bytes);
+        var random = Math.Abs(BitConverter.ToInt16(bytes, 0)) % 9000 + 1000;
         return $"RCP-{timestamp}-{random}";
     }
 
