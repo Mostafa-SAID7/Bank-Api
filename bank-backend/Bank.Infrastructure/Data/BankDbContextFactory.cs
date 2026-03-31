@@ -13,7 +13,7 @@ public class BankDbContextFactory : IDesignTimeDbContextFactory<BankDbContext>
         var optionsBuilder = new DbContextOptionsBuilder<BankDbContext>();
         
         // Use local database connection string for design-time operations
-        var connectionString = "Server=(localdb)\\mssqllocaldb;Database=BankingSystemDb;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true";
+        var connectionString = "Server=(localdb)\\mssqllocaldb;Database=BankingSystemLocalDb;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true";
         
         optionsBuilder.UseSqlServer(connectionString, sqlOptions => 
         {

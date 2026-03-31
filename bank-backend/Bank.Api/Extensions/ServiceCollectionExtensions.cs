@@ -289,7 +289,7 @@ public static class ServiceCollectionExtensions
         else
         {
             // In offline mode, skip Hangfire and background services
-            var logger = services.BuildServiceProvider().GetService<ILogger<ServiceCollectionExtensions>>();
+            var logger = services.BuildServiceProvider().GetService<ILogger<Program>>();
             logger?.LogWarning("⚠️ Background job services disabled (offline mode)");
         }
 
