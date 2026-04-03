@@ -1,6 +1,13 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Statement.Core;
+using Bank.Application.DTOs.Statement.Search;
+using Bank.Application.DTOs.Statement.Analytics;
+using Bank.Application.DTOs.Statement.Delivery;
+using Bank.Application.DTOs.Statement.Summary;
+using Bank.Application.DTOs.Statement.Transaction;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
+using Bank.Domain.Entities.Account;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -536,35 +543,8 @@ public class StatementService : IStatementService
 
     public async Task<List<StatementTemplate>> GetAvailableTemplatesAsync()
     {
-        await Task.CompletedTask; // Simulate async operation
-        
-        return new List<StatementTemplate>
-        {
-            new StatementTemplate
-            {
-                Name = "Standard",
-                Description = "Standard bank statement template",
-                Format = StatementFormat.PDF,
-                IncludeBankBranding = true,
-                IncludeRegulatoryDisclosures = true
-            },
-            new StatementTemplate
-            {
-                Name = "Detailed",
-                Description = "Detailed statement with transaction categories",
-                Format = StatementFormat.PDF,
-                IncludeBankBranding = true,
-                IncludeRegulatoryDisclosures = true
-            },
-            new StatementTemplate
-            {
-                Name = "Summary",
-                Description = "Summary statement with key metrics only",
-                Format = StatementFormat.PDF,
-                IncludeBankBranding = true,
-                IncludeRegulatoryDisclosures = true
-            }
-        };
+        // Feature not yet implemented - requires template management system
+        throw new NotImplementedException("Statement template retrieval is not yet implemented. Requires template management system implementation.");
     }
 
     public async Task<(bool IsValid, List<string> Errors)> ValidateStatementRequestAsync(GenerateStatementRequest request)

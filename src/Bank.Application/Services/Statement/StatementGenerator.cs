@@ -1,6 +1,10 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Statement.Core;
+using Bank.Application.DTOs.Statement.Delivery;
+using Bank.Application.DTOs.Statement.Analytics;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
+using Bank.Domain.Entities.Account;
 using Bank.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -225,8 +229,6 @@ public class StatementGenerator : IStatementGenerator
 
     private async Task<string> GenerateHtmlContentAsync(AccountStatement statement, StatementTemplate? template = null)
     {
-        await Task.CompletedTask; // Simulate async operation
-        
         var html = new StringBuilder();
         
         // HTML Header
@@ -488,8 +490,6 @@ public class StatementGenerator : IStatementGenerator
         List<AccountStatement> statements, 
         ConsolidatedStatementRequest request)
     {
-        await Task.CompletedTask;
-        
         var consolidatedData = new
         {
             ConsolidatedStatement = new
@@ -539,8 +539,6 @@ public class StatementGenerator : IStatementGenerator
         ConsolidatedStatementRequest request, 
         StatementTemplate? template)
     {
-        await Task.CompletedTask;
-        
         var html = new StringBuilder();
         
         // HTML Header

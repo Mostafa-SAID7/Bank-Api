@@ -1,5 +1,6 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using AccountEntity = Bank.Domain.Entities.Account.Account;
 
 namespace Bank.Domain.Entities;
 
@@ -9,10 +10,10 @@ public class PaymentTemplate : BaseEntity
     public string Description { get; set; } = string.Empty;
     
     public Guid FromAccountId { get; set; }
-    public Account FromAccount { get; set; } = null!;
+    public AccountEntity FromAccount { get; set; } = null!;
     
     public Guid? ToAccountId { get; set; } // Optional for templates
-    public Account? ToAccount { get; set; }
+    public AccountEntity? ToAccount { get; set; }
     
     public string? BeneficiaryName { get; set; }
     public string? BeneficiaryAccountNumber { get; set; }

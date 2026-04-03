@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Transaction.Core;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 

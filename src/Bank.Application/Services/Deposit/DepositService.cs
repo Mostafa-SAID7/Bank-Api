@@ -20,6 +20,7 @@ public class DepositService : IDepositService
     private readonly IInterestCalculationService _interestCalculationService;
     private readonly INotificationService _notificationService;
     private readonly IAuditLogService _auditLogService;
+    private readonly IDepositWithdrawalService _depositWithdrawalService;
     private readonly ILogger<DepositService> _logger;
     private readonly IMapper _mapper;
 
@@ -29,6 +30,7 @@ public class DepositService : IDepositService
         IInterestCalculationService interestCalculationService,
         INotificationService notificationService,
         IAuditLogService auditLogService,
+        IDepositWithdrawalService depositWithdrawalService,
         ILogger<DepositService> logger,
         IMapper mapper)
     {
@@ -37,6 +39,7 @@ public class DepositService : IDepositService
         _interestCalculationService = interestCalculationService;
         _notificationService = notificationService;
         _auditLogService = auditLogService;
+        _depositWithdrawalService = depositWithdrawalService;
         _logger = logger;
         _mapper = mapper;
     }
@@ -744,26 +747,20 @@ public class DepositService : IDepositService
 
     public async Task<WithdrawalDetailsDto> CalculateEarlyWithdrawalAsync(Guid depositId, decimal withdrawalAmount)
     {
-        var deposit = await _unitOfWork.Repository<FixedDeposit>().GetByIdAsync(depositId);
-        if (deposit == null)
-            throw new InvalidOperationException($"Fixed deposit {depositId} not found");
-
-        var availableBalance = deposit.PrincipalAmount + deposit.AccruedInterest;
-        var penaltyAmount = deposit.CalculateEarlyWithdrawalPenalty(withdrawalAmount);
-        var netAmount = withdrawalAmount - penaltyAmount;
-        var daysBeforeMaturity = (deposit.MaturityDate - DateTime.UtcNow).Days;
-
+        // Delegate to DepositWithdrawalService to avoid duplication
+        var calculation = await _depositWithdrawalService.CalculateDetailedWithdrawalAsync(depositId, withdrawalAmount);
+        
         return new WithdrawalDetailsDto
         {
             DepositId = depositId,
             RequestedAmount = withdrawalAmount,
-            AvailableBalance = availableBalance,
-            PenaltyAmount = penaltyAmount,
-            NetAmount = netAmount,
-            PenaltyType = deposit.PenaltyType,
-            PenaltyDescription = GetPenaltyDescription(deposit.PenaltyType, penaltyAmount),
-            IsEarlyWithdrawal = daysBeforeMaturity > 0,
-            DaysBeforeMaturity = Math.Max(0, daysBeforeMaturity)
+            AvailableBalance = calculation.AvailableBalance,
+            PenaltyAmount = calculation.PenaltyAmount,
+            NetAmount = calculation.NetAmount,
+            PenaltyType = calculation.PenaltyType,
+            PenaltyDescription = calculation.PenaltyDescription,
+            IsEarlyWithdrawal = calculation.IsEarlyWithdrawal,
+            DaysBeforeMaturity = calculation.DaysBeforeMaturity
         };
     }
 
@@ -782,84 +779,9 @@ public class DepositService : IDepositService
 
     public async Task<bool> ProcessEarlyWithdrawalAsync(Guid depositId, EarlyWithdrawalRequest request, Guid processedByUserId)
     {
-        var deposit = await _unitOfWork.Repository<FixedDeposit>()
-            .GetByIdAsync(depositId);
-        
-        if (deposit == null || deposit.Status != FixedDepositStatus.Active)
-            return false;
-
-        if (!request.AcknowledgePenalty)
-            throw new InvalidOperationException("Customer must acknowledge penalty for early withdrawal");
-
-        var availableBalance = deposit.PrincipalAmount + deposit.AccruedInterest;
-        if (request.WithdrawalAmount > availableBalance)
-            throw new InvalidOperationException("Withdrawal amount exceeds available balance");
-
-        var penaltyAmount = deposit.CalculateEarlyWithdrawalPenalty(request.WithdrawalAmount);
-        var netAmount = request.WithdrawalAmount - penaltyAmount;
-
-        // Close the deposit
-        deposit.Status = FixedDepositStatus.Closed;
-        deposit.ClosureDate = DateTime.UtcNow;
-        deposit.ClosedByUserId = processedByUserId;
-        deposit.ClosureReason = $"Early withdrawal: {request.Reason}";
-        deposit.PenaltyApplied = penaltyAmount;
-        deposit.NetAmountPaid = netAmount;
-
-        // Credit the linked account
-        deposit.LinkedAccount.Balance += netAmount;
-
-        // Create withdrawal transaction
-        var withdrawalTransaction = new DepositTransaction
-        {
-            FixedDepositId = depositId,
-            TransactionType = DepositTransactionType.EarlyWithdrawal,
-            Amount = request.WithdrawalAmount,
-            Description = $"Early withdrawal from deposit {deposit.DepositNumber}: {request.Reason}",
-            TransactionDate = DateTime.UtcNow,
-            Status = TransactionStatus.Completed,
-            ProcessedByUserId = processedByUserId,
-            ProcessedDate = DateTime.UtcNow
-        };
-        withdrawalTransaction.GenerateTransactionReference();
-
-        // Create penalty transaction if applicable
-        DepositTransaction? penaltyTransaction = null;
-        if (penaltyAmount > 0)
-        {
-            penaltyTransaction = new DepositTransaction
-            {
-                FixedDepositId = depositId,
-                TransactionType = DepositTransactionType.PenaltyCharge,
-                Amount = penaltyAmount,
-                Description = $"Early withdrawal penalty for deposit {deposit.DepositNumber}",
-                TransactionDate = DateTime.UtcNow,
-                Status = TransactionStatus.Completed,
-                PenaltyType = deposit.PenaltyType,
-                PenaltyReason = "Early withdrawal",
-                ProcessedByUserId = processedByUserId,
-                ProcessedDate = DateTime.UtcNow
-            };
-            penaltyTransaction.GenerateTransactionReference();
-        }
-
-        _unitOfWork.Repository<FixedDeposit>().Update(deposit);
-        _unitOfWork.Repository<Account>().Update(deposit.LinkedAccount);
-        await _unitOfWork.Repository<DepositTransaction>().AddAsync(withdrawalTransaction);
-        
-        if (penaltyTransaction != null)
-            await _unitOfWork.Repository<DepositTransaction>().AddAsync(penaltyTransaction);
-
-        await _unitOfWork.SaveChangesAsync();
-
-        await _auditLogService.LogUserActionAsync(
-            processedByUserId,
-            "FixedDeposit",
-            "EarlyWithdrawal",
-            depositId.ToString(),
-            $"Processed early withdrawal of {request.WithdrawalAmount:C} from deposit {deposit.DepositNumber}, penalty {penaltyAmount:C}");
-
-        return true;
+        // Delegate to DepositWithdrawalService to avoid duplication
+        var result = await _depositWithdrawalService.ProcessEarlyWithdrawalWithDetailsAsync(depositId, request, processedByUserId);
+        return result.Success;
     }
 
     public async Task<bool> ProcessPartialWithdrawalAsync(Guid depositId, PartialWithdrawalRequest request, Guid processedByUserId)

@@ -17,6 +17,9 @@ public class AccountValidationService : IAccountValidationService
     // SWIFT code pattern: 4 letters (bank) + 2 letters (country) + 2 alphanumeric (location) + optional 3 alphanumeric (branch)
     private static readonly Regex SwiftCodePattern = new(@"^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$", RegexOptions.Compiled);
     
+    // Default branch code when not specified in SWIFT code
+    private const string DefaultBranchCode = "XXX";
+    
     // IBAN patterns by country (simplified - in production, use comprehensive IBAN registry)
     private static readonly Dictionary<string, (int Length, Regex Pattern)> IbanPatterns = new()
     {
@@ -134,7 +137,7 @@ public class AccountValidationService : IAccountValidationService
             result.BankCode = swiftCode[..4];
             result.CountryCode = swiftCode.Substring(4, 2);
             result.LocationCode = swiftCode.Substring(6, 2);
-            result.BranchCode = swiftCode.Length > 8 ? swiftCode.Substring(8, 3) : "XXX";
+            result.BranchCode = swiftCode.Length > 8 ? swiftCode.Substring(8, 3) : DefaultBranchCode;
 
             // Simulate SWIFT directory lookup
             var bankInfo = await SimulateSwiftDirectoryLookup(swiftCode);
@@ -669,7 +672,7 @@ public class AccountValidationService : IAccountValidationService
         
         // Simplified sanctions check - in production, integrate with OFAC, UN, EU sanctions lists
         var sanctionedNames = new[] { "sanctioned", "blocked", "prohibited" };
-        var sanctionedSwiftCodes = new[] { "SANCTXXX", "BLOCXXX" };
+        var sanctionedSwiftCodes = new[] { "SANCTXXX", "BLOCXXX" }; // Known sanctioned SWIFT codes
 
         var nameSanctioned = sanctionedNames.Any(s => beneficiaryName.ToLower().Contains(s));
         var swiftSanctioned = !string.IsNullOrEmpty(swiftCode) && sanctionedSwiftCodes.Contains(swiftCode.ToUpper());

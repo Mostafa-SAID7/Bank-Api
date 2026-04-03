@@ -1,4 +1,5 @@
-using Bank.Domain.Entities.Shared;
+using Bank.Domain.Entities.Account;
+using Bank.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,40 +12,55 @@ public class StatementTransactionConfiguration : IEntityTypeConfiguration<Statem
 {
     public void Configure(EntityTypeBuilder<StatementTransaction> builder)
     {
+        // Table name
         builder.ToTable("StatementTransactions");
 
-        builder.HasKey(st => st.Id);
+        // Indexes for performance
+        builder.HasIndex(st => st.StatementId)
+            .HasDatabaseName("IX_StatementTransactions_StatementId");
 
+        builder.HasIndex(st => st.TransactionId)
+            .HasDatabaseName("IX_StatementTransactions_TransactionId");
+
+        builder.HasIndex(st => st.TransactionDate)
+            .HasDatabaseName("IX_StatementTransactions_TransactionDate");
+
+        builder.HasIndex(st => st.Type)
+            .HasDatabaseName("IX_StatementTransactions_Type");
+
+        builder.HasIndex(st => st.Category)
+            .HasDatabaseName("IX_StatementTransactions_Category");
+
+        builder.HasIndex(st => new { st.StatementId, st.TransactionDate })
+            .HasDatabaseName("IX_StatementTransactions_StatementId_TransactionDate");
+
+        // String property configurations
         builder.Property(st => st.Description)
-            .IsRequired()
-            .HasMaxLength(500);
+            .HasMaxLength(500)
+            .IsRequired();
 
         builder.Property(st => st.Reference)
             .HasMaxLength(100);
 
-        builder.Property(st => st.Amount)
-            .HasColumnType("decimal(18,2)")
-            .IsRequired();
-
-        builder.Property(st => st.RunningBalance)
-            .HasColumnType("decimal(18,2)")
-            .IsRequired();
-
-        builder.Property(st => st.Type)
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .IsRequired();
-
-        builder.Property(st => st.Status)
-            .HasConversion<string>()
-            .HasMaxLength(20)
-            .IsRequired();
-
         builder.Property(st => st.Category)
             .HasMaxLength(100);
 
-        builder.Property(st => st.Memo)
-            .HasMaxLength(500);
+        builder.Property(st => st.Merchant)
+            .HasMaxLength(200);
+
+        // Decimal property configurations
+        builder.Property(st => st.Amount)
+            .HasPrecision(18, 2)
+            .IsRequired();
+
+        builder.Property(st => st.Balance)
+            .HasPrecision(18, 2)
+            .IsRequired();
+
+        // Enum configuration
+        builder.Property(st => st.Type)
+            .HasConversion<int>()
+            .IsRequired();
 
         // Relationships
         builder.HasOne(st => st.Statement)
@@ -56,18 +72,5 @@ public class StatementTransactionConfiguration : IEntityTypeConfiguration<Statem
             .WithMany()
             .HasForeignKey(st => st.TransactionId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        // Indexes
-        builder.HasIndex(st => st.StatementId)
-            .HasDatabaseName("IX_StatementTransactions_StatementId");
-
-        builder.HasIndex(st => st.TransactionId)
-            .HasDatabaseName("IX_StatementTransactions_TransactionId");
-
-        builder.HasIndex(st => st.TransactionDate)
-            .HasDatabaseName("IX_StatementTransactions_TransactionDate");
-
-        builder.HasIndex(st => st.Category)
-            .HasDatabaseName("IX_StatementTransactions_Category");
     }
 }

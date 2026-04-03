@@ -1,15 +1,16 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using AccountEntity = Bank.Domain.Entities.Account.Account;
 
 namespace Bank.Domain.Entities;
 
 public class RecurringPayment : BaseEntity
 {
     public Guid FromAccountId { get; set; }
-    public Account FromAccount { get; set; } = null!;
+    public AccountEntity FromAccount { get; set; } = null!;
     
     public Guid ToAccountId { get; set; }
-    public Account ToAccount { get; set; } = null!;
+    public AccountEntity ToAccount { get; set; } = null!;
     
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;

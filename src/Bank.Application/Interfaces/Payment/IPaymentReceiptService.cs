@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Payment.Receipt;
 using Bank.Domain.Common;
 
 namespace Bank.Application.Interfaces;

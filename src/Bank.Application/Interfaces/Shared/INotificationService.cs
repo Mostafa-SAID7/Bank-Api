@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Shared.Notification;
 using Bank.Domain.Enums;
 
 namespace Bank.Application.Interfaces;

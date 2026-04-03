@@ -1,5 +1,6 @@
 using Bank.Application.Interfaces;
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Transaction.Fraud;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -283,20 +284,16 @@ public class FraudDetectionService : IFraudDetectionService
     {
         try
         {
-            // In a real implementation, this would save to a database table
-            // For now, just log the suspicious activity
             _logger.LogWarning("Suspicious activity reported: User {UserId}, Type: {ActivityType}, Score: {RiskScore}, Description: {Description}",
                 report.UserId, report.ActivityType, report.RiskScore, report.Description);
 
-            // TODO: Save to SuspiciousActivity table
-            // TODO: Trigger alerts for high-risk activities
-            // TODO: Update user risk profile
-
-            await Task.CompletedTask;
+            // Feature not yet implemented - requires SuspiciousActivity table and alert system
+            throw new NotImplementedException("Suspicious activity reporting is not yet implemented. Requires database schema and alert system implementation.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error reporting suspicious activity for user {UserId}", report.UserId);
+            throw;
         }
     }
 
@@ -316,9 +313,8 @@ public class FraudDetectionService : IFraudDetectionService
 
     public async Task UpdateRuleAsync(FraudRule rule)
     {
-        // TODO: Implement rule updates in database
-        _logger.LogInformation("Fraud rule updated: {RuleId} - {RuleName}", rule.Id, rule.Name);
-        await Task.CompletedTask;
+        // Feature not yet implemented - requires database persistence
+        throw new NotImplementedException("Fraud rule updates are not yet implemented. Requires database schema and persistence layer implementation.");
     }
 
     #region Private Helper Methods
@@ -339,32 +335,26 @@ public class FraudDetectionService : IFraudDetectionService
 
     private async Task<int> GetRecentFailedLoginAttemptsAsync(Guid userId, TimeSpan timeSpan)
     {
-        // TODO: Implement failed login attempt tracking
-        // For now, return mock data
-        await Task.CompletedTask;
-        return 0;
+        // Feature not yet implemented - requires login attempt tracking
+        throw new NotImplementedException("Failed login attempt tracking is not yet implemented. Requires database schema and tracking system implementation.");
     }
 
     private async Task<bool> IsNewIpAddressAsync(Guid userId, string ipAddress)
     {
-        // TODO: Implement IP address tracking
-        // For now, return false (not new)
-        await Task.CompletedTask;
-        return false;
+        // Feature not yet implemented - requires IP address tracking
+        throw new NotImplementedException("IP address tracking is not yet implemented. Requires database schema and tracking system implementation.");
     }
 
     private async Task<List<string>> GetRecentLoginIpAddressesAsync(Guid userId, TimeSpan timeSpan)
     {
-        // TODO: Implement IP address tracking
-        await Task.CompletedTask;
-        return new List<string>();
+        // Feature not yet implemented - requires IP address tracking
+        throw new NotImplementedException("IP address tracking is not yet implemented. Requires database schema and tracking system implementation.");
     }
 
     private async Task<List<SuspiciousActivityReport>> GetRecentSuspiciousActivitiesAsync(Guid userId, TimeSpan timeSpan)
     {
-        // TODO: Implement suspicious activity tracking
-        await Task.CompletedTask;
-        return new List<SuspiciousActivityReport>();
+        // Feature not yet implemented - requires suspicious activity tracking
+        throw new NotImplementedException("Suspicious activity tracking is not yet implemented. Requires database schema and tracking system implementation.");
     }
 
     #endregion

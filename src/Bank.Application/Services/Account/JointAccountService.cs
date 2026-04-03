@@ -11,17 +11,20 @@ public class JointAccountService : IJointAccountService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
     private readonly IAuditLogService _auditLogService;
+    private readonly IAccountService _accountService;
     private readonly ILogger<JointAccountService> _logger;
 
     public JointAccountService(
         IUnitOfWork unitOfWork,
         IUserRepository userRepository,
         IAuditLogService auditLogService,
+        IAccountService accountService,
         ILogger<JointAccountService> logger)
     {
         _unitOfWork = unitOfWork;
         _userRepository = userRepository;
         _auditLogService = auditLogService;
+        _accountService = accountService;
         _logger = logger;
     }
 
@@ -214,18 +217,8 @@ public class JointAccountService : IJointAccountService
 
     public async Task<bool> CanUserAccessAccountAsync(Guid accountId, Guid userId)
     {
-        try
-        {
-            var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
-            if (account == null) return false;
-
-            return account.CanUserAccess(userId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error checking user access for account {AccountId}", accountId);
-            return false;
-        }
+        // Delegate to AccountService to avoid duplication
+        return await _accountService.CanUserAccessAccountAsync(accountId, userId);
     }
 
     public async Task<bool> CanUserPerformTransactionAsync(Guid accountId, Guid userId, decimal amount)

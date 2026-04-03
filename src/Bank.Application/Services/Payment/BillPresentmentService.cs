@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Payment.Biller;
 using Bank.Application.Interfaces;
 using Bank.Domain.Common;
 using Bank.Domain.Entities;
@@ -6,7 +7,7 @@ using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using DomainBillPresentmentStatus = Bank.Domain.Enums.BillPresentmentStatus;
-using DTOBillPresentmentStatus = Bank.Application.DTOs.BillPresentmentStatus;
+using DTOBillPresentmentStatus = Bank.Application.DTOs.Payment.Biller.BillPresentmentStatus;
 
 namespace Bank.Application.Services;
 
@@ -336,55 +337,8 @@ public class BillPresentmentService : IBillPresentmentService
 
     #region Private Helper Methods
 
-    private static BillPresentmentDto MapToBillPresentmentDto(BillPresentment presentment)
-    {
-        var lineItems = new List<BillLineItemDto>();
-        
-        if (!string.IsNullOrEmpty(presentment.LineItemsJson))
-        {
-            try
-            {
-                lineItems = JsonSerializer.Deserialize<List<BillLineItemDto>>(presentment.LineItemsJson) ?? new List<BillLineItemDto>();
-            }
-            catch
-            {
-                // If deserialization fails, return empty list
-            }
-        }
-
-        return new BillPresentmentDto
-        {
-            Id = presentment.Id,
-            CustomerId = presentment.CustomerId,
-            BillerId = presentment.BillerId,
-            BillerName = presentment.Biller?.Name ?? string.Empty,
-            AccountNumber = presentment.AccountNumber,
-            AmountDue = presentment.AmountDue,
-            MinimumPayment = presentment.MinimumPayment,
-            DueDate = presentment.DueDate,
-            StatementDate = presentment.StatementDate,
-            Currency = presentment.Currency,
-            Status = ConvertToDto(presentment.Status),
-            BillNumber = presentment.BillNumber,
-            LineItems = lineItems,
-            CreatedAt = presentment.CreatedAt,
-            PaidDate = presentment.PaidDate
-        };
-    }
-
-    private static DTOBillPresentmentStatus ConvertToDto(DomainBillPresentmentStatus domainStatus)
-    {
-        return domainStatus switch
-        {
-            DomainBillPresentmentStatus.Pending => DTOBillPresentmentStatus.Pending,
-            DomainBillPresentmentStatus.Presented => DTOBillPresentmentStatus.Available,
-            DomainBillPresentmentStatus.Viewed => DTOBillPresentmentStatus.Available,
-            DomainBillPresentmentStatus.Paid => DTOBillPresentmentStatus.Paid,
-            DomainBillPresentmentStatus.Overdue => DTOBillPresentmentStatus.Overdue,
-            DomainBillPresentmentStatus.Cancelled => DTOBillPresentmentStatus.Cancelled,
-            _ => DTOBillPresentmentStatus.Pending
-        };
-    }
+    // Note: MapToBillPresentmentDto() has been moved to BillPresentmentMappingService (single source of truth)
+    // Note: ConvertToDto() has been moved to BillPresentmentMappingService and renamed to ConvertBillPresentmentStatusToDto()
 
     #endregion
 }

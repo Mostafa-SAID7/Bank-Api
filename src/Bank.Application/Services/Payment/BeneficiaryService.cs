@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Payment.Beneficiary;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -553,48 +554,6 @@ public class BeneficiaryService : IBeneficiaryService
         }
     }
 
-    #region Private Methods
-
-    private static BeneficiaryDto MapToDto(Beneficiary beneficiary)
-    {
-        return new BeneficiaryDto
-        {
-            Id = beneficiary.Id,
-            CustomerId = beneficiary.CustomerId,
-            Name = beneficiary.Name,
-            AccountNumber = beneficiary.AccountNumber,
-            AccountName = beneficiary.AccountName,
-            BankName = beneficiary.BankName,
-            BankCode = beneficiary.BankCode,
-            SwiftCode = beneficiary.SwiftCode,
-            IbanNumber = beneficiary.IbanNumber,
-            RoutingNumber = beneficiary.RoutingNumber,
-            Type = beneficiary.Type,
-            Category = beneficiary.Category,
-            IsVerified = beneficiary.IsVerified,
-            VerifiedDate = beneficiary.VerifiedDate,
-            Status = beneficiary.Status,
-            DailyTransferLimit = beneficiary.DailyTransferLimit,
-            MonthlyTransferLimit = beneficiary.MonthlyTransferLimit,
-            SingleTransferLimit = beneficiary.SingleTransferLimit,
-            IsActive = beneficiary.IsActive,
-            Notes = beneficiary.Notes,
-            Reference = beneficiary.Reference,
-            LastTransferDate = beneficiary.LastTransferDate,
-            TransferCount = beneficiary.TransferCount,
-            TotalTransferAmount = beneficiary.TotalTransferAmount,
-            CreatedAt = beneficiary.CreatedAt,
-            UpdatedAt = beneficiary.UpdatedAt
-        };
-    }
-
-    private async Task<bool> ValidateExternalAccountAsync(Beneficiary beneficiary)
-    {
-        // This would integrate with external bank validation services
-        // For now, return true for demonstration
-        await Task.Delay(100); // Simulate API call
-        return true;
-    }
-
-    #endregion
+    // Note: MapToDto() has been moved to BeneficiaryMappingService (single source of truth)
+    // Note: ValidateExternalAccountAsync() has been moved to BeneficiaryValidationService (single source of truth)
 }

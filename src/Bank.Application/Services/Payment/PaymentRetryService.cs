@@ -400,41 +400,10 @@ public class PaymentRetryService : IPaymentRetryService
         }
     }
 
-    private async Task NotifyMaxRetriesReached(BillPayment payment)
-    {
-        try
-        {
-            // This would typically send an email/SMS notification
-            // For now, we'll just log it
-            _logger.LogWarning("Payment {PaymentId} has reached maximum retry attempts", payment.Id);
-            
-            // In a real implementation, you would call the notification service
-            // await _notificationService.SendPaymentFailureNotificationAsync(payment.CustomerId, payment);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error sending max retries notification for payment {PaymentId}", payment.Id);
-        }
-    }
+    // Note: NotifyMaxRetriesReached() has been moved to PaymentRetryNotificationService (single source of truth)
+    // Note: NotifyPaymentPermanentlyFailed() has been moved to PaymentRetryNotificationService and renamed to NotifyPaymentPermanentFailure()
 
-    private async Task NotifyPaymentPermanentlyFailed(BillPayment payment)
-    {
-        try
-        {
-            // This would typically send an email/SMS notification
-            // For now, we'll just log it
-            _logger.LogWarning("Payment {PaymentId} permanently failed after all retry attempts", payment.Id);
-            
-            // In a real implementation, you would call the notification service
-            // await _notificationService.SendPaymentPermanentFailureNotificationAsync(payment.CustomerId, payment);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error sending permanent failure notification for payment {PaymentId}", payment.Id);
-        }
-    }
-
-    private static string GetRetryStatusMessage(BillPaymentStatus status, string failureReason)
+    private static string GetPaymentRetryStatusMessage(BillPaymentStatus status, string failureReason)
     {
         return status switch
         {

@@ -1,4 +1,9 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Statement.Core;
+using Bank.Application.DTOs.Statement.Search;
+using Bank.Application.DTOs.Statement.Analytics;
+using Bank.Application.DTOs.Statement.Delivery;
+using Bank.Application.DTOs.Statement.Summary;
 using Bank.Domain.Enums;
 
 namespace Bank.Application.Interfaces;

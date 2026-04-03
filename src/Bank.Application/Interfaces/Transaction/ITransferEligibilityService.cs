@@ -1,4 +1,6 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Transaction.Core;
+using Bank.Application.DTOs.Account.Transfer;
 
 namespace Bank.Application.Interfaces;
 

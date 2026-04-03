@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Bank.Domain.Enums;
 using Bank.Domain.ValueObjects;
 using Bank.Domain.Common;
+using AccountEntity = Bank.Domain.Entities.Account.Account;
 
 namespace Bank.Domain.Entities;
 
@@ -31,7 +32,7 @@ public class User : IdentityUser<Guid>
 
     public string FullName => $"{FirstName} {LastName}";
 
-    public ICollection<Account> Accounts { get; set; } = new List<Account>();
+    public ICollection<AccountEntity> Accounts { get; set; } = new List<AccountEntity>();
     public ICollection<TwoFactorToken> TwoFactorTokens { get; set; } = new List<TwoFactorToken>();
 
     public void SoftDelete(string? deletedBy = null)

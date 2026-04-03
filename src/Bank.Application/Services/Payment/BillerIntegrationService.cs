@@ -1,4 +1,7 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Payment.Biller;
+using Bank.Application.DTOs.Payment.Routing;
+using Bank.Application.DTOs.Payment.Batch;
 using Bank.Application.Interfaces;
 using Bank.Application.Validators.Payment;
 using Bank.Application.Validators.Shared;
@@ -584,41 +587,7 @@ public class BillerIntegrationService : IBillerIntegrationService
         };
     }
 
-    private static BillPresentmentDto MapToBillPresentmentDto(BillPresentment presentment)
-    {
-        var lineItems = new List<BillLineItemDto>();
-        
-        if (!string.IsNullOrEmpty(presentment.LineItemsJson))
-        {
-            try
-            {
-                lineItems = JsonSerializer.Deserialize<List<BillLineItemDto>>(presentment.LineItemsJson) ?? new List<BillLineItemDto>();
-            }
-            catch
-            {
-                // If deserialization fails, return empty list
-            }
-        }
-
-        return new BillPresentmentDto
-        {
-            Id = presentment.Id,
-            CustomerId = presentment.CustomerId,
-            BillerId = presentment.BillerId,
-            BillerName = presentment.Biller?.Name ?? string.Empty,
-            AccountNumber = presentment.AccountNumber,
-            AmountDue = presentment.AmountDue,
-            MinimumPayment = presentment.MinimumPayment,
-            DueDate = presentment.DueDate,
-            StatementDate = presentment.StatementDate,
-            Currency = presentment.Currency,
-            Status = (Bank.Application.DTOs.BillPresentmentStatus)presentment.Status,
-            BillNumber = presentment.BillNumber,
-            LineItems = lineItems,
-            CreatedAt = presentment.CreatedAt,
-            PaidDate = presentment.PaidDate
-        };
-    }
+    // Note: MapToBillPresentmentDto() has been moved to BillPresentmentService (single source of truth)
 
     #endregion
 }

@@ -1,5 +1,6 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using AccountEntity = Bank.Domain.Entities.Account.Account;
 
 namespace Bank.Domain.Entities;
 
@@ -28,7 +29,7 @@ public class Card : BaseEntity
     /// Account linked to this card
     /// </summary>
     public Guid AccountId { get; set; }
-    public Account Account { get; set; } = null!;
+    public AccountEntity Account { get; set; } = null!;
     
     /// <summary>
     /// Type of card (debit, credit, etc.)

@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.DTOs.Payment.Receipt;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
 using Bank.Domain.Common;
@@ -272,108 +273,7 @@ public class PaymentReceiptService : IPaymentReceiptService
         }
     }
 
-    #region Private Helper Methods
-
-    private static PaymentReceiptDto MapToPaymentReceiptDto(PaymentReceipt receipt)
-    {
-        return new PaymentReceiptDto
-        {
-            PaymentId = receipt.PaymentId,
-            ReceiptNumber = receipt.ReceiptNumber,
-            CustomerId = receipt.CustomerId,
-            CustomerName = receipt.CustomerName,
-            BillerName = receipt.BillerName,
-            Amount = receipt.Amount,
-            Currency = receipt.Currency,
-            PaymentDate = receipt.PaymentDate,
-            ProcessedDate = receipt.ProcessedDate,
-            ConfirmationNumber = receipt.ConfirmationNumber,
-            Reference = receipt.Reference,
-            PaymentMethod = receipt.PaymentMethod,
-            ProcessingFee = receipt.ProcessingFee,
-            Status = receipt.Status,
-            CreatedAt = receipt.CreatedAt
-        };
-    }
-
-    private static string GenerateConfirmationNumber()
-    {
-        return TokenGenerationHelper.GenerateConfirmationNumber();
-    }
-
-    private static byte[] GenerateMockPdfContent(PaymentReceipt receipt)
-    {
-        // In a real implementation, this would generate an actual PDF
-        // For now, we'll return mock content that represents a PDF structure
-        var pdfContent = $@"
-%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
-
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
-
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
->>
-endobj
-
-4 0 obj
-<<
-/Length 200
->>
-stream
-BT
-/F1 12 Tf
-50 750 Td
-(PAYMENT RECEIPT) Tj
-0 -20 Td
-(Receipt Number: {receipt.ReceiptNumber}) Tj
-0 -20 Td
-(Customer: {receipt.CustomerName}) Tj
-0 -20 Td
-(Biller: {receipt.BillerName}) Tj
-0 -20 Td
-(Amount: {receipt.Currency} {receipt.Amount:F2}) Tj
-0 -20 Td
-(Date: {receipt.ProcessedDate:yyyy-MM-dd}) Tj
-0 -20 Td
-(Confirmation: {receipt.ConfirmationNumber}) Tj
-ET
-endstream
-endobj
-
-xref
-0 5
-0000000000 65535 f 
-0000000010 00000 n 
-0000000053 00000 n 
-0000000110 00000 n 
-0000000205 00000 n 
-trailer
-<<
-/Size 5
-/Root 1 0 R
->>
-startxref
-456
-%%EOF";
-
-        return System.Text.Encoding.UTF8.GetBytes(pdfContent);
-    }
-
-    #endregion
+    // Note: MapToPaymentReceiptDto() has been moved to PaymentReceiptMappingService (single source of truth)
+    // Note: GenerateConfirmationNumber() has been moved to PaymentReceiptGenerationService (single source of truth)
+    // Note: GenerateMockPdfContent() has been moved to PaymentReceiptGenerationService (single source of truth)
 }

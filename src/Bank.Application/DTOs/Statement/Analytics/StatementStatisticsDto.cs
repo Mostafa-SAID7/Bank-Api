@@ -1,4 +1,6 @@
-﻿namespace Bank.Application.DTOs.Statement.Analytics;
+﻿using Bank.Application.DTOs.Statement.Summary;
+
+namespace Bank.Application.DTOs.Statement.Analytics;
 
 /// <summary>
 /// Statement statistics for analytics

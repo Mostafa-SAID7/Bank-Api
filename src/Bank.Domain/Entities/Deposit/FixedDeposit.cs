@@ -1,6 +1,7 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
 using System.Security.Cryptography;
+using AccountEntity = Bank.Domain.Entities.Account.Account;
 
 namespace Bank.Domain.Entities;
 
@@ -55,7 +56,7 @@ public class FixedDeposit : BaseEntity
     // Navigation properties
     public virtual User Customer { get; set; } = null!;
     public virtual DepositProduct DepositProduct { get; set; } = null!;
-    public virtual Account LinkedAccount { get; set; } = null!;
+    public virtual AccountEntity LinkedAccount { get; set; } = null!;
     public virtual User? ClosedByUser { get; set; }
     public virtual FixedDeposit? RenewedFromDeposit { get; set; }
     public virtual FixedDeposit? RenewedToDeposit { get; set; }

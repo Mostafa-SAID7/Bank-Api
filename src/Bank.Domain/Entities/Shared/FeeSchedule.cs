@@ -1,5 +1,6 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
+using AccountEntity = Bank.Domain.Entities.Account.Account;
 
 namespace Bank.Domain.Entities;
 
@@ -30,7 +31,7 @@ public class FeeSchedule : BaseEntity
     public Guid CreatedByUserId { get; set; }
     public User CreatedByUser { get; set; } = null!;
     
-    public bool IsApplicable(Account account)
+    public bool IsApplicable(AccountEntity account)
     {
         if (!IsActive || DateTime.UtcNow < EffectiveDate || (ExpiryDate.HasValue && DateTime.UtcNow > ExpiryDate))
             return false;
@@ -54,7 +55,7 @@ public class FeeSchedule : BaseEntity
         return true;
     }
     
-    public bool IsWaiverEligible(Account account)
+    public bool IsWaiverEligible(AccountEntity account)
     {
         if (WaiverMinimumBalance.HasValue && account.Balance >= WaiverMinimumBalance.Value)
             return true;

@@ -1,4 +1,5 @@
 using Bank.Domain.Entities;
+using Bank.Domain.Entities.Account;
 
 namespace Bank.Domain.Interfaces;
 
