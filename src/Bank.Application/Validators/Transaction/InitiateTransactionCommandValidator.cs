@@ -1,8 +1,11 @@
 using FluentValidation;
 using Bank.Application.Commands;
 
-namespace Bank.Application.Validators;
+namespace Bank.Application.Validators.Transaction;
 
+/// <summary>
+/// Validator for initiate transaction commands
+/// </summary>
 public class InitiateTransactionCommandValidator : AbstractValidator<InitiateTransactionCommand>
 {
     public InitiateTransactionCommandValidator()

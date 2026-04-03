@@ -2,7 +2,7 @@ using Bank.Application.DTOs.Loan;
 using Bank.Domain.Enums;
 using FluentValidation;
 
-namespace Bank.Application.Validators;
+namespace Bank.Application.Validators.Loan;
 
 /// <summary>
 /// Validator for loan application requests

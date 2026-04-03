@@ -1,7 +1,7 @@
 using Bank.Application.DTOs.Loan;
 using FluentValidation;
 
-namespace Bank.Application.Validators;
+namespace Bank.Application.Validators.Loan;
 
 /// <summary>
 /// Validator for approval decisions
