@@ -1,6 +1,7 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities;
+using Bank.Application.Validators.Payment;
+using Bank.Application.Validators.Shared;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -113,7 +114,7 @@ public class BillerIntegrationService : IBillerIntegrationService
                 ExternalReference = externalReference,
                 Status = status,
                 LastUpdated = DateTime.UtcNow,
-                StatusMessage = ValidationHelper.GetBillPaymentStatusMessage(status),
+                StatusMessage = BillPaymentStatusHelper.GetStatusMessage(status),
                 DeliveredDate = status == BillPaymentStatus.Delivered ? DateTime.UtcNow.AddHours(-1) : null
             };
         }
@@ -516,7 +517,7 @@ public class BillerIntegrationService : IBillerIntegrationService
 
         // Simulate success/failure based on amount (higher amounts have higher chance of additional verification)
         var successRate = request.Amount > 10000 ? 0.85 : 0.95;
-        var isSuccess = ValidationHelper.GenerateRandomBoolean(successRate);
+        var isSuccess = RandomGenerator.GenerateBoolean(successRate);
 
         if (isSuccess)
         {
@@ -547,7 +548,7 @@ public class BillerIntegrationService : IBillerIntegrationService
     private async Task<bool> SimulateBillerHealthCheck(Biller biller, CancellationToken cancellationToken)
     {
         // Simulate network delay
-        var delay = ValidationHelper.GenerateRandomNumber(100, 1000);
+        var delay = RandomGenerator.GenerateNumber(100, 1000);
         await Task.Delay(delay, cancellationToken);
 
         // Simulate health based on biller category (some are more reliable than others)
@@ -561,7 +562,7 @@ public class BillerIntegrationService : IBillerIntegrationService
             _ => 0.85
         };
 
-        return ValidationHelper.GenerateRandomBoolean(healthRate);
+        return RandomGenerator.GenerateBoolean(healthRate);
     }
 
     private static BillPaymentStatus SimulatePaymentStatusCheck(string externalReference)
