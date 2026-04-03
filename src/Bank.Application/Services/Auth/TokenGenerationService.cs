@@ -1,5 +1,8 @@
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities;
+using Bank.Application.Utilities.Auth;
+using Bank.Application.Utilities.Card;
+using Bank.Application.Utilities.Payment;
+using Bank.Application.Utilities.Shared;
 
 namespace Bank.Application.Services;
 
@@ -9,33 +12,33 @@ namespace Bank.Application.Services;
 public class TokenGenerationService : ITokenGenerationService
 {
     public string GenerateSecureToken(int length = 32)
-        => TokenGenerationHelper.GenerateSecureToken(length);
+        => SecureTokenGenerator.GenerateSecureToken(length);
 
     public string GenerateNumericToken(int length = 6)
-        => TokenGenerationHelper.GenerateNumericToken(length);
+        => SecureTokenGenerator.GenerateNumericToken(length);
 
     public string GenerateActivationCode(int length = 8)
-        => TokenGenerationHelper.GenerateActivationCode(length);
+        => SecureTokenGenerator.GenerateActivationCode(length);
 
     public string GenerateRandomPin(int length = 4)
-        => TokenGenerationHelper.GenerateRandomPin(length);
+        => PinGenerator.GenerateRandomPin(length);
 
     public string GenerateConfirmationNumber(string prefix = "CNF")
-        => TokenGenerationHelper.GenerateConfirmationNumber(prefix);
+        => ConfirmationNumberGenerator.GenerateConfirmationNumber(prefix);
 
     public List<string> GenerateBackupCodes(int count = 10, int length = 8)
-        => TokenGenerationHelper.GenerateBackupCodes(count, length);
+        => BackupCodeGenerator.GenerateBackupCodes(count, length);
 
     public string GenerateSecretKey(int length = 20)
-        => TokenGenerationHelper.GenerateSecretKey(length);
+        => TotpSecretGenerator.GenerateSecretKey(length);
 
     public string GenerateQrCodeUrl(string issuer, string accountName, string secretKey)
-        => TokenGenerationHelper.GenerateQrCodeUrl(issuer, accountName, secretKey);
+        => TotpSecretGenerator.GenerateQrCodeUrl(issuer, accountName, secretKey);
 
     public string GeneratePassword(int length = 12, bool includeUppercase = true, 
         bool includeLowercase = true, bool includeNumbers = true, bool includeSpecialChars = true)
-        => TokenGenerationHelper.GeneratePassword(length, includeUppercase, includeLowercase, includeNumbers, includeSpecialChars);
+        => PasswordGenerator.GeneratePassword(length, includeUppercase, includeLowercase, includeNumbers, includeSpecialChars);
 
     public string GenerateRandomCode(int length = 6, bool alphanumeric = false)
-        => TokenGenerationHelper.GenerateRandomCode(length, alphanumeric);
+        => RandomCodeGenerator.GenerateRandomCode(length, alphanumeric);
 }

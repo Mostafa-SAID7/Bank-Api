@@ -1,5 +1,7 @@
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities;
+using Bank.Application.Utilities.Deposit;
+using Bank.Application.Utilities.Loan;
+using Bank.Application.Utilities.Payment;
 using Bank.Domain.Enums;
 
 namespace Bank.Application.Services;
@@ -10,38 +12,38 @@ namespace Bank.Application.Services;
 public class CalculationService : ICalculationService
 {
     public decimal CalculateCompoundInterest(decimal principal, decimal rate, int compoundingFrequency, decimal time)
-        => CalculationHelper.CalculateCompoundInterest(principal, rate, compoundingFrequency, time);
+        => InterestCalculationHelper.CalculateCompoundInterest(principal, rate, compoundingFrequency, time);
 
     public decimal CalculateSimpleInterest(decimal principal, decimal rate, decimal time)
-        => CalculationHelper.CalculateSimpleInterest(principal, rate, time);
+        => InterestCalculationHelper.CalculateSimpleInterest(principal, rate, time);
 
     public decimal CalculateInterestRateFromScore(int creditScore, decimal baseRate = 0.03m, decimal maxRate = 0.25m)
-        => CalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate, maxRate);
+        => InterestCalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate, maxRate);
 
     public decimal CalculateMaxLoanAmount(decimal monthlyIncome, decimal existingDebt, 
         decimal maxDebtToIncomeRatio, int loanTermMonths, decimal interestRate)
-        => CalculationHelper.CalculateMaxLoanAmount(monthlyIncome, existingDebt, maxDebtToIncomeRatio, loanTermMonths, interestRate);
+        => LoanCalculationHelper.CalculateMaxLoanAmount(monthlyIncome, existingDebt, maxDebtToIncomeRatio, loanTermMonths, interestRate);
 
     public (decimal PrincipalPayment, decimal InterestPayment) CalculatePaymentAllocation(
         decimal remainingBalance, decimal monthlyPayment, decimal monthlyInterestRate)
-        => CalculationHelper.CalculatePaymentAllocation(remainingBalance, monthlyPayment, monthlyInterestRate);
+        => PaymentCalculationHelper.CalculatePaymentAllocation(remainingBalance, monthlyPayment, monthlyInterestRate);
 
     public decimal CalculateProcessingFee(decimal amount, PaymentMethod paymentMethod)
-        => CalculationHelper.CalculateProcessingFee(amount, paymentMethod);
+        => PaymentCalculationHelper.CalculateProcessingFee(amount, paymentMethod);
 
     public decimal CalculatePenaltyAmount(decimal amount, WithdrawalPenaltyType penaltyType, 
         decimal? penaltyAmount = null, decimal? penaltyPercentage = null)
-        => CalculationHelper.CalculatePenaltyAmount(amount, penaltyType, penaltyAmount, penaltyPercentage);
+        => PenaltyCalculationHelper.CalculatePenaltyAmount(amount, penaltyType, penaltyAmount, penaltyPercentage);
 
     public decimal CalculateDelinquencyRate(int delinquentLoans, int totalLoans)
-        => CalculationHelper.CalculateDelinquencyRate(delinquentLoans, totalLoans);
+        => RiskCalculationHelper.CalculateDelinquencyRate(delinquentLoans, totalLoans);
 
     public decimal CalculateDefaultRate(int defaultedLoans, int totalLoans)
-        => CalculationHelper.CalculateDefaultRate(defaultedLoans, totalLoans);
+        => RiskCalculationHelper.CalculateDefaultRate(defaultedLoans, totalLoans);
 
     public string CalculateRiskLevel(int creditScore, decimal debtToIncomeRatio, decimal loanToValueRatio = 0)
-        => CalculationHelper.CalculateRiskLevel(creditScore, debtToIncomeRatio, loanToValueRatio);
+        => RiskCalculationHelper.CalculateRiskLevel(creditScore, debtToIncomeRatio, loanToValueRatio);
 
     public decimal CalculateMonthlyPayment(decimal principal, decimal annualRate, int termMonths)
-        => CalculationHelper.CalculateMonthlyPayment(principal, annualRate, termMonths);
+        => LoanCalculationHelper.CalculateMonthlyPayment(principal, annualRate, termMonths);
 }
