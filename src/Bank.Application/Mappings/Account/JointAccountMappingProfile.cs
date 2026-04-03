@@ -1,11 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Account.Core;
 using Bank.Application.DTOs.Account.Validation;
 using Bank.Application.DTOs.Account.Lockout;
 using Bank.Application.DTOs.Account.Profile;
 using Bank.Application.DTOs.Account.JointAccount;
 using Bank.Application.DTOs.Account.Transfer;
-using Bank.Domain.Entities.Account;
+using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Account;
 
@@ -26,4 +26,5 @@ public class JointAccountMappingProfile : Profile
         CreateMap<JointAccount, CreateJointAccountRequest>().ReverseMap();
     }
 }
+
 

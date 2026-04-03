@@ -1,11 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Statement.Core;
 using Bank.Application.DTOs.Statement.Search;
 using Bank.Application.DTOs.Statement.Summary;
 using Bank.Application.DTOs.Statement.Delivery;
 using Bank.Application.DTOs.Statement.Analytics;
 using Bank.Application.DTOs.Statement.Transaction;
-using Bank.Domain.Entities.Statement;
+using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Statement;
 
@@ -28,4 +28,5 @@ public class StatementMappingProfile : Profile
         CreateMap<Statement, CreateStatementRequest>().ReverseMap();
     }
 }
+
 

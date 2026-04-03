@@ -7,6 +7,9 @@ namespace Bank.Application.DTOs.Transaction.Core;
 /// </summary>
 public class TransactionDto
 {
+    public Guid FromAccountId { get; set; }
+    public Guid ToAccountId { get; set; }
+    public Bank.Domain.Enums.TransactionType Type { get; set; }
     public Guid Id { get; set; }
     public Guid AccountId { get; set; }
     public decimal Amount { get; set; }
@@ -17,3 +20,4 @@ public class TransactionDto
     public DateTime CreatedAt { get; set; }
     public DateTime? ProcessedAt { get; set; }
 }
+

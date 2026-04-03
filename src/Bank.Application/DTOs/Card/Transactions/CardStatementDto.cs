@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Transactions;
@@ -43,7 +43,7 @@ public class CardStatementResult
 /// <summary>
 /// Card statement DTO
 /// </summary>
-public class CardStatementData
+public class CardStatementDto
 {
     public Guid Id { get; set; }
     public Guid CardId { get; set; }

@@ -8,6 +8,8 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class Notification : BaseEntity
 {
+    public bool IsRead { get; set; }
+    public string Title { get; set; }
     /// <summary>
     /// User who receives this notification
     /// </summary>

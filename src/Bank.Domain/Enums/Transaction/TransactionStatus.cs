@@ -5,5 +5,10 @@ public enum TransactionStatus
     Pending,
     Processing,
     Completed,
-    Failed
+    Failed,
+    Cancelled,
+    Settled,
+    Reversed
 }
+
+

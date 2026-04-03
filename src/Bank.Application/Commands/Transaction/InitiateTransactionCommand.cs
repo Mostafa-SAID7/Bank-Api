@@ -10,9 +10,9 @@ public record InitiateTransactionCommand(
     Guid ToAccountId, 
     decimal Amount, 
     TransactionType Type, 
-    string Description) : IRequest<Transaction>;
+    string Description) : IRequest<Bank.Domain.Entities.Transaction>;
 
-public class InitiateTransactionCommandHandler : IRequestHandler<InitiateTransactionCommand, Transaction>
+public class InitiateTransactionCommandHandler : IRequestHandler<InitiateTransactionCommand, Bank.Domain.Entities.Transaction>
 {
     private readonly ITransactionService _transactionService;
 
@@ -21,7 +21,7 @@ public class InitiateTransactionCommandHandler : IRequestHandler<InitiateTransac
         _transactionService = transactionService;
     }
 
-    public async Task<Transaction> Handle(InitiateTransactionCommand request, CancellationToken cancellationToken)
+    public async Task<Bank.Domain.Entities.Transaction> Handle(InitiateTransactionCommand request, CancellationToken cancellationToken)
     {
         // For CQRS we are delegating to the domain service, but this could be moved 
         // entirely into the handler in a pure CQRS setup.

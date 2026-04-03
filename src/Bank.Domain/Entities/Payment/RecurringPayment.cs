@@ -6,6 +6,8 @@ namespace Bank.Domain.Entities;
 
 public class RecurringPayment : BaseEntity
 {
+    public Guid BeneficiaryId { get; set; }
+    public Guid CustomerId { get; set; }
     public Guid FromAccountId { get; set; }
     public AccountEntity FromAccount { get; set; } = null!;
     

@@ -8,6 +8,7 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class NotificationPreference : BaseEntity
 {
+    public bool HasValue { get; set; }
     /// <summary>
     /// User who owns these preferences
     /// </summary>

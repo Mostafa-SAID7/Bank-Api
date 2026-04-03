@@ -1,5 +1,5 @@
 using FluentValidation;
-using Bank.Application.Commands;
+using Bank.Application.Commands.Transaction;
 
 namespace Bank.Application.Validators.Transaction;
 

@@ -46,7 +46,7 @@ public interface ICardService
     /// <summary>
     /// Get card transactions with filtering and pagination
     /// </summary>
-    Task<PagedResult<CardTransactionDto>> GetCardTransactionsAsync(CardTransactionSearchRequest request);
+    Task<Bank.Domain.Common.PagedResult<CardTransactionDto>> GetCardTransactionsAsync(CardTransactionSearchRequest request);
     
     /// <summary>
     /// Change card PIN

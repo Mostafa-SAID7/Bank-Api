@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Auth.Core;
 using Bank.Application.DTOs.Auth.TwoFactor;
 using Bank.Application.DTOs.Auth.Security;
 using Bank.Application.DTOs.Auth.Session;
-using Bank.Domain.Entities.Auth;
+using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Auth;
 
@@ -24,4 +24,5 @@ public class TwoFactorMappingProfile : Profile
         CreateMap<TwoFactorToken, CreateTwoFactorTokenRequest>().ReverseMap();
     }
 }
+
 

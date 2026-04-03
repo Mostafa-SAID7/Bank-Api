@@ -52,7 +52,7 @@ public interface ICardNetworkService
     /// <summary>
     /// Get card transactions for a specific card
     /// </summary>
-    Task<PagedResult<CardTransactionDto>> GetCardTransactionsAsync(CardTransactionSearchRequest request);
+    Task<Bank.Domain.Common.PagedResult<CardTransactionDto>> GetCardTransactionsAsync(CardTransactionSearchRequest request);
 
     /// <summary>
     /// Generate card statement

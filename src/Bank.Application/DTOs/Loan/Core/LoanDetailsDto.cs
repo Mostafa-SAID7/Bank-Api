@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Loan.Core;
 
@@ -7,6 +7,8 @@ namespace Bank.Application.DTOs.Loan.Core;
 /// </summary>
 public class LoanDto
 {
+    public decimal Amount { get; set; }
+    public Guid CustomerId { get; set; }
     public Guid Id { get; set; }
     public string LoanNumber { get; set; } = string.Empty;
     public LoanType Type { get; set; }
@@ -30,4 +32,5 @@ public class LoanDto
     public int? CreditScore { get; set; }
     public CreditScoreRange? CreditScoreRange { get; set; }
 }
+
 

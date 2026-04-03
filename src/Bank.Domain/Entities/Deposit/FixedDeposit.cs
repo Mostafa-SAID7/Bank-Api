@@ -10,6 +10,7 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class FixedDeposit : BaseEntity
 {
+    public decimal Amount { get; set; }
     public string DepositNumber { get; set; } = string.Empty;
     public Guid CustomerId { get; set; }
     public Guid DepositProductId { get; set; }

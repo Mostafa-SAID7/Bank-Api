@@ -4,5 +4,15 @@ public enum TransactionType
 {
     ACH,
     WPS,
-    RTGS
+    RTGS,
+    Deposit,
+    Withdrawal,
+    Transfer,
+    Payment,
+    Fee,
+    Interest,
+    Refund,
+    Reversal
 }
+
+

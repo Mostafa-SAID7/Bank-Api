@@ -8,4 +8,7 @@ public enum AccountStatus
     Closed = 4,
     Frozen = 5,
     Suspended = 6
+,
+    Pending
 }
+

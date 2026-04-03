@@ -437,7 +437,7 @@ public class CardService : ICardService
         }
     }
 
-    public async Task<PagedResult<CardTransactionDto>> GetCardTransactionsAsync(CardTransactionSearchRequest request)
+    public async Task<Bank.Domain.Common.PagedResult<CardTransactionDto>> GetCardTransactionsAsync(CardTransactionSearchRequest request)
     {
         try
         {

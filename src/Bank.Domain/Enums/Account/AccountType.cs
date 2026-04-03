@@ -6,4 +6,8 @@ public enum AccountType
     Checking = 2,
     Business = 3,
     Premium = 4
+,
+    MoneyMarket,
+    CertificateOfDeposit
 }
+

@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Deposit.Withdrawal;
 
@@ -42,6 +42,10 @@ public class PartialWithdrawalRequest
 /// </summary>
 public class DetailedWithdrawalCalculation
 {
+    public int DaysBeforeMaturity { get; set; }
+    public decimal PenaltyAmount { get; set; }
+    public string PenaltyDescription { get; set; }
+    public string PenaltyType { get; set; }
     public Guid DepositId { get; set; }
     public string DepositNumber { get; set; } = string.Empty;
     public decimal RequestedAmount { get; set; }
@@ -119,5 +123,6 @@ public class WithdrawalHistoryDto
     public string Reason { get; set; } = string.Empty;
     public Guid? ProcessedBy { get; set; }
 }
+
 
 

@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Card.Core;
 
@@ -7,6 +7,8 @@ namespace Bank.Application.DTOs.Card.Core;
 /// </summary>
 public class CardDto
 {
+    public string CardHolderName { get; set; }
+    public string Type { get; set; }
     public Guid Id { get; set; }
     public string CardNumber { get; set; } = string.Empty;
     public CardType CardType { get; set; }
@@ -18,5 +20,6 @@ public class CardDto
     public DateTime UpdatedAt { get; set; }
     public bool IsActive { get; set; }
 }
+
 
 

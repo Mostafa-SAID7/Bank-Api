@@ -11,4 +11,9 @@ public enum StatementStatus
     Delivered = 4,
     Failed = 5,
     Cancelled = 6
+,
+    Draft,
+    Viewed,
+    Archived
 }
+

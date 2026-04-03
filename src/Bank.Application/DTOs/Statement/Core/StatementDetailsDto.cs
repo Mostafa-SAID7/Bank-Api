@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Statement.Core;
 
@@ -7,6 +7,8 @@ namespace Bank.Application.DTOs.Statement.Core;
 /// </summary>
 public class StatementDto
 {
+    public DateTime EndDate { get; set; }
+    public DateTime StartDate { get; set; }
     public Guid Id { get; set; }
     public Guid AccountId { get; set; }
     public string AccountNumber { get; set; } = string.Empty;
@@ -31,4 +33,5 @@ public class StatementDto
     public DateTime? DeliveredDate { get; set; }
     public DateTime CreatedAt { get; set; }
 }
+
 

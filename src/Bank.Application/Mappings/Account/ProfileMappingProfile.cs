@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Account.Core;
 using Bank.Application.DTOs.Account.Validation;
 using Bank.Application.DTOs.Account.Lockout;
@@ -27,4 +27,5 @@ public class ProfileMappingProfile : Profile
         CreateMap<User, UpdateProfileRequest>().ReverseMap();
     }
 }
+
 

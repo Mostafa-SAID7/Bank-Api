@@ -1,10 +1,10 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Deposit.Core;
 using Bank.Application.DTOs.Deposit.FixedDeposit;
 using Bank.Application.DTOs.Deposit.Interest;
 using Bank.Application.DTOs.Deposit.Maturity;
 using Bank.Application.DTOs.Deposit.Withdrawal;
-using Bank.Domain.Entities.Deposit;
+using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Deposit;
 
@@ -24,4 +24,5 @@ public class DepositTransactionMappingProfile : Profile
             .ReverseMap();
     }
 }
+
 

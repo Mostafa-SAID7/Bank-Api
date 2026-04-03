@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Deposit.Core;
 
@@ -7,6 +7,7 @@ namespace Bank.Application.DTOs.Deposit.Core;
 /// </summary>
 public class DepositTransactionDto
 {
+    public Guid DepositId { get; set; }
     public Guid Id { get; set; }
     public Guid FixedDepositId { get; set; }
     public string TransactionReference { get; set; } = string.Empty;
@@ -24,5 +25,6 @@ public class DepositTransactionDto
     public WithdrawalPenaltyType? PenaltyType { get; set; }
     public string? PenaltyReason { get; set; }
 }
+
 
 

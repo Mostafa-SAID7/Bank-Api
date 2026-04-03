@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Payment.Core;
 using Bank.Application.DTOs.Payment.Beneficiary;
 using Bank.Application.DTOs.Payment.Biller;
@@ -7,7 +7,7 @@ using Bank.Application.DTOs.Payment.Routing;
 using Bank.Application.DTOs.Payment.Receipt;
 using Bank.Application.DTOs.Payment.Recurring;
 using Bank.Application.DTOs.Payment.Template;
-using Bank.Domain.Entities.Payment;
+using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Payment;
 
@@ -52,4 +52,5 @@ public class BeneficiaryMappingProfile : Profile
         CreateMap<Beneficiary, UpdateBeneficiaryRequest>().ReverseMap();
     }
 }
+
 

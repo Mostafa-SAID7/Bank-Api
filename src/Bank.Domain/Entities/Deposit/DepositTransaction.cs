@@ -9,6 +9,7 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class DepositTransaction : BaseEntity
 {
+    public Guid DepositId { get; set; }
     public Guid FixedDepositId { get; set; }
     public string TransactionReference { get; set; } = string.Empty;
     public DepositTransactionType TransactionType { get; set; }

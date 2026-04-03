@@ -1,9 +1,6 @@
 using AutoMapper;
-using Bank.Application.DTOs;
-using Bank.Application.DTOs.Payment.BillPresentment;
 using Bank.Domain.Entities;
-using DomainBillPresentmentStatus = Bank.Domain.Enums.BillPresentmentStatus;
-using DTOBillPresentmentStatus = Bank.Application.DTOs.BillPresentmentStatus;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.Mappings.Payment;
 
@@ -15,7 +12,7 @@ public class BillPresentmentMappingProfile : Profile
     public BillPresentmentMappingProfile()
     {
         // BillPresentment to BillPresentmentDto mapping
-        CreateMap<BillPresentment, BillPresentmentDto>()
+        CreateMap<BillPresentment, Bank.Application.DTOs.Payment.BillPresentment.BillPresentmentDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
             .ForMember(dest => dest.BillerId, opt => opt.MapFrom(src => src.BillerId))
@@ -26,27 +23,10 @@ public class BillPresentmentMappingProfile : Profile
             .ForMember(dest => dest.DueDate, opt => opt.MapFrom(src => src.DueDate))
             .ForMember(dest => dest.StatementDate, opt => opt.MapFrom(src => src.StatementDate))
             .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Currency))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ConvertBillPresentmentStatusToDto(src.Status)))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
             .ForMember(dest => dest.BillNumber, opt => opt.MapFrom(src => src.BillNumber))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
             .ForMember(dest => dest.PaidDate, opt => opt.MapFrom(src => src.PaidDate))
             .ReverseMap();
-    }
-
-    /// <summary>
-    /// Converts a domain BillPresentmentStatus to a DTO BillPresentmentStatus
-    /// </summary>
-    private static DTOBillPresentmentStatus ConvertBillPresentmentStatusToDto(DomainBillPresentmentStatus domainStatus)
-    {
-        return domainStatus switch
-        {
-            DomainBillPresentmentStatus.Pending => DTOBillPresentmentStatus.Pending,
-            DomainBillPresentmentStatus.Presented => DTOBillPresentmentStatus.Available,
-            DomainBillPresentmentStatus.Viewed => DTOBillPresentmentStatus.Available,
-            DomainBillPresentmentStatus.Paid => DTOBillPresentmentStatus.Paid,
-            DomainBillPresentmentStatus.Overdue => DTOBillPresentmentStatus.Overdue,
-            DomainBillPresentmentStatus.Cancelled => DTOBillPresentmentStatus.Cancelled,
-            _ => DTOBillPresentmentStatus.Pending
-        };
     }
 }

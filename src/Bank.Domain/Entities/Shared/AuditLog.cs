@@ -9,6 +9,7 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class AuditLog : BaseEntity
 {
+    public DateTime Timestamp { get; set; }
     public Guid? UserId { get; private set; }
     public string Action { get; private set; } = string.Empty;
     public string EntityType { get; private set; } = string.Empty;

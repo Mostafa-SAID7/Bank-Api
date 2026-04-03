@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs.Transaction.Core;
 using Bank.Application.DTOs.Transaction.Search;
 using Bank.Application.DTOs.Transaction.Analytics;
 using Bank.Application.DTOs.Transaction.Fraud;
-using Bank.Domain.Entities.Transaction;
+using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Transaction;
 
@@ -27,4 +27,5 @@ public class TransactionMappingProfile : Profile
         CreateMap<Transaction, CreateTransactionRequest>().ReverseMap();
     }
 }
+
 

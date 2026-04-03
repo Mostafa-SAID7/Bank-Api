@@ -8,6 +8,7 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class LoanPayment : BaseEntity
 {
+    public decimal Amount { get; set; }
     public Guid LoanId { get; set; }
     public Loan Loan { get; set; } = null!;
     
