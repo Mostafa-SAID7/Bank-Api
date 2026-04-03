@@ -1,4 +1,9 @@
 using Bank.Api.Extensions;
+using Bank.Api.Extensions.Configuration;
+using Bank.Api.Extensions.Data;
+using Bank.Api.Extensions.DependencyInjection;
+using Bank.Api.Extensions.Infrastructure;
+using Bank.Api.Extensions.Middleware;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
