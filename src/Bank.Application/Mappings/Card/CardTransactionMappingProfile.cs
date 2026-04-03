@@ -1,5 +1,10 @@
-using AutoMapper;
-using Bank.Application.DTOs.Card;
+﻿using AutoMapper;
+using Bank.Application.DTOs.Card.Core;
+using Bank.Application.DTOs.Card.Activation;
+using Bank.Application.DTOs.Card.Transactions;
+using Bank.Application.DTOs.Card.Fees;
+using Bank.Application.DTOs.Card.Operations;
+using Bank.Application.DTOs.Card.Advanced;
 using Bank.Domain.Entities.Card;
 
 namespace Bank.Application.Mappings.Card;
@@ -20,3 +25,4 @@ public class CardTransactionMappingProfile : Profile
             .ReverseMap();
     }
 }
+

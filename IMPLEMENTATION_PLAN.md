@@ -1,21 +1,16 @@
 # Bank API Backend - Implementation & Verification Plan
 
-## 📢 IMPORTANT: Project Reorganization Required
+## ✅ DTO Reorganization Complete
 
-**Before proceeding with this implementation plan, the project structure needs reorganization.**
+**The DTO reorganization has been successfully completed!**
 
-See **[REORGANIZATION_PLAN.md](REORGANIZATION_PLAN.md)** for:
-- Detailed folder structure improvements
-- Service file decomposition strategy
-- Automated reorganization script
-- Step-by-step refactoring guide
+All 195 DTO files are now organized into a clean, hierarchical structure:
+- **145 files moved** to appropriate subfolders
+- **23 files updated** with new using statements
+- **All namespaces updated** to match folder hierarchy
+- **Zero DTO-related compilation errors**
 
-**Quick Reorganization:**
-```bash
-# Run the automated reorganization script
-./scripts/reorganize-structure.ps1 -DryRun  # Preview changes
-./scripts/reorganize-structure.ps1           # Apply changes
-```
+See **[DTO_MIGRATION_COMPLETE.md](DTO_MIGRATION_COMPLETE.md)** for complete details.
 
 ---
 
@@ -117,6 +112,50 @@ Create `appsettings.Development.json` if needed:
   }
 }
 ```
+
+### 2.4 DTO Namespace Structure (Updated)
+
+All DTOs are now organized into a hierarchical structure with specific namespaces:
+
+**Example Using Statements:**
+```csharp
+// Auth DTOs
+using Bank.Application.DTOs.Auth.Core;
+using Bank.Application.DTOs.Auth.TwoFactor;
+using Bank.Application.DTOs.Auth.Security;
+using Bank.Application.DTOs.Auth.Session;
+
+// Card DTOs
+using Bank.Application.DTOs.Card.Core;
+using Bank.Application.DTOs.Card.Activation;
+using Bank.Application.DTOs.Card.Transactions;
+using Bank.Application.DTOs.Card.Operations;
+
+// Loan DTOs
+using Bank.Application.DTOs.Loan.Core;
+using Bank.Application.DTOs.Loan.Approval;
+using Bank.Application.DTOs.Loan.Repayment;
+
+// Payment DTOs
+using Bank.Application.DTOs.Payment.Beneficiary;
+using Bank.Application.DTOs.Payment.Biller;
+using Bank.Application.DTOs.Payment.Recurring;
+
+// Shared DTOs
+using Bank.Application.DTOs.Shared.Notification;
+using Bank.Application.DTOs.Shared.Audit;
+```
+
+**DTO Organization by Domain:**
+- **Account**: Core, Validation, Lockout, Profile, JointAccount, Transfer
+- **Auth**: Core, TwoFactor, Security, Session
+- **Card**: Core, Activation, Transactions, Fees, Operations, Advanced
+- **Deposit**: Core, FixedDeposit, Interest, Maturity, Withdrawal
+- **Loan**: Core, Application, Approval, Disbursement, Repayment, Analytics, Configuration
+- **Payment**: Core, Beneficiary, Biller, Batch, Routing, Receipt, Recurring, Template
+- **Statement**: Core, Search, Summary, Delivery, Analytics, Transaction
+- **Transaction**: Core, Search, Analytics, Fraud
+- **Shared**: Notification, Audit, RateLimit
 
 ---
 
@@ -244,7 +283,21 @@ info: Microsoft.Hosting.Lifetime[0]
 
 ## Phase 6: Verification & Testing ✔️
 
-### 6.1 Health Check Endpoints
+### 6.1 DTO Structure Verification
+
+**Verify all DTOs are in correct subfolders:**
+```bash
+# Check DTO folder structure
+Get-ChildItem -Path "Bank-Api/src/Bank.Application/DTOs" -Directory -Recurse | Select-Object FullName
+
+# Verify no orphaned DTO files in root folders
+Get-ChildItem -Path "Bank-Api/src/Bank.Application/DTOs/Auth" -Filter "*.cs" | Where-Object { $_.Directory.Name -eq "Auth" }
+Get-ChildItem -Path "Bank-Api/src/Bank.Application/DTOs/Card" -Filter "*.cs" | Where-Object { $_.Directory.Name -eq "Card" }
+```
+
+**Expected Result:** All DTO files should be in subfolders, not in domain root folders.
+
+### 6.2 Health Check Endpoints
 ```bash
 # Basic health check
 curl http://localhost:5000/health
@@ -253,20 +306,20 @@ curl http://localhost:5000/health
 curl http://localhost:5000/health/ready
 ```
 
-### 6.2 Access Swagger UI
+### 6.3 Access Swagger UI
 Open browser and navigate to:
 ```
 https://localhost:5001/swagger
 ```
 
-### 6.3 Test Static Files (wwwroot)
+### 6.4 Test Static Files (wwwroot)
 ```
 https://localhost:5001/Home.html
 https://localhost:5001/Docs.html
 https://localhost:5001/404.html
 ```
 
-### 6.4 Test API Endpoints
+### 6.5 Test API Endpoints
 
 **Register a new user:**
 ```bash
@@ -297,7 +350,7 @@ curl -X GET https://localhost:5001/api/Account \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-### 6.5 Run Unit Tests
+### 6.6 Run Unit Tests
 ```bash
 cd Bank-Api/src
 dotnet test
@@ -450,9 +503,12 @@ start https://localhost:5001/Home.html
 ## Verification Checklist ✅
 
 - [ ] .NET SDK installed and verified
+- [ ] DTO structure verified (all files in subfolders)
+- [ ] DTO namespaces correct (Bank.Application.DTOs.{Domain}.{Subfolder})
+- [ ] Using statements updated in services/controllers/mappings
 - [ ] Database connection successful
 - [ ] Migrations applied successfully
-- [ ] Application builds without errors
+- [ ] Application builds without DTO-related errors
 - [ ] Application starts successfully
 - [ ] Swagger UI accessible
 - [ ] Static files (Home.html) load correctly

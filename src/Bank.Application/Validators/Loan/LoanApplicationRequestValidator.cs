@@ -1,4 +1,10 @@
-using Bank.Application.DTOs.Loan;
+﻿using Bank.Application.DTOs.Loan.Core;
+using Bank.Application.DTOs.Loan.Application;
+using Bank.Application.DTOs.Loan.Approval;
+using Bank.Application.DTOs.Loan.Disbursement;
+using Bank.Application.DTOs.Loan.Repayment;
+using Bank.Application.DTOs.Loan.Analytics;
+using Bank.Application.DTOs.Loan.Configuration;
 using Bank.Domain.Enums;
 using FluentValidation;
 
@@ -99,3 +105,4 @@ public class LoanApplicationRequestValidator : AbstractValidator<LoanApplication
         return loanToValueRatio <= 0.80m; // 80% maximum LTV ratio
     }
 }
+

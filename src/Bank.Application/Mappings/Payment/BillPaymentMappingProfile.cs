@@ -1,5 +1,12 @@
-using AutoMapper;
-using Bank.Application.DTOs.Payment;
+﻿using AutoMapper;
+using Bank.Application.DTOs.Payment.Core;
+using Bank.Application.DTOs.Payment.Beneficiary;
+using Bank.Application.DTOs.Payment.Biller;
+using Bank.Application.DTOs.Payment.Batch;
+using Bank.Application.DTOs.Payment.Routing;
+using Bank.Application.DTOs.Payment.Receipt;
+using Bank.Application.DTOs.Payment.Recurring;
+using Bank.Application.DTOs.Payment.Template;
 using Bank.Domain.Entities.Payment;
 
 namespace Bank.Application.Mappings.Payment;
@@ -24,3 +31,4 @@ public class BillPaymentMappingProfile : Profile
         CreateMap<BillPayment, UpdateBillPaymentRequest>().ReverseMap();
     }
 }
+

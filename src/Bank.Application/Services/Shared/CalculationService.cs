@@ -1,7 +1,7 @@
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities.Deposit;
-using Bank.Application.Utilities.Loan;
-using Bank.Application.Utilities.Payment;
+using Bank.Application.Helpers.Deposit;
+using Bank.Application.Helpers.Loan;
+using Bank.Application.Helpers.Payment;
 using Bank.Domain.Enums;
 
 namespace Bank.Application.Services;

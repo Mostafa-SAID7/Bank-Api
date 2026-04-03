@@ -1,8 +1,8 @@
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities.Auth;
-using Bank.Application.Utilities.Card;
-using Bank.Application.Utilities.Payment;
-using Bank.Application.Utilities.Shared;
+using Bank.Application.Helpers.Auth;
+using Bank.Application.Helpers.Card;
+using Bank.Application.Helpers.Payment;
+using Bank.Application.Helpers.Shared;
 
 namespace Bank.Application.Services;
 

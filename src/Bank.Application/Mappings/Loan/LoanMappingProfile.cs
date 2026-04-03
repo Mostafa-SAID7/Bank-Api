@@ -1,5 +1,11 @@
-using AutoMapper;
-using Bank.Application.DTOs.Loan;
+﻿using AutoMapper;
+using Bank.Application.DTOs.Loan.Core;
+using Bank.Application.DTOs.Loan.Application;
+using Bank.Application.DTOs.Loan.Approval;
+using Bank.Application.DTOs.Loan.Disbursement;
+using Bank.Application.DTOs.Loan.Repayment;
+using Bank.Application.DTOs.Loan.Analytics;
+using Bank.Application.DTOs.Loan.Configuration;
 using Bank.Domain.Entities.Loan;
 
 namespace Bank.Application.Mappings.Loan;
@@ -25,3 +31,4 @@ public class LoanMappingProfile : Profile
         CreateMap<Loan, UpdateLoanRequest>().ReverseMap();
     }
 }
+

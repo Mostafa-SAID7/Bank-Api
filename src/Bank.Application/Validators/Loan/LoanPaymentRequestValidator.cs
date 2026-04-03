@@ -1,4 +1,10 @@
-using Bank.Application.DTOs.Loan;
+﻿using Bank.Application.DTOs.Loan.Core;
+using Bank.Application.DTOs.Loan.Application;
+using Bank.Application.DTOs.Loan.Approval;
+using Bank.Application.DTOs.Loan.Disbursement;
+using Bank.Application.DTOs.Loan.Repayment;
+using Bank.Application.DTOs.Loan.Analytics;
+using Bank.Application.DTOs.Loan.Configuration;
 using FluentValidation;
 
 namespace Bank.Application.Validators.Loan;
@@ -31,3 +37,4 @@ public class LoanPaymentRequestValidator : AbstractValidator<LoanPaymentRequest>
             .WithMessage("Notes cannot exceed 1000 characters");
     }
 }
+

@@ -1,0 +1,20 @@
+﻿namespace Bank.Application.DTOs.Statement.Core;
+
+/// <summary>
+/// Statement generation result
+/// </summary>
+public class StatementGenerationResult
+{
+    public bool Success { get; set; }
+    public string? Message { get; set; }
+    public Guid? StatementId { get; set; }
+    public string? StatementNumber { get; set; }
+    public string? FileName { get; set; }
+    public string? FilePath { get; set; }
+    public long? FileSizeBytes { get; set; }
+    public string? DownloadUrl { get; set; }
+    public DateTime? GeneratedDate { get; set; }
+    public List<string> Errors { get; set; } = new();
+    public List<string> Warnings { get; set; } = new();
+}
+
