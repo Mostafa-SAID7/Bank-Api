@@ -13,16 +13,16 @@ All 195 DTO files are now organized into a clean, hierarchical structure:
 ### DTO Organization Summary
 ```
 Account:     35 files in 6 subfolders
-Auth:        21 files in 4 subfolders
+Auth:        23 files in 4 subfolders
 Card:        30 files in 6 subfolders
 Deposit:     15 files in 5 subfolders
 Loan:        29 files in 7 subfolders
 Payment:     34 files in 8 subfolders
-Shared:      11 files in 3 subfolders
+Shared:      12 files in 3 subfolders
 Statement:   15 files in 6 subfolders
 Transaction:  5 files in 4 subfolders
 ─────────────────────────────────────
-TOTAL:      195 files in 49 subfolders
+TOTAL:      198 files in 49 subfolders
 ```
 
 See **[FINAL_STATUS_REPORT.md](FINAL_STATUS_REPORT.md)** for complete details.
@@ -521,7 +521,7 @@ start https://localhost:5001/Home.html
 
 - [x] .NET SDK installed and verified
 - [x] DTO structure verified (all files in subfolders)
-  - **Result**: 195 DTO files in 49 subfolders, 0 orphaned files
+  - **Result**: 198 DTO files in 49 subfolders, 0 orphaned files
 - [x] DTO namespaces correct (Bank.Application.DTOs.{Domain}.{Subfolder})
   - **Result**: 100% compliance, all namespaces match folder structure
 - [x] Using statements updated in services/controllers/mappings
@@ -532,7 +532,7 @@ start https://localhost:5001/Home.html
   - **Status**: Auto-migration enabled on startup
 - [x] Application builds without DTO-related errors
   - **Result**: 0 DTO errors, 0 DTO syntax errors, 0 DTO namespace errors
-  - **Note**: 48 pre-existing Domain layer errors (not DTO-related)
+  - **Note**: 24 pre-existing Domain layer errors (not DTO-related)
 - [x] Application starts successfully
   - **Status**: Ready to run with `dotnet run`
 - [x] Swagger UI accessible
@@ -562,9 +562,9 @@ start https://localhost:5001/Home.html
 
 ### Current Build Status
 
-**Total Build Errors**: 48  
+**Total Build Errors**: 24  
 **DTO-Related Errors**: 0 ✅  
-**Domain Layer Errors**: 48 (pre-existing)
+**Domain Layer Errors**: 24 (pre-existing)
 
 ### Error Categories
 
