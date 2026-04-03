@@ -39,13 +39,16 @@ builder.Services.AddInfrastructureServices();
 // 7. CQRS & Validation
 builder.Services.AddCqrsServices();
 
-// 8. Background Jobs
+// 8. AutoMapper (Object Mapping)
+builder.Services.AddAutoMapperServices();
+
+// 9. Background Jobs
 builder.Services.AddBackgroundJobServices(builder.Configuration);
 
-// 9. API Documentation
+// 10. API Documentation
 builder.Services.AddApiDocumentationServices();
 
-// 10. CORS Policies
+// 11. CORS Policies
 builder.Services.AddCorsServices();
 
 var app = builder.Build();
