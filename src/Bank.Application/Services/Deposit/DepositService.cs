@@ -1,6 +1,6 @@
+using AutoMapper;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -21,6 +21,7 @@ public class DepositService : IDepositService
     private readonly INotificationService _notificationService;
     private readonly IAuditLogService _auditLogService;
     private readonly ILogger<DepositService> _logger;
+    private readonly IMapper _mapper;
 
     public DepositService(
         IUnitOfWork unitOfWork,
@@ -28,7 +29,8 @@ public class DepositService : IDepositService
         IInterestCalculationService interestCalculationService,
         INotificationService notificationService,
         IAuditLogService auditLogService,
-        ILogger<DepositService> logger)
+        ILogger<DepositService> logger,
+        IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _userRepository = userRepository;
@@ -36,6 +38,7 @@ public class DepositService : IDepositService
         _notificationService = notificationService;
         _auditLogService = auditLogService;
         _logger = logger;
+        _mapper = mapper;
     }
 
     #region Deposit Product Management
@@ -1184,7 +1187,7 @@ Bank Customer Service
                            (!fromDate.HasValue || t.TransactionDate >= fromDate.Value) &&
                            (!toDate.HasValue || t.TransactionDate <= toDate.Value));
 
-        return transactions.OrderByDescending(t => t.TransactionDate).Select(MappingHelper.MapToDepositTransactionDto);
+        return transactions.OrderByDescending(t => t.TransactionDate).Select(t => _mapper.Map<DepositTransactionDto>(t));
     }
 
     public async Task<DepositPortfolioDto> GetCustomerDepositPortfolioAsync(Guid customerId)

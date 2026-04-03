@@ -1,6 +1,6 @@
+using AutoMapper;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
-using Bank.Application.Utilities;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -18,19 +18,22 @@ public class LoanService : ILoanService
     private readonly ILogger<LoanService> _logger;
     private readonly ITransactionService _transactionService;
     private readonly ILoanInterestCalculationService _loanInterestCalculationService;
+    private readonly IMapper _mapper;
 
     public LoanService(
         ILoanRepository loanRepository,
         IUserRepository userRepository,
         ILogger<LoanService> logger,
         ITransactionService transactionService,
-        ILoanInterestCalculationService loanInterestCalculationService)
+        ILoanInterestCalculationService loanInterestCalculationService,
+        IMapper mapper)
     {
         _loanRepository = loanRepository;
         _userRepository = userRepository;
         _logger = logger;
         _transactionService = transactionService;
         _loanInterestCalculationService = loanInterestCalculationService;
+        _mapper = mapper;
     }
 
     public async Task<LoanApplicationResult> SubmitApplicationAsync(Guid customerId, LoanApplicationRequest request)
@@ -726,9 +729,9 @@ public class LoanService : ILoanService
         return CalculationHelper.CalculatePaymentAllocation(loan.OutstandingBalance, paymentAmount, monthlyInterestRate);
     }
 
-    private static LoanDto MapToLoanDto(Loan loan)
+    private LoanDto MapToLoanDto(Loan loan)
     {
-        return MappingHelper.MapToLoanDto(loan);
+        return _mapper.Map<LoanDto>(loan);
     }
 
     #endregion
