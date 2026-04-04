@@ -1,22 +1,73 @@
-using System;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs
 {
     public class CreateBeneficiaryRequest { }
     public class CreateBillPaymentRequest { }
-    public class CreateJointAccountRequest { }
-    public class JointAccountDto { }
+    public class CreateJointAccountRequest { 
+        public Guid AccountId { get; set; }
+        public Guid SecondaryOwnerId { get; set; }
+    }
+    public class JointAccountDto { 
+        public Guid Id { get; set; }
+        public Guid AccountId { get; set; }
+        public Guid PrimaryOwnerId { get; set; }
+        public Guid SecondaryOwnerId { get; set; }
+        public string? Notes { get; set; }
+    }
     public class UpdateCardRequest { }
     public class CreateCardRequest { }
     public class CreateDepositRequest { }
-    public class DepositDto { }
+    public class DepositDto { 
+        public Guid Id { get; set; }
+        public string DepositNumber { get; set; } = string.Empty;
+        public decimal PrincipalAmount { get; set; }
+        public decimal InterestRate { get; set; }
+        public DateTime MaturityDate { get; set; }
+        public string Status { get; set; } = string.Empty;
+    }
     public class UpdateLoanRequest { }
     public class CreateLoanRequest { }
-    public class LoanDto { }
     public class CreateLoanPaymentRequest { }
-    public class LoanPaymentDto { }
-    public class UserDto { }
+    public class LoanPaymentDto { 
+        public Guid Id { get; set; }
+        public Guid LoanId { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public string Status { get; set; } = string.Empty; 
+    }
+    public class TwoFactorTokenDto { 
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public string Token { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
+    }
+    public class CreateTwoFactorTokenRequest { 
+        public Guid UserId { get; set; }
+        public string Purpose { get; set; } = string.Empty;
+    }
+    public class UserDto {
+        public Guid Id { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+    }
     public class CreateUserRequest { }
     public class UpdateUserRequest { }
     public class CreateStatementRequest { }
+
+    public class JointAccountHolderDetailsDto
+    {
+        public Guid Id { get; set; }
+        public Guid AccountId { get; set; }
+        public Guid UserId { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+        public JointAccountRole Role { get; set; }
+        public JointAccountAccessLevel AccessLevel { get; set; }
+        public decimal? TransactionLimit { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime JoinedDate { get; set; }
+    }
 }

@@ -3,7 +3,7 @@ using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Auth;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for PasswordHistory entity
@@ -80,3 +80,4 @@ public class PasswordHistoryRepository : Repository<PasswordHistory>, IPasswordH
             .FirstOrDefaultAsync(h => h.UserId == userId && h.PasswordHash == passwordHash);
     }
 }
+

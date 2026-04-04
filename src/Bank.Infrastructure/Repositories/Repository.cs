@@ -80,6 +80,28 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         return await _dbSet.Where(e => !e.IsDeleted).AnyAsync(predicate);
     }
 
+    public async Task<(IEnumerable<T> Items, int TotalCount)> ListAsync(Expression<Func<T, bool>>? predicate = null, int page = 1, int pageSize = 10)
+    {
+        var query = _dbSet.Where(e => !e.IsDeleted);
+        if (predicate != null)
+            query = query.Where(predicate);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<T> Items, int TotalCount)> SearchAsync(string searchTerm, int page = 1, int pageSize = 10)
+    {
+        // Default search implementation - can be overridden in specific repositories
+        // This is a placeholder that returns everything if no override is provided
+        return await ListAsync(null, page, pageSize);
+    }
+
     public IQueryable<T> Query()
     {
         return _dbSet.Where(e => !e.IsDeleted).AsQueryable();

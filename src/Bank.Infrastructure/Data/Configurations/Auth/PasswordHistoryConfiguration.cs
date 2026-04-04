@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Auth;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Auth;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for PasswordHistory entity
@@ -30,3 +30,4 @@ public class PasswordHistoryConfiguration : IEntityTypeConfiguration<PasswordHis
             .HasMaxLength(128);
     }
 }
+

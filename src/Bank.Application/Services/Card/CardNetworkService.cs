@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -542,7 +543,7 @@ public class CardNetworkService : ICardNetworkService
             
             var transactionDtos = transactions.Select(MapToCardTransactionDto).ToList();
             
-            return new PagedResult<CardTransactionDto>
+            return new Bank.Domain.Common.PagedResult<CardTransactionDto>
             {
                 Items = transactionDtos,
                 TotalCount = totalCount,

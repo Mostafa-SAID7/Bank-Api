@@ -7,6 +7,7 @@ using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using AutoMapper;
 
 namespace Bank.Application.Services;
 
@@ -25,6 +26,7 @@ public class BillPaymentService : IBillPaymentService
     private readonly IBillPaymentProcessingService _billPaymentProcessingService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<BillPaymentService> _logger;
+    private readonly IMapper _mapper;
 
     public BillPaymentService(
         IBillerRepository billerRepository,
@@ -36,7 +38,8 @@ public class BillPaymentService : IBillPaymentService
         IPaymentReceiptService paymentReceiptService,
         IBillPaymentProcessingService billPaymentProcessingService,
         IUnitOfWork unitOfWork,
-        ILogger<BillPaymentService> logger)
+        ILogger<BillPaymentService> logger,
+        IMapper mapper)
     {
         _billerRepository = billerRepository;
         _billPaymentRepository = billPaymentRepository;
@@ -48,6 +51,7 @@ public class BillPaymentService : IBillPaymentService
         _billPaymentProcessingService = billPaymentProcessingService;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<List<BillerDto>> GetAvailableBillersAsync()
@@ -209,8 +213,20 @@ public class BillPaymentService : IBillPaymentService
 
     #region Private Helper Methods
 
-    // Note: MapToBillerDto() has been moved to BillerService (single source of truth)
-    // Note: MapToBillPaymentDto() and MapToBillPaymentHistoryDto() have been moved to BillPaymentMappingService
+    private BillerDto MapToBillerDto(Biller biller)
+    {
+        return _mapper.Map<BillerDto>(biller);
+    }
+
+    private BillPaymentDto MapToBillPaymentDto(BillPayment payment)
+    {
+        return _mapper.Map<BillPaymentDto>(payment);
+    }
+
+    private BillPaymentHistoryDto MapToBillPaymentHistoryDto(BillPayment payment)
+    {
+        return _mapper.Map<BillPaymentHistoryDto>(payment);
+    }
 
     #endregion
 }

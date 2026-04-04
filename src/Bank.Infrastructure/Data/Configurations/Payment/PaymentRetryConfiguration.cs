@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Payment;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Payment;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for PaymentRetry entity
@@ -53,3 +53,4 @@ public class PaymentRetryConfiguration : IEntityTypeConfiguration<PaymentRetry>
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
+

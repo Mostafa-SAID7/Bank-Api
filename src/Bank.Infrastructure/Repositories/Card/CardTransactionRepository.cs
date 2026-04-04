@@ -1,11 +1,12 @@
 using Bank.Application.DTOs;
 using Bank.Domain.Entities;
+using Card = Bank.Domain.Entities.Card;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Card;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for card transaction operations
@@ -111,7 +112,17 @@ public class CardTransactionRepository : ICardTransactionRepository
 
         return (transactions, totalCount);
     }
-    public async Task<(List<CardTransaction> transactions, int totalCount)> SearchTransactionsAsync(CardTransactionSearchRequest request)
+        public async Task<(List<CardTransaction> transactions, int totalCount)> SearchTransactionsAsync(
+        Guid cardId,
+        DateTime? fromDate = null, 
+        DateTime? toDate = null,
+        CardTransactionType? type = null,
+        CardTransactionStatus? status = null,
+        decimal? minAmount = null,
+        decimal? maxAmount = null,
+        string? merchantName = null,
+        int page = 1,
+        int pageSize = 20)
     {
         var query = _context.CardTransactions
             .Include(t => t.Card)
@@ -264,3 +275,5 @@ public class CardTransactionRepository : ICardTransactionRepository
         return await query.ToListAsync();
     }
 }
+
+

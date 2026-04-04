@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Payment;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Payment;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for BillPresentment entity
@@ -85,3 +85,4 @@ public class BillPresentmentConfiguration : IEntityTypeConfiguration<BillPresent
             .OnDelete(DeleteBehavior.SetNull);
     }
 }
+

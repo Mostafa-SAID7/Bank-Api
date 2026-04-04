@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text.Json;
+using AutoMapper;
 using DomainPaymentMethod = Bank.Domain.Enums.PaymentMethod;
 using DomainBillPresentmentStatus = Bank.Domain.Enums.BillPresentmentStatus;
 
@@ -33,6 +34,7 @@ public class BillerIntegrationService : IBillerIntegrationService
     private readonly IConfiguration _configuration;
     private readonly ILogger<BillerIntegrationService> _logger;
     private readonly HttpClient _httpClient;
+    private readonly IMapper _mapper;
 
     // Configuration constants
     private const int MaxRetryAttempts = 3;
@@ -47,7 +49,8 @@ public class BillerIntegrationService : IBillerIntegrationService
         IUnitOfWork unitOfWork,
         IConfiguration configuration,
         ILogger<BillerIntegrationService> logger,
-        HttpClient httpClient)
+        HttpClient httpClient,
+        IMapper mapper)
     {
         _billerRepository = billerRepository;
         _billerHealthCheckRepository = billerHealthCheckRepository;
@@ -57,6 +60,7 @@ public class BillerIntegrationService : IBillerIntegrationService
         _configuration = configuration;
         _logger = logger;
         _httpClient = httpClient;
+        _mapper = mapper;
     }
 
     public async Task<BillerPaymentResponse> SendPaymentToBillerAsync(BillerPaymentRequest request)
@@ -587,7 +591,10 @@ public class BillerIntegrationService : IBillerIntegrationService
         };
     }
 
-    // Note: MapToBillPresentmentDto() has been moved to BillPresentmentService (single source of truth)
+    private BillPresentmentDto MapToBillPresentmentDto(BillPresentment presentment)
+    {
+        return _mapper.Map<BillPresentmentDto>(presentment);
+    }
 
     #endregion
 }

@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Payment;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Payment;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for RecurringPaymentExecution entity
@@ -28,3 +28,4 @@ public class RecurringPaymentExecutionConfiguration : IEntityTypeConfiguration<R
             .HasDatabaseName("IX_RecurringPaymentExecutions_RecurringPaymentId_ScheduledDate");
     }
 }
+

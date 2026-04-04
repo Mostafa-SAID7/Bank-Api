@@ -1,4 +1,5 @@
 using Bank.Application.Helpers;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Helpers.Auth;
 using Bank.Domain.Entities;
 using Microsoft.Extensions.Logging;

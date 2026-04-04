@@ -45,7 +45,7 @@ public class DetailedWithdrawalCalculation
     public int DaysBeforeMaturity { get; set; }
     public decimal PenaltyAmount { get; set; }
     public string PenaltyDescription { get; set; }
-    public string PenaltyType { get; set; }
+    public WithdrawalPenaltyType PenaltyType { get; set; }
     public Guid DepositId { get; set; }
     public string DepositNumber { get; set; } = string.Empty;
     public decimal RequestedAmount { get; set; }
@@ -55,12 +55,10 @@ public class DetailedWithdrawalCalculation
     public DateTime MaturityDate { get; set; }
     public int DaysToMaturity { get; set; }
     public bool IsEarlyWithdrawal { get; set; }
-    
     public List<PenaltyDetail> PenaltyDetails { get; set; } = new();
     public decimal TotalPenalty { get; set; }
     public decimal NetAmount { get; set; }
     public decimal RemainingBalance { get; set; }
-    
     public WithdrawalValidationResult ValidationResults { get; set; } = new();
 }
 
@@ -123,6 +121,3 @@ public class WithdrawalHistoryDto
     public string Reason { get; set; } = string.Empty;
     public Guid? ProcessedBy { get; set; }
 }
-
-
-

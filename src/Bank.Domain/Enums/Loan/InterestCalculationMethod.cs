@@ -1,13 +1,12 @@
 namespace Bank.Domain.Enums;
 
-/// <summary>
-/// Interest calculation methods
-/// </summary>
 public enum InterestCalculationMethod
 {
     Simple = 1,
-    CompoundMonthly = 2,
-    CompoundDaily = 3,
-    ReducingBalance = 4,
-    FlatRate = 5
+    Compound = 2,
+    DecliningBalance = 3,
+    FlatRate = 4,
+    ReducingBalance = 5,
+    CompoundDaily = 6,
+    CompoundMonthly = 7
 }

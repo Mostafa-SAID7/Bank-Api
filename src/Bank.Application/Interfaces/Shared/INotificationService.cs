@@ -70,6 +70,11 @@ public interface INotificationService
     Task<NotificationResponse> SendPaymentReminderAsync(string userId, string paymentType, decimal amount, DateTime dueDate);
     
     /// <summary>
+    /// Send system notification
+    /// </summary>
+    Task SendSystemNotificationAsync(Guid userId, string title, string message, string type);
+    
+    /// <summary>
     /// Process scheduled notifications
     /// </summary>
     Task ProcessScheduledNotificationsAsync();

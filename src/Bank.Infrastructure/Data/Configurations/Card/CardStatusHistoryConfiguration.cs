@@ -1,8 +1,9 @@
 using Bank.Domain.Entities;
+using Card = Bank.Domain.Entities.Card;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Card;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for CardStatusHistory entity
@@ -64,3 +65,4 @@ public class CardStatusHistoryConfiguration : IEntityTypeConfiguration<CardStatu
             .HasDatabaseName("IX_CardStatusHistories_CardId_ChangeDate");
     }
 }
+

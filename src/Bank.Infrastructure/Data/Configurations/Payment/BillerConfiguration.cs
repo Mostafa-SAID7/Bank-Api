@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Payment;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Payment;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for Biller entity
@@ -76,3 +76,4 @@ public class BillerConfiguration : IEntityTypeConfiguration<Biller>
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+

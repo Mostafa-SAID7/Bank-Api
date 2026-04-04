@@ -1,10 +1,11 @@
 using Bank.Domain.Entities;
+using Loan = Bank.Domain.Entities.Loan;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Loan;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for loan data access
@@ -207,3 +208,4 @@ public class LoanRepository : ILoanRepository
         return query;
     }
 }
+

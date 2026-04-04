@@ -1,9 +1,9 @@
-using Bank.Domain.Entities.Payment;
+using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Payment;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for BillPayment entity
@@ -78,3 +78,4 @@ public class BillPaymentConfiguration : IEntityTypeConfiguration<BillPayment>
             .OnDelete(DeleteBehavior.SetNull);
     }
 }
+

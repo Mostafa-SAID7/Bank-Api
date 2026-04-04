@@ -6,6 +6,7 @@ using Bank.Domain.Entities;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using AutoMapper;
 using DomainBillPresentmentStatus = Bank.Domain.Enums.BillPresentmentStatus;
 using DTOBillPresentmentStatus = Bank.Application.DTOs.Payment.Biller.BillPresentmentStatus;
 
@@ -21,19 +22,22 @@ public class BillPresentmentService : IBillPresentmentService
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<BillPresentmentService> _logger;
+    private readonly IMapper _mapper;
 
     public BillPresentmentService(
         IBillPresentmentRepository billPresentmentRepository,
         IBillerRepository billerRepository,
         IUserRepository userRepository,
         IUnitOfWork unitOfWork,
-        ILogger<BillPresentmentService> logger)
+        ILogger<BillPresentmentService> logger,
+        IMapper mapper)
     {
         _billPresentmentRepository = billPresentmentRepository;
         _billerRepository = billerRepository;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<List<BillPresentmentDto>> GetCustomerBillPresentmentsAsync(Guid customerId, DomainBillPresentmentStatus? status = null)
@@ -150,6 +154,7 @@ public class BillPresentmentService : IBillPresentmentService
             throw;
         }
     }
+
 
     public async Task<bool> UpdateBillPresentmentStatusAsync(Guid presentmentId, DomainBillPresentmentStatus status)
     {
@@ -337,8 +342,10 @@ public class BillPresentmentService : IBillPresentmentService
 
     #region Private Helper Methods
 
-    // Note: MapToBillPresentmentDto() has been moved to BillPresentmentMappingService (single source of truth)
-    // Note: ConvertToDto() has been moved to BillPresentmentMappingService and renamed to ConvertBillPresentmentStatusToDto()
+    private BillPresentmentDto MapToBillPresentmentDto(BillPresentment presentment)
+    {
+        return _mapper.Map<BillPresentmentDto>(presentment);
+    }
 
     #endregion
 }

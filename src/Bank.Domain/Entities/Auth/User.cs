@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Bank.Domain.Enums;
 using Bank.Domain.ValueObjects;
 using Bank.Domain.Common;
-using AccountEntity = Bank.Domain.Entities.Account.Account;
+using AccountEntity = Bank.Domain.Entities.Account;
 
 namespace Bank.Domain.Entities;
 

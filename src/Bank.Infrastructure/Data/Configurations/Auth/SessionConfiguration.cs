@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Auth;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Auth;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for Session entity
@@ -48,3 +48,4 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
             .IsRequired();
     }
 }
+

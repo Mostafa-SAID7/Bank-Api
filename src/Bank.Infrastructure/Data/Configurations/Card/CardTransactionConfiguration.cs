@@ -1,8 +1,9 @@
 using Bank.Domain.Entities;
+using Card = Bank.Domain.Entities.Card;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Card;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for CardTransaction entity
@@ -124,3 +125,4 @@ public class CardTransactionConfiguration : IEntityTypeConfiguration<CardTransac
             .HasFilter("[AuthorizationCode] IS NOT NULL");
     }
 }
+

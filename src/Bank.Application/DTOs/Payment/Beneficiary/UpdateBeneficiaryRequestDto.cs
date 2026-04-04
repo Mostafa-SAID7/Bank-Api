@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Payment.Beneficiary;
 
@@ -8,6 +8,7 @@ namespace Bank.Application.DTOs.Payment.Beneficiary;
 public class UpdateBeneficiaryRequest
 {
     public string? Name { get; set; }
+    public string? Nickname { get; set; }
     public string? AccountName { get; set; }
     public string? BankName { get; set; }
     public BeneficiaryCategory? Category { get; set; }

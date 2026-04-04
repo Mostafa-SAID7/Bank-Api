@@ -1,6 +1,8 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
+using Bank.Application.Helpers.Loan;
+using Bank.Application.Helpers.Shared;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -288,13 +290,13 @@ public class LoanAnalyticsService : ILoanAnalyticsService
     private decimal CalculateDelinquencyRate(List<Loan> loans)
     {
         var delinquentCount = loans.Count(l => l.Status == LoanStatus.Delinquent);
-        return CalculationHelper.CalculateDelinquencyRate(delinquentCount, loans.Count);
+        return RiskCalculationHelper.CalculateDelinquencyRate(delinquentCount, loans.Count);
     }
 
     private decimal CalculateDefaultRate(List<Loan> loans)
     {
         var defaultCount = loans.Count(l => l.Status == LoanStatus.DefaultStatus);
-        return CalculationHelper.CalculateDefaultRate(defaultCount, loans.Count);
+        return RiskCalculationHelper.CalculateDefaultRate(defaultCount, loans.Count);
     }
 
     private LoanRiskLevel CalculateRiskLevel(Loan loan, int onTimePayments, int totalPayments)

@@ -2,6 +2,7 @@ using AutoMapper;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers.Loan;
+using Bank.Application.Helpers.Shared;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -648,7 +649,7 @@ public class LoanService : ILoanService
             _ => 10.0m
         };
 
-        return CalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate / 100, 0.25m) * 100;
+        return InterestCalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate / 100, 0.25m) * 100;
     }
 
     private static decimal CalculateMaxLoanAmount(int creditScore, decimal requestedAmount)

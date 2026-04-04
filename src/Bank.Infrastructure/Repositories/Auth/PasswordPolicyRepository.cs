@@ -4,7 +4,7 @@ using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Auth;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for PasswordPolicy entity
@@ -55,3 +55,4 @@ public class PasswordPolicyRepository : Repository<PasswordPolicy>, IPasswordPol
             .FirstOrDefaultAsync(p => p.Name == name);
     }
 }
+

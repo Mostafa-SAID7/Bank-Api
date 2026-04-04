@@ -1,4 +1,4 @@
-﻿namespace Bank.Application.DTOs.Card.Advanced;
+namespace Bank.Application.DTOs.Card.Advanced;
 
 /// <summary>
 /// Base class for paged requests
@@ -11,12 +11,6 @@ public class PagedRequest
     public bool SortDescending { get; set; } = true;
 }
 
-/// <summary>
-/// Paged result wrapper - using Domain PagedResult
-/// </summary>
-public class PagedResult<T> : Bank.Domain.Common.PagedResult<T>
-{
-    // Inherits from Domain PagedResult to avoid duplication
-}
+
 
 

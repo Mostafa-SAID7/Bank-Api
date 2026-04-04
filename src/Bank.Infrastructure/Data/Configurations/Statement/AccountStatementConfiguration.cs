@@ -1,9 +1,9 @@
-using Bank.Domain.Entities.Account;
+using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Statement;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for AccountStatement entity
@@ -79,3 +79,4 @@ public class AccountStatementConfiguration : IEntityTypeConfiguration<AccountSta
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
+

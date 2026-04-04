@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Payment.Beneficiary;
 
@@ -9,6 +9,7 @@ public class AddBeneficiaryRequest
 {
     public string Name { get; set; } = string.Empty;
     public string AccountNumber { get; set; } = string.Empty;
+    public string? Nickname { get; set; }
     public string? AccountName { get; set; }
     public string BankName { get; set; } = string.Empty;
     public string BankCode { get; set; } = string.Empty;

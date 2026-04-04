@@ -7,7 +7,7 @@ public enum StatementDeliveryMethod
 {
     Email = 1,
     Download = 2,
-    Mail = 3,
+    PostalMail = 3, // Alias for Mail
     SMS = 4,
     API = 5
 }

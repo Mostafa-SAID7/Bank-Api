@@ -5,7 +5,7 @@ using Bank.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace Bank.Infrastructure.Repositories.Payment;
+namespace Bank.Infrastructure.Repositories;
 
 public class PaymentTemplateRepository : IPaymentTemplateRepository
 {
@@ -141,3 +141,4 @@ public class PaymentTemplateRepository : IPaymentTemplateRepository
         }
     }
 }
+

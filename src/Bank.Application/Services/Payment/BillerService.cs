@@ -5,6 +5,7 @@ using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using AutoMapper;
 
 namespace Bank.Application.Services;
 
@@ -15,13 +16,16 @@ public class BillerService : IBillerService
 {
     private readonly IBillerRepository _billerRepository;
     private readonly ILogger<BillerService> _logger;
+    private readonly IMapper _mapper;
 
     public BillerService(
         IBillerRepository billerRepository,
-        ILogger<BillerService> logger)
+        ILogger<BillerService> logger,
+        IMapper mapper)
     {
         _billerRepository = billerRepository;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<List<BillerDto>> GetAvailableBillersAsync()
@@ -77,37 +81,28 @@ public class BillerService : IBillerService
 
     #region Private Helper Methods
 
-    private static BillerDto MapToBillerDto(Biller biller)
+    private BillerDto MapToBillerDto(Biller biller)
     {
-        string[] supportedMethods = Array.Empty<string>();
-        
+        var dto = _mapper.Map<BillerDto>(biller);
+
         if (!string.IsNullOrEmpty(biller.SupportedPaymentMethods))
         {
             try
             {
-                supportedMethods = JsonSerializer.Deserialize<string[]>(biller.SupportedPaymentMethods) ?? Array.Empty<string>();
+                dto.SupportedPaymentMethods = JsonSerializer.Deserialize<string[]>(biller.SupportedPaymentMethods) ?? Array.Empty<string>();
             }
             catch
             {
                 // If deserialization fails, return empty array
+                dto.SupportedPaymentMethods = Array.Empty<string>();
             }
         }
-
-        return new BillerDto
+        else
         {
-            Id = biller.Id,
-            Name = biller.Name,
-            Category = biller.Category,
-            AccountNumber = biller.AccountNumber,
-            RoutingNumber = biller.RoutingNumber,
-            Address = biller.Address,
-            IsActive = biller.IsActive,
-            SupportedPaymentMethods = supportedMethods,
-            MinAmount = biller.MinAmount,
-            MaxAmount = biller.MaxAmount,
-            ProcessingDays = biller.ProcessingDays,
-            CreatedAt = biller.CreatedAt
-        };
+            dto.SupportedPaymentMethods = Array.Empty<string>();
+        }
+
+        return dto;
     }
 
     #endregion

@@ -1,10 +1,11 @@
 using Bank.Domain.Entities;
+using Account = Bank.Domain.Entities.Account;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Account;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for AccountLockout entity
@@ -73,3 +74,5 @@ public class AccountLockoutRepository : Repository<AccountLockout>, IAccountLock
             .ToListAsync();
     }
 }
+
+

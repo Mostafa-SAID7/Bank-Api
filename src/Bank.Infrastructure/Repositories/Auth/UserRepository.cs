@@ -4,7 +4,7 @@ using Bank.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Auth;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for User entity (Identity User)
@@ -60,3 +60,4 @@ public class UserRepository : IUserRepository
         return (await _userManager.GetUsersInRoleAsync(roleName)).ToList();
     }
 }
+

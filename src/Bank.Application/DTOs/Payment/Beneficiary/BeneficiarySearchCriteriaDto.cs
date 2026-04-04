@@ -1,4 +1,4 @@
-﻿using Bank.Domain.Enums;
+using Bank.Domain.Enums;
 
 namespace Bank.Application.DTOs.Payment.Beneficiary;
 
@@ -8,8 +8,9 @@ namespace Bank.Application.DTOs.Payment.Beneficiary;
 public class BeneficiarySearchCriteria
 {
     public Guid CustomerId { get; set; }
-    public string? Name { get; set; }
+    public string? SearchTerm { get; set; }
     public string? AccountNumber { get; set; }
+    public string? Name { get; set; }
     public string? BankCode { get; set; }
     public BeneficiaryType? Type { get; set; }
     public BeneficiaryCategory? Category { get; set; }

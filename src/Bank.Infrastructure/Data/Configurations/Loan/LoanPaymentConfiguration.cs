@@ -1,8 +1,9 @@
-using Bank.Domain.Entities.Loan;
+using Bank.Domain.Entities;
+using Loan = Bank.Domain.Entities.Loan;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Loan;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for LoanPayment entity
@@ -62,3 +63,5 @@ public class LoanPaymentConfiguration : IEntityTypeConfiguration<LoanPayment>
         builder.HasIndex(p => p.Status);
     }
 }
+
+

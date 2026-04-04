@@ -400,10 +400,25 @@ public class PaymentRetryService : IPaymentRetryService
         }
     }
 
-    // Note: NotifyMaxRetriesReached() has been moved to PaymentRetryNotificationService (single source of truth)
-    // Note: NotifyPaymentPermanentlyFailed() has been moved to PaymentRetryNotificationService and renamed to NotifyPaymentPermanentFailure()
+    private async Task NotifyMaxRetriesReached(BillPayment payment)
+    {
+        await _notificationService.SendSystemNotificationAsync(
+            payment.CustomerId,
+            "FINAL_RETRY_ATTEMPT",
+            $"The final retry attempt for your payment of {payment.Currency} {payment.Amount} to {payment.Biller?.Name} has been scheduled.",
+            null);
+    }
 
-    private static string GetPaymentRetryStatusMessage(BillPaymentStatus status, string failureReason)
+    private async Task NotifyPaymentPermanentlyFailed(BillPayment payment)
+    {
+        await _notificationService.SendSystemNotificationAsync(
+            payment.CustomerId,
+            "PAYMENT_PERMANENT_FAILURE",
+            $"Your payment of {payment.Currency} {payment.Amount} to {payment.Biller?.Name} has permanently failed after {_maxRetryAttempts} attempts.",
+            null);
+    }
+
+    private static string GetRetryStatusMessage(BillPaymentStatus status, string failureReason)
     {
         return status switch
         {

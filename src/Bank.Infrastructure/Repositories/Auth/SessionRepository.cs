@@ -4,7 +4,7 @@ using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Auth;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for Session entity
@@ -71,3 +71,4 @@ public class SessionRepository : Repository<Session>, ISessionRepository
             .ToListAsync();
     }
 }
+

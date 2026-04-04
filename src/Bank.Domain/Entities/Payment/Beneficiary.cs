@@ -13,6 +13,7 @@ public class Beneficiary : BaseEntity
     public User Customer { get; set; } = null!;
     
     public string Name { get; set; } = string.Empty;
+    public string? Nickname { get; set; }
     public string AccountNumber { get; set; } = string.Empty;
     public string? AccountName { get; set; }
     
@@ -30,7 +31,9 @@ public class Beneficiary : BaseEntity
     // Verification and status
     public bool IsVerified { get; set; } = false;
     public DateTime? VerifiedDate { get; set; }
+    public DateTime? VerifiedAt { get => VerifiedDate; set => VerifiedDate = value; }
     public Guid? VerifiedByUserId { get; set; }
+    public Guid? VerifiedBy { get => VerifiedByUserId; set => VerifiedByUserId = value; }
     public User? VerifiedByUser { get; set; }
     public BeneficiaryStatus Status { get; set; } = BeneficiaryStatus.Pending;
     
@@ -44,7 +47,9 @@ public class Beneficiary : BaseEntity
     public string? Notes { get; set; }
     public string? Reference { get; set; }
     public DateTime? LastTransferDate { get; set; }
+    public decimal? LastTransferAmount { get; set; }
     public int TransferCount { get; set; } = 0;
+    public int TotalTransferCount { get => TransferCount; set => TransferCount = value; }
     public decimal TotalTransferAmount { get; set; } = 0;
     
     // Archival

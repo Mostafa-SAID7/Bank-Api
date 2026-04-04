@@ -1,6 +1,6 @@
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
-using Bank.Domain.Entities.Account;
+using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;

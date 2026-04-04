@@ -4,7 +4,7 @@ using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Auth;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for IpWhitelist entity
@@ -97,3 +97,4 @@ public class IpWhitelistRepository : Repository<IpWhitelist>, IIpWhitelistReposi
             .ToListAsync();
     }
 }
+

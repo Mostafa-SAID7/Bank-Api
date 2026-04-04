@@ -231,4 +231,15 @@ public class AuditLogService : IAuditLogService
                 description);
         }
     }
+
+    public async Task LogActivityAsync(Guid userId, string action, string entityType, string entityId, string description)
+    {
+        await LogUserActionAsync(
+            userId,
+            action,
+            entityType,
+            entityId,
+            null,
+            description);
+    }
 }

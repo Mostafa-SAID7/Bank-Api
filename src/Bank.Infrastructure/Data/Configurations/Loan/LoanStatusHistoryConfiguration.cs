@@ -1,8 +1,9 @@
-using Bank.Domain.Entities.Loan;
+using Bank.Domain.Entities;
+using Loan = Bank.Domain.Entities.Loan;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Loan;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for LoanStatusHistory entity
@@ -42,3 +43,5 @@ public class LoanStatusHistoryConfiguration : IEntityTypeConfiguration<LoanStatu
         builder.HasIndex(h => h.ToStatus);
     }
 }
+
+

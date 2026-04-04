@@ -4,7 +4,7 @@ using Bank.Domain.Enums;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Deposit;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for FixedDeposit entity

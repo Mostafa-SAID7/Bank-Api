@@ -4,7 +4,7 @@ using Bank.Infrastructure.Data;
 using Bank.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Payment;
+namespace Bank.Infrastructure.Repositories;
 
 public class RecurringPaymentRepository : IRecurringPaymentRepository
 {
@@ -97,3 +97,4 @@ public class RecurringPaymentRepository : IRecurringPaymentRepository
             .ToListAsync();
     }
 }
+

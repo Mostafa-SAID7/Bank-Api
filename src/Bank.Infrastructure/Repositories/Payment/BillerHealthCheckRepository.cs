@@ -4,7 +4,7 @@ using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Payment;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for BillerHealthCheck entity

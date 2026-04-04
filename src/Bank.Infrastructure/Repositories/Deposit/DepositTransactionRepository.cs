@@ -4,7 +4,7 @@ using Bank.Domain.Enums;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Deposit;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for DepositTransaction entity
@@ -50,3 +50,4 @@ public class DepositTransactionRepository : Repository<DepositTransaction>, IDep
             .SumAsync(t => t.Amount);
     }
 }
+

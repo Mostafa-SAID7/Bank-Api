@@ -423,6 +423,21 @@ public class NotificationService : INotificationService
         return await SendNotificationAsync(notificationRequest);
     }
 
+    public async Task SendSystemNotificationAsync(Guid userId, string title, string message, string type)
+    {
+        var request = new SendNotificationRequest
+        {
+            UserId = userId.ToString(),
+            Subject = title,
+            Message = message,
+            Type = Enum.Parse<NotificationType>(type),
+            Channel = NotificationChannel.InApp,
+            Priority = NotificationPriority.High
+        };
+
+        await SendNotificationAsync(request);
+    }
+
     public async Task ProcessScheduledNotificationsAsync()
     {
         var scheduledNotifications = await _unitOfWork.Repository<Notification>().Query()

@@ -1,5 +1,6 @@
 using AutoMapper;
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -427,10 +428,10 @@ public class DepositService : IDepositService
 
         return deposit.InterestCalculationMethod switch
         {
-            InterestCalculationMethod.Simple => CalculationHelper.CalculateSimpleInterest(principal, rate, years),
-            InterestCalculationMethod.CompoundDaily => CalculationHelper.CalculateCompoundInterest(principal, rate, 365, years),
-            InterestCalculationMethod.CompoundMonthly => CalculationHelper.CalculateCompoundInterest(principal, rate, 12, years),
-            _ => CalculationHelper.CalculateSimpleInterest(principal, rate, years)
+            InterestCalculationMethod.Simple => CalculationHelper.CalculateSimpleInterest(principal, rate, days),
+            InterestCalculationMethod.CompoundDaily => CalculationHelper.CalculateCompoundInterest(principal, rate, days, 365),
+            InterestCalculationMethod.CompoundMonthly => CalculationHelper.CalculateCompoundInterest(principal, rate, days, 12),
+            _ => CalculationHelper.CalculateSimpleInterest(principal, rate, days)
         };
     }
 

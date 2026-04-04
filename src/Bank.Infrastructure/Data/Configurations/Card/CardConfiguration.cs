@@ -1,8 +1,9 @@
 using Bank.Domain.Entities;
+using Card = Bank.Domain.Entities.Card;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Card;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for Card entity
@@ -135,3 +136,4 @@ public class CardConfiguration : IEntityTypeConfiguration<Card>
             .HasDatabaseName("IX_Cards_CustomerId_Status");
     }
 }
+

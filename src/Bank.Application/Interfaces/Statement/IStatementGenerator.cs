@@ -3,7 +3,7 @@ using Bank.Application.DTOs.Statement.Core;
 using Bank.Application.DTOs.Statement.Delivery;
 using Bank.Application.DTOs.Statement.Analytics;
 using Bank.Domain.Entities;
-using Bank.Domain.Entities.Account;
+using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 
 namespace Bank.Application.Interfaces;

@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Deposit;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Deposit;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for MaturityNotice entity
@@ -75,3 +75,4 @@ public class MaturityNoticeConfiguration : IEntityTypeConfiguration<MaturityNoti
         builder.HasIndex(n => new { n.Status, n.NoticeDate });
     }
 }
+

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Auth;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Configuration for ASP.NET Identity UserToken table to handle key length limitations
@@ -19,3 +19,4 @@ public class IdentityUserTokenConfiguration : IEntityTypeConfiguration<IdentityU
             .HasMaxLength(128); // Reduced from default 450
     }
 }
+

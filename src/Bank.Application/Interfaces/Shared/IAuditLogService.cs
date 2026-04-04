@@ -119,4 +119,9 @@ public interface IAuditLogService
     /// Simple audit log method for backward compatibility
     /// </summary>
     Task LogAsync(string action, string description, Guid? userId = null);
+
+    /// <summary>
+    /// Logs a specific activity for an entity
+    /// </summary>
+    Task LogActivityAsync(Guid userId, string action, string entityType, string entityId, string description);
 }

@@ -1,7 +1,7 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
 using System.Security.Cryptography;
-using AccountEntity = Bank.Domain.Entities.Account.Account;
+using AccountEntity = Bank.Domain.Entities.Account;
 
 namespace Bank.Domain.Entities;
 

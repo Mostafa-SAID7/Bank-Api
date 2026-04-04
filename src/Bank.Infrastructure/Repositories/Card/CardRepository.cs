@@ -1,11 +1,12 @@
 using Bank.Domain.Entities;
+using Card = Bank.Domain.Entities.Card;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Bank.Infrastructure.Repositories.Card;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for Card entity
@@ -218,3 +219,4 @@ public class CardRepository : Repository<Card>, ICardRepository
         }
     }
 }
+

@@ -1,8 +1,8 @@
-using Bank.Domain.Entities.Deposit;
+using Bank.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Deposit;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for DepositCertificate entity
@@ -87,3 +87,4 @@ public class DepositCertificateConfiguration : IEntityTypeConfiguration<DepositC
         builder.HasIndex(c => c.IssueDate);
     }
 }
+

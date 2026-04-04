@@ -1,7 +1,7 @@
 using Bank.Domain.Common;
 using Bank.Domain.Enums;
 
-namespace Bank.Domain.Entities.Account;
+namespace Bank.Domain.Entities;
 
 /// <summary>
 /// Represents an account statement with transaction details and summaries

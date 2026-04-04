@@ -4,7 +4,7 @@ using Bank.Application.DTOs.Statement.Delivery;
 using Bank.Application.DTOs.Statement.Analytics;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
-using Bank.Domain.Entities.Account;
+using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using System.Text;

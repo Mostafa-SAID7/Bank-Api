@@ -4,7 +4,7 @@ using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Infrastructure.Repositories.Shared;
+namespace Bank.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository for audit logs with immutable storage guarantees.
@@ -269,4 +269,5 @@ public class AuditLogRepository : IAuditLogRepository
         return await query.CountAsync(cancellationToken);
     }
 }
+
 

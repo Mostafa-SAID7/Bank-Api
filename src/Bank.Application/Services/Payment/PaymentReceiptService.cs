@@ -2,6 +2,7 @@ using Bank.Application.DTOs;
 using Bank.Application.DTOs.Payment.Receipt;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
+using Bank.Application.Helpers.Shared;
 using Bank.Domain.Common;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -9,6 +10,7 @@ using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text.Json;
+using AutoMapper;
 
 namespace Bank.Application.Services;
 
@@ -22,19 +24,22 @@ public class PaymentReceiptService : IPaymentReceiptService
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<PaymentReceiptService> _logger;
+    private readonly IMapper _mapper;
 
     public PaymentReceiptService(
         IPaymentReceiptRepository paymentReceiptRepository,
         IBillPaymentRepository billPaymentRepository,
         IUserRepository userRepository,
         IUnitOfWork unitOfWork,
-        ILogger<PaymentReceiptService> logger)
+        ILogger<PaymentReceiptService> logger,
+        IMapper mapper)
     {
         _paymentReceiptRepository = paymentReceiptRepository;
         _billPaymentRepository = billPaymentRepository;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<PaymentReceiptDto> GeneratePaymentReceiptAsync(Guid paymentId)
@@ -273,7 +278,24 @@ public class PaymentReceiptService : IPaymentReceiptService
         }
     }
 
-    // Note: MapToPaymentReceiptDto() has been moved to PaymentReceiptMappingService (single source of truth)
-    // Note: GenerateConfirmationNumber() has been moved to PaymentReceiptGenerationService (single source of truth)
-    // Note: GenerateMockPdfContent() has been moved to PaymentReceiptGenerationService (single source of truth)
+    #region Private Helper Methods
+
+    private PaymentReceiptDto MapToPaymentReceiptDto(PaymentReceipt receipt)
+    {
+        return _mapper.Map<PaymentReceiptDto>(receipt);
+    }
+
+    private string GenerateConfirmationNumber()
+    {
+        return TokenGenerationHelper.GenerateConfirmationNumber();
+    }
+
+    private byte[] GenerateMockPdfContent(PaymentReceipt receipt)
+    {
+        // Mock PDF generation logic
+        var content = $"PAYMENT RECEIPT\nReceipt #: {receipt.ReceiptNumber}\nDate: {receipt.ProcessedDate}\nAmount: {receipt.Currency} {receipt.Amount}\nBiller: {receipt.BillerName}\nConfirmation: {receipt.ConfirmationNumber}";
+        return System.Text.Encoding.UTF8.GetBytes(content);
+    }
+
+    #endregion
 }

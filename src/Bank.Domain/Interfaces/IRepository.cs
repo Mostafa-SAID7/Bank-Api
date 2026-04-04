@@ -19,5 +19,7 @@ public interface IRepository<T> where T : BaseEntity
     void SoftDelete(T entity, string? deletedBy = null);
     Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
     Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+    Task<(IEnumerable<T> Items, int TotalCount)> ListAsync(Expression<Func<T, bool>>? predicate = null, int page = 1, int pageSize = 10);
+    Task<(IEnumerable<T> Items, int TotalCount)> SearchAsync(string searchTerm, int page = 1, int pageSize = 10);
     IQueryable<T> Query();
 }

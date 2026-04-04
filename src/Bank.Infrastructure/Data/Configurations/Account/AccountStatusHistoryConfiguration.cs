@@ -1,8 +1,9 @@
-using Bank.Domain.Entities.Account;
+using Bank.Domain.Entities;
+using Account = Bank.Domain.Entities.Account;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.Infrastructure.Data.Configurations.Account;
+namespace Bank.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for AccountStatusHistory entity
@@ -22,3 +23,5 @@ public class AccountStatusHistoryConfiguration : IEntityTypeConfiguration<Accoun
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+
+
