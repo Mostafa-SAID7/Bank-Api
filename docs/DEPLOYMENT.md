@@ -1,5 +1,66 @@
 # Deployment Guide
 
+## Railpack Deployment
+
+### Configuration Files
+
+The project includes several files for Railpack deployment:
+
+1. **start.sh** - Main startup script that Railpack executes
+   - Runs build and start commands
+   - Sets environment variables
+   - Located at repo root
+
+2. **.replit** - Repl.it configuration
+   - Defines build and run commands
+   - Specifies modules and runtime environment
+   - Configured with proper database URL and JWT settings
+
+3. **Procfile** - Heroku/Railpack process file
+   - Specifies how to run the web application
+   - Sets port binding for deployment
+
+4. **railpack.toml** - Railpack-specific configuration
+   - Tells Railpack the project is .NET in the `src/Bank.Api` subdirectory
+   - Specifies language and runtime version
+   - Defines build and start commands
+
+### Deployment Steps
+
+1. Ensure all config files are at repository root:
+   - `start.sh` ✓
+   - `Procfile` ✓
+   - `railpack.toml` ✓
+   - `.replit` ✓
+
+2. Push to your repository
+3. Railpack will auto-detect the .NET project and build/deploy
+4. Application will start on the configured port (5000 internally, 80 externally)
+
+### Environment Variables for Railpack
+
+Set these in your Railpack/Repl.it dashboard:
+- `ASPNETCORE_ENVIRONMENT=Production`
+- `DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require`
+- `JwtSettings__SecretKey=your-secret-key`
+- `ASPNETCORE_URLS=http://+:5000`
+
+### Troubleshooting Railpack Deployment
+
+**Error: "Script start.sh not found"**
+- Ensure `start.sh` is at repository root (not in src/)
+- Make sure file is executable: `chmod +x start.sh`
+
+**Error: "Railpack could not determine how to build the app"**
+- Verify `railpack.toml` exists at root
+- Check that `src/Bank.Api` contains `.csproj` file
+- Ensure `.NET` is recognized as a supported language
+
+**Port binding issues**
+- Railpack uses `$PORT` environment variable
+- Application automatically binds to 5000 internally
+- External port is managed by Railpack (usually 80 for HTTP)
+
 ## Database Migration Strategy
 
 ### Pre-Deployment Checklist

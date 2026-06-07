@@ -1,0 +1,25 @@
+# Railpack configuration for Bank API
+# This helps Railpack understand the project structure
+
+[build]
+# Specify the root directory where the main project is located
+root = "src/Bank.Api"
+language = "dotnet"
+
+# Build command
+build_command = "dotnet build --configuration Release"
+
+# Start command
+start_command = "dotnet run --configuration Release --urls='http://+:$PORT'"
+
+[runtime]
+# .NET runtime version
+dotnet_version = "9.0"
+
+[ports]
+# Port the application listens on
+port = 5000
+
+[environment]
+# Default environment
+ASPNETCORE_ENVIRONMENT = "Production"
