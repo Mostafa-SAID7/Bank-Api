@@ -1,53 +1,59 @@
 # Multi-stage build for Bank API
-# This Dockerfile is used by Railpack for containerized deployment
+# Simplified for Railpack deployment compatibility
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-# Install curl for health checks and bash for startup script
-RUN apt-get update && apt-get install -y curl bash && rm -rf /var/lib/apt/lists/*
-
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy project files
-COPY ["src/Bank.Api/Bank.Api.csproj", "Bank.Api/"]
-COPY ["src/Bank.Application/Bank.Application.csproj", "Bank.Application/"]
-COPY ["src/Bank.Domain/Bank.Domain.csproj", "Bank.Domain/"]
-COPY ["src/Bank.Infrastructure/Bank.Infrastructure.csproj", "Bank.Infrastructure/"]
+COPY src/Bank.Api/Bank.Api.csproj Bank.Api/
+COPY src/Bank.Application/Bank.Application.csproj Bank.Application/
+COPY src/Bank.Domain/Bank.Domain.csproj Bank.Domain/
+COPY src/Bank.Infrastructure/Bank.Infrastructure.csproj Bank.Infrastructure/
+
+# Copy NuGet config
+COPY NuGet.Config .
 
 # Restore dependencies
-RUN dotnet restore "Bank.Api/Bank.Api.csproj"
+RUN dotnet restore Bank.Api/Bank.Api.csproj
 
-# Copy source code
+# Copy all source code
 COPY src/ .
 
-# Build application
-WORKDIR "/src/Bank.Api"
-RUN dotnet build "Bank.Api.csproj" -c Release -o /app/build
+# Build
+WORKDIR /src/Bank.Api
+RUN dotnet build Bank.Api.csproj -c Release
 
+# Stage 2: Publish
 FROM build AS publish
-RUN dotnet publish "Bank.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR /src/Bank.Api
+RUN dotnet publish Bank.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-FROM base AS final
+# Stage 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
+
+# Install dependencies for startup script
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy published application
 COPY --from=publish /app/publish .
 
 # Copy startup script
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+COPY start.sh .
+RUN chmod +x start.sh
 
-# Create non-root user for security
-RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
-USER appuser
+# Expose port
+EXPOSE 80
+EXPOSE 443
 
-# Health check endpoint
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:80/health || exit 1
+# Set environment
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:5000
 
-# Use the startup script to handle environment variables dynamically
-ENTRYPOINT ["/app/start.sh"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:5000/health || exit 1
+
+# Run application
+ENTRYPOINT ["./start.sh"]
