@@ -1,6 +1,5 @@
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
-using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -103,73 +102,72 @@ public class InterestCalculationService : IInterestCalculationService
                 return false;
             }
 
-            if (account.Status != AccountStatus.Active && account.Status != AccountStatus.Dormant)
-            {
-                _logger.LogWarning("Account {AccountId} is not eligible for interest calculation", accountId);
-                return false;
-            }
-
-            var fromDate = account.LastInterestCalculationDate ?? account.OpenedDate;
-            var toDate = DateTime.UtcNow;
-
-            decimal interest;
-            switch (account.CompoundingFrequency)
-            {
-                case InterestCompoundingFrequency.Daily:
-                    interest = await CalculateCompoundInterestAsync(account, fromDate, toDate, 365);
-                    break;
-                case InterestCompoundingFrequency.Monthly:
-                    interest = await CalculateCompoundInterestAsync(account, fromDate, toDate, 12);
-                    break;
-                case InterestCompoundingFrequency.Quarterly:
-                    interest = await CalculateCompoundInterestAsync(account, fromDate, toDate, 4);
-                    break;
-                case InterestCompoundingFrequency.SemiAnnually:
-                    interest = await CalculateCompoundInterestAsync(account, fromDate, toDate, 2);
-                    break;
-                case InterestCompoundingFrequency.Annually:
-                    interest = await CalculateCompoundInterestAsync(account, fromDate, toDate, 1);
-                    break;
-                default:
-                    interest = await CalculateSimpleInterestAsync(account, fromDate, toDate);
-                    break;
-            }
-
-            if (interest > 0)
-            {
-                // Create interest credit transaction
-                var transaction = new Transaction
-                {
-                    FromAccountId = Guid.Empty, // System/Bank account
-                    ToAccountId = account.Id,
-                    Amount = interest,
-                    Type = TransactionType.ACH, // Interest credit
-                    Status = TransactionStatus.Completed,
-                    Description = $"Interest credit for period {fromDate:yyyy-MM-dd} to {toDate:yyyy-MM-dd}",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                await _unitOfWork.Repository<Transaction>().AddAsync(transaction);
-
-                // Update account balance and last calculation date
-                account.Balance += interest;
-                account.LastInterestCalculationDate = toDate;
-                account.UpdateActivity();
-
-                _unitOfWork.Repository<Account>().Update(account);
-                await _unitOfWork.SaveChangesAsync();
-
-                await _auditLogService.LogAsync("Interest Applied", $"Interest of {interest:C} applied to account {accountId}", userId);
-                _logger.LogInformation("Interest of {Interest:C} applied to account {AccountId}", interest, accountId);
-            }
-
-            return true;
+            return await ApplyInterestCoreAsync(account, userId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error applying interest to account {AccountId}", accountId);
             return false;
         }
+    }
+
+    /// <summary>
+    /// Core interest application logic. Accepts an already-loaded <see cref="Account"/> so
+    /// batch callers (e.g. <see cref="ProcessMonthlyInterestAsync"/>) avoid the N+1 re-fetch.
+    /// </summary>
+    private async Task<bool> ApplyInterestCoreAsync(Account account, Guid userId)
+    {
+        if (account.Status != AccountStatus.Active && account.Status != AccountStatus.Dormant)
+        {
+            _logger.LogWarning("Account {AccountId} is not eligible for interest calculation", account.Id);
+            return false;
+        }
+
+        var fromDate = account.LastInterestCalculationDate ?? account.OpenedDate;
+        var toDate = DateTime.UtcNow;
+
+        decimal interest = account.CompoundingFrequency switch
+        {
+            InterestCompoundingFrequency.Daily       => await CalculateCompoundInterestAsync(account, fromDate, toDate, 365),
+            InterestCompoundingFrequency.Monthly     => await CalculateCompoundInterestAsync(account, fromDate, toDate, 12),
+            InterestCompoundingFrequency.Quarterly   => await CalculateCompoundInterestAsync(account, fromDate, toDate, 4),
+            InterestCompoundingFrequency.SemiAnnually => await CalculateCompoundInterestAsync(account, fromDate, toDate, 2),
+            InterestCompoundingFrequency.Annually    => await CalculateCompoundInterestAsync(account, fromDate, toDate, 1),
+            _                                        => await CalculateSimpleInterestAsync(account, fromDate, toDate)
+        };
+
+        if (interest > 0)
+        {
+            var transaction = new Transaction
+            {
+                FromAccountId = Guid.Empty,
+                ToAccountId   = account.Id,
+                Amount        = interest,
+                Type          = TransactionType.ACH,
+                Status        = TransactionStatus.Completed,
+                Description   = $"Interest credit for period {fromDate:yyyy-MM-dd} to {toDate:yyyy-MM-dd}",
+                CreatedAt     = DateTime.UtcNow
+            };
+
+            await _unitOfWork.Repository<Transaction>().AddAsync(transaction);
+
+            account.Balance += interest;
+            account.LastInterestCalculationDate = toDate;
+            account.UpdateActivity();
+
+            _unitOfWork.Repository<Account>().Update(account);
+            await _unitOfWork.SaveChangesAsync();
+
+            await _auditLogService.LogAsync(
+                "Interest Applied",
+                $"Interest of {interest:C} applied to account {account.Id}",
+                userId);
+
+            _logger.LogInformation(
+                "Interest of {Interest:C} applied to account {AccountId}", interest, account.Id);
+        }
+
+        return true;
     }
 
     public async Task<bool> ProcessMonthlyInterestAsync()
@@ -179,9 +177,10 @@ public class InterestCalculationService : IInterestCalculationService
             var accountsForProcessing = await GetAccountsForInterestProcessingAsync();
             var processedCount = 0;
 
+            // Use ApplyInterestCoreAsync directly — accounts are already loaded, avoiding N+1.
             foreach (var account in accountsForProcessing)
             {
-                var success = await ApplyInterestAsync(account.Id, Guid.Empty); // System process
+                var success = await ApplyInterestCoreAsync(account, Guid.Empty);
                 if (success) processedCount++;
             }
 
@@ -265,7 +264,7 @@ public class InterestCalculationService : IInterestCalculationService
         try
         {
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
-            var maskedAccountId = MaskGuid(accountId);
+            var maskedAccountId = SecureLoggingService.MaskGuid(accountId);
             if (account == null)
             {
                 _logger.LogWarning("Account {AccountId} not found for interest rate update", maskedAccountId);
@@ -293,17 +292,10 @@ public class InterestCalculationService : IInterestCalculationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating interest rate for account {AccountId}", MaskGuid(accountId));
+            _logger.LogError(ex, "Error updating interest rate for account {AccountId}", SecureLoggingService.MaskGuid(accountId));
             return false;
         }
     }
 
-    private static string MaskGuid(Guid id)
-    {
-        var value = id.ToString("N");
-        return value.Length <= 8
-            ? "********"
-            : $"{value[..8]}********";
-    }
 }
 

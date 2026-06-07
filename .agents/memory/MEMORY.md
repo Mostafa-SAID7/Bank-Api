@@ -1,0 +1,3 @@
+- [Controller cleanup pattern](controller-cleanup.md) — try/catch removal script targets exactly 8-space indentation; null-check assignments like `_logger = logger ?? throw ...` need separate regex from simple `_logger = logger;`
+- [Namespace standardization](namespace-standardization.md) — Payment services standardized to Bank.Application.Services; SecureLoggingService moved from .Shared; DI registrations and GlobalUsings must be updated together
+- [GlobalExceptionMiddleware](middleware-exceptions.md) — handles ValidationException→400, UnauthorizedAccessException→401, InvalidOperationException→400, ArgumentException→400, KeyNotFoundException→404, FileNotFoundException→404; never expose ex.Message to clients

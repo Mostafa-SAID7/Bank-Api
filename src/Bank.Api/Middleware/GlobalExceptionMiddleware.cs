@@ -1,3 +1,4 @@
+using FluentValidation;
 using System.Net;
 using System.Text.Json;
 
@@ -30,34 +31,56 @@ public class GlobalExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        
-        var response = new 
-        {
-            Message = "An error occurred on the server.",
-            Detailed = exception.ToString(), // Full exception including inner exceptions
-            StackTrace = (string?)null
-        };
+
+        int statusCode;
+        object body;
 
         switch (exception)
         {
+            case ValidationException validationEx:
+                statusCode = (int)HttpStatusCode.BadRequest;
+                // Validation errors are user-facing by design — safe to return.
+                var validationErrors = validationEx.Errors
+                    .Select(e => new { e.PropertyName, e.ErrorMessage })
+                    .ToList();
+                body = new { Message = "One or more validation errors occurred.", Errors = validationErrors };
+                break;
+
             case UnauthorizedAccessException:
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                response = new { Message = "Unauthorized access.", Detailed = exception.Message, StackTrace = (string?)null };
+                statusCode = (int)HttpStatusCode.Unauthorized;
+                body = new { Message = "Unauthorized access." };
                 break;
+
             case InvalidOperationException:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response = new { Message = "Invalid operation.", Detailed = exception.Message, StackTrace = (string?)null };
+                statusCode = (int)HttpStatusCode.BadRequest;
+                body = new { Message = "Invalid operation." };
                 break;
+
+            case ArgumentException:
+                statusCode = (int)HttpStatusCode.BadRequest;
+                body = new { Message = "Invalid argument." };
+                break;
+
             case KeyNotFoundException:
-                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                response = new { Message = "Resource not found.", Detailed = exception.Message, StackTrace = (string?)null };
+                statusCode = (int)HttpStatusCode.NotFound;
+                body = new { Message = "Resource not found." };
                 break;
+
+            case FileNotFoundException:
+                statusCode = (int)HttpStatusCode.NotFound;
+                body = new { Message = "The requested file was not found." };
+                break;
+
             default:
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                statusCode = (int)HttpStatusCode.InternalServerError;
+                // Never expose internal exception details, stack traces, or message text to the client.
+                // All details are logged server-side by the catch block above.
+                body = new { Message = "An unexpected error occurred. Please try again later." };
                 break;
         }
 
-        var result = JsonSerializer.Serialize(response);
+        context.Response.StatusCode = statusCode;
+        var result = JsonSerializer.Serialize(body);
         return context.Response.WriteAsync(result);
     }
 }
