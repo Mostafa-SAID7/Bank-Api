@@ -1,25 +1,34 @@
 # Railpack configuration for Bank API
-# This helps Railpack understand the project structure
+# This helps Railpack understand the project structure and deployment requirements
 
 [build]
-# Specify the root directory where the main project is located
-root = "src/Bank.Api"
-language = "dotnet"
-
-# Build command
-build_command = "dotnet build --configuration Release"
-
-# Start command
-start_command = "dotnet run --configuration Release --urls='http://+:$PORT'"
+# Use Docker for containerized deployment
+type = "docker"
+dockerfile = "Dockerfile"
 
 [runtime]
 # .NET runtime version
 dotnet_version = "9.0"
 
 [ports]
-# Port the application listens on
+# Port the application listens on internally
 port = 5000
 
 [environment]
-# Default environment
+# Default environment for production
 ASPNETCORE_ENVIRONMENT = "Production"
+
+# Database connection (configure in Railpack dashboard)
+DATABASE_URL = "postgresql://user:password@host:5432/dbname"
+
+# JWT settings (configure in Railpack dashboard with actual values)
+JwtSettings__SecretKey = "your-secret-key"
+
+# Other required settings
+ASPNETCORE_URLS = "http://+:5000"
+
+[health_check]
+# Health check endpoint
+path = "/health"
+interval = 30
+timeout = 3

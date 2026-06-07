@@ -2,64 +2,104 @@
 
 ## Railpack Deployment
 
+### Overview
+
+Railpack uses Docker for containerized deployment. The application is automatically built and deployed using the `Dockerfile` at the repository root.
+
 ### Configuration Files
 
-The project includes several files for Railpack deployment:
+1. **Dockerfile** - Multi-stage Docker build
+   - Builds .NET 9.0 application
+   - Located at repo root (not in devops/)
+   - Creates optimized production image
 
-1. **start.sh** - Main startup script that Railpack executes
-   - Runs build and start commands
+2. **.dockerignore** - Docker build optimization
+   - Excludes unnecessary files from build context
+   - Reduces image size and build time
+
+3. **start.sh** - Startup script
+   - Handles environment detection
+   - Falls back to pre-published binaries if .NET SDK unavailable
+   - Manages port binding
+
+4. **.replit** - Repl.it configuration
+   - Points to Dockerfile for containerized builds
+   - Runs `start.sh` for startup
+
+5. **Procfile** - Process definition
+   - Defines how to run the web process
+   - Uses pre-published binaries
+
+6. **railpack.toml** - Railpack-specific settings
+   - Specifies Docker build type
+   - Configures health checks
    - Sets environment variables
-   - Located at repo root
-
-2. **.replit** - Repl.it configuration
-   - Defines build and run commands
-   - Specifies modules and runtime environment
-   - Configured with proper database URL and JWT settings
-
-3. **Procfile** - Heroku/Railpack process file
-   - Specifies how to run the web application
-   - Sets port binding for deployment
-
-4. **railpack.toml** - Railpack-specific configuration
-   - Tells Railpack the project is .NET in the `src/Bank.Api` subdirectory
-   - Specifies language and runtime version
-   - Defines build and start commands
 
 ### Deployment Steps
 
-1. Ensure all config files are at repository root:
-   - `start.sh` ✓
-   - `Procfile` ✓
-   - `railpack.toml` ✓
-   - `.replit` ✓
+1. **Automatic Detection**
+   - Railpack scans the repository root
+   - Finds `Dockerfile`
+   - Auto-detects .NET project (language = dotnet)
 
-2. Push to your repository
-3. Railpack will auto-detect the .NET project and build/deploy
-4. Application will start on the configured port (5000 internally, 80 externally)
+2. **Build Process**
+   - Runs multi-stage Docker build
+   - First stage: SDK 9.0 (compilation)
+   - Second stage: Runtime 9.0 (minimal image)
+   - Publishes to Release configuration
 
-### Environment Variables for Railpack
+3. **Runtime**
+   - Container starts `start.sh`
+   - Script checks for .NET availability
+   - Runs published application on configured port
 
-Set these in your Railpack/Repl.it dashboard:
+4. **Port Mapping**
+   - Application listens on port 5000 internally
+   - Railpack maps to port 80 externally
+
+### Environment Variables
+
+Configure these in Railpack dashboard:
+
+**Required:**
 - `ASPNETCORE_ENVIRONMENT=Production`
 - `DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require`
-- `JwtSettings__SecretKey=your-secret-key`
+- `JwtSettings__SecretKey=your-secret-key-here`
+
+**Optional:**
 - `ASPNETCORE_URLS=http://+:5000`
+- `ASPNETCORE_Logging__LogLevel__Default=Warning`
 
-### Troubleshooting Railpack Deployment
+### Troubleshooting
 
-**Error: "Script start.sh not found"**
-- Ensure `start.sh` is at repository root (not in src/)
-- Make sure file is executable: `chmod +x start.sh`
+**Error: "dotnet: command not found"**
+- ✓ This is expected in containerized environments
+- ✓ Application falls back to pre-published binaries
+- ✓ Dockerfile includes .NET runtime automatically
 
-**Error: "Railpack could not determine how to build the app"**
-- Verify `railpack.toml` exists at root
-- Check that `src/Bank.Api` contains `.csproj` file
-- Ensure `.NET` is recognized as a supported language
+**Build fails: "Unable to find project"**
+- Verify `Dockerfile` is at repository root
+- Ensure `src/` directory contains project files
+- Check `.dockerignore` doesn't exclude `src/`
 
-**Port binding issues**
-- Railpack uses `$PORT` environment variable
-- Application automatically binds to 5000 internally
-- External port is managed by Railpack (usually 80 for HTTP)
+**Application won't start**
+- Check DATABASE_URL is configured
+- Verify JWT_KEY is set in environment
+- Review logs in Railpack dashboard
+
+**Health check failing**
+- Ensure `/health` endpoint is accessible
+- Check database connectivity
+- Verify port binding is correct (5000 internally)
+
+### Best Practices
+
+✓ Use Docker for consistent deployment across environments  
+✓ Store sensitive data in Railpack dashboard (not in config files)  
+✓ Keep .dockerignore updated to reduce build context  
+✓ Use Release configuration in production  
+✓ Enable health checks for monitoring  
+✓ Use non-root user (configured in Dockerfile)  
 
 ## Database Migration Strategy
 
