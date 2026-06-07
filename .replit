@@ -22,7 +22,7 @@ NEON_DATABASE_URL = "postgresql://neondb_owner:npg_Wt5zXsHe4ThJ@ep-royal-darknes
 dockerfile = "Dockerfile"
 
 [run]
-# Run the published application
+# Run the startup script (pre-built app, no SDK needed)
 run = "bash start.sh"
 
 [workflows]

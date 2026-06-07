@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Bank API startup script for Railpack deployment
-# Automatically detects runtime environment and starts the application
+# Bank API startup script
+# Runs the pre-published .NET application (built by Docker)
 
 set -e
 
@@ -10,28 +10,17 @@ echo "🏦 Starting Bank API..."
 # Set environment variables
 export ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
 export PORT=${PORT:-5000}
+export ASPNETCORE_URLS="http://+:${PORT}"
 
-# Check if dotnet is available
-if ! command -v dotnet &> /dev/null; then
-    echo "⚠️  .NET SDK not found in PATH"
-    echo "📦 Attempting to use pre-published binaries..."
-    
-    # Check if application is already published
-    if [ -f "src/Bank.Api/bin/Release/net9.0/Bank.Api.dll" ]; then
-        echo "🚀 Starting from published binaries..."
-        cd src/Bank.Api/bin/Release/net9.0
-        exec dotnet Bank.Api.dll --urls="http://+:$PORT"
-    else
-        echo "❌ Error: .NET SDK not available and application not pre-published"
-        echo "Please ensure this container has .NET 9.0 SDK installed"
-        exit 1
-    fi
-else
-    echo "📦 Publishing application..."
-    cd src/Bank.Api
-    dotnet publish -c Release -o ../../publish /p:UseAppHost=false
-    
-    echo "🚀 Starting application on port $PORT..."
-    cd ../../publish
-    exec dotnet Bank.Api.dll --urls="http://+:$PORT"
+# Ensure the app binary exists
+if [ ! -f "/app/Bank.Api.dll" ]; then
+    echo "❌ Error: Bank.Api.dll not found at /app/"
+    echo "Docker build likely failed. Check build logs."
+    exit 1
 fi
+
+echo "✅ Found application binary"
+echo "🚀 Starting on port $PORT..."
+
+# Run the application
+exec dotnet /app/Bank.Api.dll
