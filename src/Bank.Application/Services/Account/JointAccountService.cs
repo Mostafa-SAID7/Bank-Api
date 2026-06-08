@@ -139,17 +139,18 @@ public class JointAccountService : IJointAccountService
     {
         try
         {
+            var maskedAccountId = MaskGuid(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for joint holder role update", accountId);
+                _logger.LogWarning("Account {AccountId} not found for joint holder role update", maskedAccountId);
                 return false;
             }
 
             var jointHolder = account.JointHolders.FirstOrDefault(jh => jh.UserId == userId && jh.IsActive);
             if (jointHolder == null)
             {
-                _logger.LogWarning("Active joint holder {UserId} not found for account {AccountId}", userId, accountId);
+                _logger.LogWarning("Active joint holder {UserId} not found for account {AccountId}", userId, maskedAccountId);
                 return false;
             }
 
@@ -182,15 +183,15 @@ public class JointAccountService : IJointAccountService
             await _unitOfWork.SaveChangesAsync();
 
             await _auditLogService.LogAsync("Joint Holder Role Updated", 
-                $"User {userId} role updated from {oldRole} to {newRole} for account {accountId}", updatedByUserId);
+                $"User {userId} role updated from {oldRole} to {newRole} for account {maskedAccountId}", updatedByUserId);
             _logger.LogInformation("Joint holder {UserId} role updated from {OldRole} to {NewRole} for account {AccountId}", 
-                userId, oldRole, newRole, accountId);
+                userId, oldRole, newRole, maskedAccountId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating joint holder role for account {AccountId}", accountId);
+            _logger.LogError(ex, "Error updating joint holder role for account {AccountId}", maskedAccountId);
             return false;
         }
     }
@@ -367,6 +368,11 @@ public class JointAccountService : IJointAccountService
             _logger.LogError(ex, "Error converting account {AccountId} to single account", accountId);
             return false;
         }
+    }
+    private static string MaskGuid(Guid value)
+    {
+        var text = value.ToString("N");
+        return $"{text[..8]}***";
     }
 }
 
