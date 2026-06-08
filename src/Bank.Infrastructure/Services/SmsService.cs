@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Bank.Application.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Bank.Infrastructure.Services;
@@ -8,15 +7,18 @@ namespace Bank.Infrastructure.Services;
 /// <summary>
 /// SMS service implementation - mock implementation for development
 /// In production, integrate with services like Twilio, AWS SNS, etc.
+/// Uses centralized template service for template management.
 /// </summary>
-public class SmsService : ISmsService
+public sealed class SmsService : ISmsService
 {
     private readonly ILogger<SmsService> _logger;
+    private readonly ITemplateService _templateService;
     private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(500);
 
-    public SmsService(ILogger<SmsService> logger)
+    public SmsService(ILogger<SmsService> logger, ITemplateService templateService)
     {
         _logger = logger;
+        _templateService = templateService;
     }
 
     public async Task<bool> SendSmsAsync(string phoneNumber, string message)
@@ -52,14 +54,14 @@ public class SmsService : ISmsService
     {
         try
         {
-            var template = GetSmsTemplate(templateId);
+            var template = _templateService.GetSmsTemplate(templateId);
             if (string.IsNullOrEmpty(template))
             {
                 _logger.LogWarning("SMS template not found: {TemplateId}", templateId);
                 return false;
             }
 
-            var message = ReplaceTemplateParameters(template, parameters);
+            var message = _templateService.ReplaceTemplateVariables(template, parameters);
             return await SendSmsAsync(phoneNumber, message);
         }
         catch (Exception ex)
@@ -85,49 +87,6 @@ public class SmsService : ISmsService
         {
             return false;
         }
-    }
-
-    private string GetSmsTemplate(string templateId)
-    {
-        // Simple template system - in production, load from database or configuration
-        return templateId switch
-        {
-            "2fa_token" => "Your Bank verification code is: {Token}. Valid for {ExpiryMinutes} minutes.",
-            
-            "password_reset" => "Your password reset code is: {ResetCode}. Valid for {ExpiryMinutes} minutes. Never share this code.",
-            
-            "welcome" => "Welcome to SecureBank, {UserName}! Your account is now active. Log in to get started.",
-            
-            "transaction_alert" => "Transaction alert: ${Amount} {TransactionType} from account {AccountLast4} on {TransactionDate}. If not you, contact support.",
-            
-            "payment_confirmation" => "Bill payment confirmed: ${Amount} to {BillerName} on {PaymentDate}. Reference: {PaymentReference}",
-            
-            "account_locked" => "Your account has been locked due to security concerns. Contact support at 1-800-BANK-123 to unlock your account.",
-            
-            "suspicious_activity" => "Suspicious activity detected on your account. Please verify your recent transactions or reset your password immediately.",
-            
-            "deposit_maturity_notice" => "Your fixed deposit (Account: {DepositNumber}) matures on {MaturityDate}. Action required: Choose renewal or withdrawal.",
-            
-            "low_balance_alert" => "Balance alert: Your account balance is now ${CurrentBalance}. Minimum balance is ${MinimumBalance}.",
-            
-            "loan_payment_due" => "Loan payment due: ${Amount} for loan {LoanNumber} is due on {DueDate}. Pay now to avoid late fees.",
-            
-            "card_blocked" => "Your card ending in {CardLast4} has been blocked for security. Call {SupportNumber} to unblock it.",
-            
-            "card_activated" => "Your new {CardType} card ending in {CardLast4} has been activated and is ready to use.",
-            
-            _ => string.Empty
-        };
-    }
-
-    private static string ReplaceTemplateParameters(string template, Dictionary<string, string> parameters)
-    {
-        var result = template;
-        foreach (var parameter in parameters)
-        {
-            result = result.Replace($"{{{parameter.Key}}}", parameter.Value);
-        }
-        return result;
     }
 
     /// <summary>

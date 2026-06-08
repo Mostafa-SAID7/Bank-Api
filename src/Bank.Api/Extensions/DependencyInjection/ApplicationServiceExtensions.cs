@@ -91,6 +91,9 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IFeeCalculationService, Bank.Application.Services.FeeCalculationService>();
         services.AddScoped<IInterestCalculationService, Bank.Application.Services.InterestCalculationService>();
 
+        // Template Service (centralized template management)
+        services.AddSingleton<ITemplateService, Bank.Infrastructure.Services.TemplateService>();
+
         // Security & Compliance Services
         services.AddScoped<IFraudDetectionService, Bank.Application.Services.FraudDetectionService>();
         services.AddScoped<IAuditLogService, Bank.Application.Services.AuditLogService>();
