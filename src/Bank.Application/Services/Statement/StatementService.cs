@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.DTOs.Statement.Core;
 using Bank.Application.DTOs.Statement.Search;
 using Bank.Application.DTOs.Statement.Analytics;
@@ -49,14 +49,13 @@ public class StatementService : IStatementService
     {
         try
         {
-            // Validate parameters only (no DB call) — avoids the double-fetch that
+            // Validate parameters only (no DB call) â€” avoids the double-fetch that
             // would occur if we called ValidateStatementRequestAsync here (which also
             // fetches the account) and then fetched again below.
             var paramErrors = ValidateStatementParameters(request);
             if (paramErrors.Count > 0)
                 return new StatementGenerationResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Invalid statement request",
                     Errors = paramErrors
                 };
@@ -109,8 +108,7 @@ public class StatementService : IStatementService
                 $"Statement {statement.StatementNumber} generated for account {account.AccountNumber}", requestedByUserId);
 
             return new StatementGenerationResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Statement generated successfully",
                 StatementId = statement.Id,
                 StatementNumber = statement.StatementNumber,
@@ -124,8 +122,7 @@ public class StatementService : IStatementService
         {
             SecureLoggingService.LogErrorSecurely(_logger, ex, "statement generation");
             return new StatementGenerationResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while generating the statement"
             };
         }
@@ -151,7 +148,7 @@ public class StatementService : IStatementService
                 };
 
                 var result = await GenerateStatementAsync(individualRequest, requestedByUserId);
-                if (result.Success && result.StatementId.HasValue)
+                if (result.IsSuccess && result.StatementId.HasValue)
                 {
                     var statement = await _unitOfWork.Repository<AccountStatement>().GetByIdAsync(result.StatementId.Value);
                     if (statement != null)
@@ -164,8 +161,7 @@ public class StatementService : IStatementService
             if (!statements.Any())
             {
                 return new StatementGenerationResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "No statements could be generated for the specified accounts"
                 };
             }
@@ -212,8 +208,7 @@ public class StatementService : IStatementService
                 $"Consolidated statement generated for {request.AccountIds.Count} accounts", requestedByUserId);
 
             return new StatementGenerationResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Consolidated statement generated successfully",
                 StatementId = consolidatedStatement.Id,
                 StatementNumber = consolidatedStatement.StatementNumber,
@@ -227,8 +222,7 @@ public class StatementService : IStatementService
         {
             _logger.LogError(ex, "Error generating consolidated statement");
             return new StatementGenerationResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while generating the consolidated statement"
             };
         }
@@ -483,8 +477,7 @@ public class StatementService : IStatementService
             if (existingStatement == null)
             {
                 return new StatementGenerationResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Statement not found"
                 };
             }
@@ -504,8 +497,7 @@ public class StatementService : IStatementService
         {
             _logger.LogError(ex, "Error regenerating statement {StatementId}", statementId);
             return new StatementGenerationResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while regenerating the statement"
             };
         }
@@ -847,3 +839,4 @@ public class StatementService : IStatementService
 
     #endregion
 }
+

@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.DTOs.Shared.Notification;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
@@ -33,8 +33,7 @@ public class NotificationService : INotificationService
             if (!Guid.TryParse(request.UserId, out var userGuid))
             {
                 return new NotificationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Invalid user ID"
                 };
             }
@@ -44,8 +43,7 @@ public class NotificationService : INotificationService
             if (preferences != null && !preferences.IsNotificationTypeEnabled(request.Type))
             {
                 return new NotificationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Notification type disabled by user preferences"
                 };
             }
@@ -86,8 +84,7 @@ public class NotificationService : INotificationService
 
             return new NotificationResponse
             {
-                NotificationId = notification.Id.ToString(),
-                Success = true,
+                NotificationId = notification.Id.ToString(), Success = true,
                 Message = "Notification sent successfully",
                 Status = notification.Status,
                 SentAt = notification.SentAt ?? DateTime.UtcNow
@@ -98,8 +95,7 @@ public class NotificationService : INotificationService
             _logger.LogError(ex, "Error sending notification to user {UserId}", request.UserId);
             
             return new NotificationResponse
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while sending notification"
             };
         }
@@ -113,8 +109,7 @@ public class NotificationService : INotificationService
             if (preferences != null && !preferences.ShouldAlertForTransaction(request.Amount))
             {
                 return new NotificationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Transaction amount below alert threshold"
                 };
             }
@@ -160,8 +155,7 @@ public class NotificationService : INotificationService
             _logger.LogError(ex, "Error sending transaction alert for user {UserId}", request.UserId);
             
             return new NotificationResponse
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while sending transaction alert"
             };
         }

@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Bank.Application.DTOs;
@@ -95,8 +95,7 @@ public sealed class TwoFactorAuthService : ITwoFactorAuthService
             _logger.LogInformation("2FA token generated for user {UserId} via {Method}", userId, method);
 
             return new TwoFactorTokenResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Verification token sent successfully",
                 TokenId = twoFactorToken.Id.ToString(),
                 ExpiresAt = expiresAt
@@ -142,8 +141,7 @@ public sealed class TwoFactorAuthService : ITwoFactorAuthService
             _logger.LogInformation("2FA token verified successfully for user {UserId}", userId);
 
             return new TwoFactorVerificationResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Token verified successfully"
             };
         }
@@ -174,8 +172,7 @@ public sealed class TwoFactorAuthService : ITwoFactorAuthService
             await _userManager.UpdateAsync(user);
 
             return new TwoFactorSetupResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Authenticator setup initiated",
                 SecretKey = secretKey,
                 QrCodeUrl = qrCodeUrl
@@ -221,8 +218,7 @@ public sealed class TwoFactorAuthService : ITwoFactorAuthService
             _logger.LogInformation("2FA setup completed for user {UserId}", userId);
 
             return new TwoFactorSetupResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Two-factor authentication enabled successfully",
                 BackupCodes = backupCodes
             };

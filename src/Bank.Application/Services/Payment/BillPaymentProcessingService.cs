@@ -1,4 +1,4 @@
-using Bank.Application.DTOs.Payment.Biller;
+﻿using Bank.Application.DTOs.Payment.Biller;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -124,8 +124,7 @@ public class BillPaymentProcessingService : IBillPaymentProcessingService
                     {
                         PaymentId = payment.Id,
                         Status = BillPaymentStatus.Failed,
-                        Message = "Insufficient funds - scheduled for retry",
-                        Success = false
+                        Message = "Insufficient funds - scheduled for retry", Success = false
                     });
                     continue;
                 }
@@ -157,8 +156,7 @@ public class BillPaymentProcessingService : IBillPaymentProcessingService
                         PaymentId = payment.Id,
                         Status = BillPaymentStatus.Processed,
                         ProcessedDate = payment.ProcessedDate,
-                        Message = "Payment processed successfully",
-                        Success = true
+                        Message = "Payment processed successfully", Success = true
                     });
                 }
                 else
@@ -177,8 +175,7 @@ public class BillPaymentProcessingService : IBillPaymentProcessingService
                     {
                         PaymentId = payment.Id,
                         Status = BillPaymentStatus.Failed,
-                        Message = $"Payment failed: {billerResponse.Message} - scheduled for retry",
-                        Success = false
+                        Message = $"Payment failed: {billerResponse.Message} - scheduled for retry", Success = false
                     });
                 }
 
@@ -202,8 +199,7 @@ public class BillPaymentProcessingService : IBillPaymentProcessingService
                 {
                     PaymentId = payment.Id,
                     Status = BillPaymentStatus.Failed,
-                    Message = "Payment processing failed - scheduled for retry",
-                    Success = false
+                    Message = "Payment processing failed - scheduled for retry", Success = false
                 });
             }
 

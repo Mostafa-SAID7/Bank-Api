@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers.Loan;
@@ -47,8 +47,7 @@ public class LoanService : ILoanService
             if (customer == null)
             {
                 return new LoanApplicationResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Customer not found"
                 };
             }
@@ -97,8 +96,7 @@ public class LoanService : ILoanService
                 loanNumber, customerId);
 
             return new LoanApplicationResult
-            {
-                IsSuccess = true,
+            { Success = true,
                 LoanId = loan.Id,
                 LoanNumber = loanNumber,
                 Status = LoanStatus.UnderReview,
@@ -111,8 +109,7 @@ public class LoanService : ILoanService
         {
             _logger.LogError(ex, "Error submitting loan application for customer {CustomerId}", customerId);
             return new LoanApplicationResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = "An error occurred while processing your application"
             };
         }
@@ -126,8 +123,7 @@ public class LoanService : ILoanService
             if (loan == null || loan.CustomerId != customerId)
             {
                 return new CreditScoreResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     RiskAssessment = "Loan not found"
                 };
             }
@@ -150,8 +146,7 @@ public class LoanService : ILoanService
                 loanId, scoreRange);
 
             return new CreditScoreResult
-            {
-                IsSuccess = true,
+            { Success = true,
                 CreditScore = creditScore,
                 ScoreRange = scoreRange,
                 RiskAssessment = GetRiskAssessment(scoreRange),
@@ -165,8 +160,7 @@ public class LoanService : ILoanService
         {
             _logger.LogError(ex, "Error performing credit scoring for loan {LoanId}", loanId);
             return new CreditScoreResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 RiskAssessment = "Error occurred during credit scoring"
             };
         }
@@ -181,8 +175,7 @@ public class LoanService : ILoanService
             if (loan == null)
             {
                 return new LoanApprovalResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Loan not found"
                 };
             }
@@ -190,8 +183,7 @@ public class LoanService : ILoanService
             if (loan.Status != LoanStatus.UnderReview)
             {
                 return new LoanApprovalResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Loan is not in a state that can be approved or rejected"
                 };
             }
@@ -242,8 +234,7 @@ public class LoanService : ILoanService
                 loanId, decision.IsApproved ? "approved" : "rejected", approvedBy);
 
             return new LoanApprovalResult
-            {
-                IsSuccess = true,
+            { Success = true,
                 Message = decision.IsApproved ? "Loan approved successfully" : "Loan application rejected",
                 NewStatus = loan.Status,
                 ApprovedAmount = decision.IsApproved ? loan.PrincipalAmount : null,
@@ -257,8 +248,7 @@ public class LoanService : ILoanService
         {
             _logger.LogError(ex, "Error processing loan approval for loan {LoanId}", loanId);
             return new LoanApprovalResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = "An error occurred while processing the approval"
             };
         }
@@ -273,8 +263,7 @@ public class LoanService : ILoanService
             if (loan == null)
             {
                 return new DisbursementResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Loan not found"
                 };
             }
@@ -282,8 +271,7 @@ public class LoanService : ILoanService
             if (!loan.IsEligibleForDisbursement())
             {
                 return new DisbursementResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Loan is not eligible for disbursement"
                 };
             }
@@ -306,8 +294,7 @@ public class LoanService : ILoanService
             if (transaction == null)
             {
                 return new DisbursementResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Failed to process disbursement transaction"
                 };
             }
@@ -339,8 +326,7 @@ public class LoanService : ILoanService
                 loanId, loan.PrincipalAmount);
 
             return new DisbursementResult
-            {
-                IsSuccess = true,
+            { Success = true,
                 Message = "Loan disbursed successfully",
                 DisbursedAmount = loan.PrincipalAmount,
                 TransactionReference = transaction.Id.ToString(),
@@ -353,8 +339,7 @@ public class LoanService : ILoanService
         {
             _logger.LogError(ex, "Error disbursing loan {LoanId}", loanId);
             return new DisbursementResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = "An error occurred during loan disbursement"
             };
         }
@@ -368,8 +353,7 @@ public class LoanService : ILoanService
             if (loan == null)
             {
                 return new PaymentResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Loan not found"
                 };
             }
@@ -377,8 +361,7 @@ public class LoanService : ILoanService
             if (!loan.IsActive())
             {
                 return new PaymentResult
-                {
-                    IsSuccess = false,
+                { Success = false,
                     Message = "Loan is not active"
                 };
             }
@@ -429,8 +412,7 @@ public class LoanService : ILoanService
                 request.LoanId, request.PaymentAmount);
 
             return new PaymentResult
-            {
-                IsSuccess = true,
+            { Success = true,
                 Message = loan.Status == LoanStatus.PaidOff ? "Loan paid off successfully" : "Payment processed successfully",
                 PaymentAmount = request.PaymentAmount,
                 PrincipalAmount = principalAmount,
@@ -444,8 +426,7 @@ public class LoanService : ILoanService
         {
             _logger.LogError(ex, "Error processing loan payment for loan {LoanId}", request.LoanId);
             return new PaymentResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = "An error occurred while processing the payment"
             };
         }

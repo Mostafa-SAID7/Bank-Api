@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.DTOs.Payment.Biller;
 using Bank.Application.DTOs.Payment.Routing;
 using Bank.Application.DTOs.Payment.Batch;
@@ -69,8 +69,7 @@ public class BillerIntegrationService : IBillerIntegrationService
         if (biller == null)
         {
             return new BillerPaymentResponse
-            {
-                Success = false,
+            { Success = false,
                 Status = BillPaymentStatus.Failed,
                 Message = "Biller not found"
             };
@@ -99,8 +98,7 @@ public class BillerIntegrationService : IBillerIntegrationService
                 request.PaymentId, request.BillerId);
 
             return new BillerPaymentResponse
-            {
-                Success = false,
+            { Success = false,
                 Status = BillPaymentStatus.Failed,
                 Message = $"Payment processing failed: {ex.Message}",
                 ProcessedDate = DateTime.UtcNow
@@ -369,8 +367,7 @@ public class BillerIntegrationService : IBillerIntegrationService
                 
                 results.Add(new BatchPaymentResult
                 {
-                    PaymentId = payment.PaymentId,
-                    Success = response.Success,
+                    PaymentId = payment.PaymentId, Success = response.Success,
                     ExternalReference = response.ExternalReference,
                     Message = response.Message,
                     Status = response.Status
@@ -383,8 +380,7 @@ public class BillerIntegrationService : IBillerIntegrationService
 
                 results.Add(new BatchPaymentResult
                 {
-                    PaymentId = payment.PaymentId,
-                    Success = false,
+                    PaymentId = payment.PaymentId, Success = false,
                     Message = $"Batch processing failed: {ex.Message}",
                     Status = BillPaymentStatus.Failed
                 });
@@ -481,8 +477,7 @@ public class BillerIntegrationService : IBillerIntegrationService
 
                 var syncResult = new PaymentStatusSyncResult
                 {
-                    PaymentId = paymentId,
-                    Success = true,
+                    PaymentId = paymentId, Success = true,
                     OldStatus = BillPaymentStatus.Processing,
                     NewStatus = BillPaymentStatus.Delivered,
                     SyncDate = DateTime.UtcNow,
@@ -497,8 +492,7 @@ public class BillerIntegrationService : IBillerIntegrationService
                 
                 results.Add(new PaymentStatusSyncResult
                 {
-                    PaymentId = paymentId,
-                    Success = false,
+                    PaymentId = paymentId, Success = false,
                     SyncDate = DateTime.UtcNow,
                     Message = $"Synchronization failed: {ex.Message}"
                 });
@@ -532,8 +526,7 @@ public class BillerIntegrationService : IBillerIntegrationService
         if (isSuccess)
         {
             return new BillerPaymentResponse
-            {
-                Success = true,
+            { Success = true,
                 ExternalReference = TokenGenerationHelper.GenerateExternalReference(),
                 ConfirmationNumber = TokenGenerationHelper.GenerateConfirmationNumber(),
                 Status = BillPaymentStatus.Processing,
@@ -546,8 +539,7 @@ public class BillerIntegrationService : IBillerIntegrationService
         else
         {
             return new BillerPaymentResponse
-            {
-                Success = false,
+            { Success = false,
                 Status = BillPaymentStatus.Failed,
                 ProcessedDate = DateTime.UtcNow,
                 Message = "Payment processing failed - insufficient funds or account validation error"

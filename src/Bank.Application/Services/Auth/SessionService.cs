@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Bank.Application.DTOs;
@@ -108,8 +108,7 @@ public sealed class SessionService : ISessionService
                 userId, ipAddress, isAdminSession);
 
             return new SessionResult
-            {
-                Success = true,
+            { Success = true,
                 SessionToken = sessionToken,
                 RefreshToken = refreshToken,
                 ExpiresAt = session.ExpiresAt,
@@ -276,8 +275,7 @@ public sealed class SessionService : ISessionService
             _logger.LogInformation("Session refreshed for user {UserId}", session.UserId);
 
             return new SessionResult
-            {
-                Success = true,
+            { Success = true,
                 SessionToken = newSessionToken,
                 RefreshToken = newRefreshToken,
                 ExpiresAt = session.ExpiresAt
@@ -391,7 +389,7 @@ public sealed class SessionService : ISessionService
     }
 
     /// <summary>
-    /// Masks a sensitive token for safe logging — shows only the first 4 and last 4 characters.
+    /// Masks a sensitive token for safe logging â€” shows only the first 4 and last 4 characters.
     /// Never log raw session or refresh tokens.
     /// </summary>
     private static string MaskToken(string? token)

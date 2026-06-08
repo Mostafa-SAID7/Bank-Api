@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
 using Bank.Application.Helpers.Shared;
@@ -49,8 +49,7 @@ public class CardService : ICardService
             if (customer == null)
             {
                 return new CardIssuanceResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Customer not found",
                     Errors = new List<string> { "Invalid customer ID" }
                 };
@@ -61,8 +60,7 @@ public class CardService : ICardService
             if (account == null || account.UserId != request.CustomerId)
             {
                 return new CardIssuanceResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Account not found or does not belong to customer",
                     Errors = new List<string> { "Invalid account ID" }
                 };
@@ -72,8 +70,7 @@ public class CardService : ICardService
             if (!account.IsActive())
             {
                 return new CardIssuanceResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Cannot issue card for inactive account",
                     Errors = new List<string> { "Account is not active" }
                 };
@@ -115,8 +112,7 @@ public class CardService : ICardService
                 card.Id, request.CustomerId);
 
             return new CardIssuanceResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Card issued successfully",
                 CardId = card.Id,
                 MaskedCardNumber = card.MaskedCardNumber,
@@ -128,8 +124,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error issuing card for customer {CustomerId}", request.CustomerId);
             return new CardIssuanceResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while issuing the card",
                 Errors = new List<string> { ex.Message }
             };
@@ -147,8 +142,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardActivationResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -157,8 +151,7 @@ public class CardService : ICardService
             if (card.Status != CardStatus.Inactive)
             {
                 return new CardActivationResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card is not in inactive status",
                     Errors = new List<string> { "Card cannot be activated" }
                 };
@@ -169,8 +162,7 @@ public class CardService : ICardService
             if (string.IsNullOrEmpty(request.ActivationCode))
             {
                 return new CardActivationResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Activation code is required",
                     Errors = new List<string> { "Invalid activation code" }
                 };
@@ -192,8 +184,7 @@ public class CardService : ICardService
             _logger.LogInformation("Card {CardId} activated successfully", request.CardId);
 
             return new CardActivationResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Card activated successfully",
                 ActivationDate = card.ActivationDate
             };
@@ -202,8 +193,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error activating card {CardId}", request.CardId);
             return new CardActivationResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while activating the card",
                 Errors = new List<string> { ex.Message }
             };
@@ -217,8 +207,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardBlockResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -231,8 +220,7 @@ public class CardService : ICardService
             _logger.LogInformation("Card {CardId} blocked with reason {Reason}", request.CardId, request.Reason);
 
             return new CardBlockResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Card blocked successfully",
                 NewStatus = card.Status,
                 StatusChangeDate = card.LastBlockedDate
@@ -242,8 +230,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error blocking card {CardId}", request.CardId);
             return new CardBlockResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while blocking the card",
                 Errors = new List<string> { ex.Message }
             };
@@ -258,8 +245,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardBlockResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -268,8 +254,7 @@ public class CardService : ICardService
             if (card.Status != CardStatus.Blocked)
             {
                 return new CardBlockResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card is not blocked",
                     Errors = new List<string> { "Card cannot be unblocked" }
                 };
@@ -282,8 +267,7 @@ public class CardService : ICardService
             _logger.LogInformation("Card {CardId} unblocked successfully", request.CardId);
 
             return new CardBlockResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Card unblocked successfully",
                 NewStatus = card.Status,
                 StatusChangeDate = DateTime.UtcNow
@@ -293,8 +277,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error unblocking card {CardId}", request.CardId);
             return new CardBlockResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while unblocking the card",
                 Errors = new List<string> { ex.Message }
             };
@@ -309,8 +292,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardLimitUpdateResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -331,8 +313,7 @@ public class CardService : ICardService
             _logger.LogInformation("Card {CardId} limits updated successfully", request.CardId);
 
             return new CardLimitUpdateResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Card limits updated successfully",
                 NewDailyLimit = card.DailyLimit,
                 NewMonthlyLimit = card.MonthlyLimit,
@@ -343,8 +324,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error updating limits for card {CardId}", request.CardId);
             return new CardLimitUpdateResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while updating card limits",
                 Errors = new List<string> { ex.Message }
             };
@@ -509,8 +489,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardPinChangeResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -520,8 +499,7 @@ public class CardService : ICardService
             if (string.IsNullOrEmpty(card.PinHash) || !VerifyPin(request.CurrentPin, card.PinHash))
             {
                 return new CardPinChangeResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Current PIN is incorrect",
                     Errors = new List<string> { "Invalid current PIN" }
                 };
@@ -538,8 +516,7 @@ public class CardService : ICardService
             _logger.LogInformation("PIN changed successfully for card {CardId}", request.CardId);
 
             return new CardPinChangeResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "PIN changed successfully",
                 PinChangeDate = card.PinSetDate
             };
@@ -548,8 +525,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error changing PIN for card {CardId}", request.CardId);
             return new CardPinChangeResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while changing PIN",
                 Errors = new List<string> { ex.Message }
             };
@@ -564,8 +540,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardPinResetResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -576,8 +551,7 @@ public class CardService : ICardService
             if (string.IsNullOrEmpty(request.VerificationCode))
             {
                 return new CardPinResetResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Verification code is required",
                     Errors = new List<string> { "Invalid verification code" }
                 };
@@ -595,8 +569,7 @@ public class CardService : ICardService
             _logger.LogInformation("PIN reset successfully for card {CardId}", request.CardId);
 
             return new CardPinResetResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "PIN reset successfully",
                 NewPin = newPin, // In real implementation, this would be sent via secure channel
                 PinResetDate = card.PinSetDate
@@ -606,8 +579,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error resetting PIN for card {CardId}", request.CardId);
             return new CardPinResetResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while resetting PIN",
                 Errors = new List<string> { ex.Message }
             };
@@ -623,8 +595,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardMerchantRestrictionsResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -638,8 +609,7 @@ public class CardService : ICardService
             await _unitOfWork.SaveChangesAsync();
 
             return new CardMerchantRestrictionsResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Merchant restrictions updated successfully",
                 BlockedCategories = request.BlockedCategories
             };
@@ -648,8 +618,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error updating merchant restrictions for card {CardId}", request.CardId);
             return new CardMerchantRestrictionsResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while updating merchant restrictions",
                 Errors = new List<string> { ex.Message }
             };
@@ -663,8 +632,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardContactlessResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -675,8 +643,7 @@ public class CardService : ICardService
             await _unitOfWork.SaveChangesAsync();
 
             return new CardContactlessResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Contactless settings updated successfully",
                 ContactlessEnabled = card.ContactlessEnabled
             };
@@ -685,8 +652,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error updating contactless settings for card {CardId}", request.CardId);
             return new CardContactlessResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while updating contactless settings",
                 Errors = new List<string> { ex.Message }
             };
@@ -701,8 +667,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardOnlineTransactionsResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -713,8 +678,7 @@ public class CardService : ICardService
             await _unitOfWork.SaveChangesAsync();
 
             return new CardOnlineTransactionsResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "Online transactions settings updated successfully",
                 OnlineTransactionsEnabled = card.OnlineTransactionsEnabled
             };
@@ -723,8 +687,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error updating online transactions settings for card {CardId}", request.CardId);
             return new CardOnlineTransactionsResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while updating online transactions settings",
                 Errors = new List<string> { ex.Message }
             };
@@ -739,8 +702,7 @@ public class CardService : ICardService
             if (card == null || card.CustomerId != request.CustomerId)
             {
                 return new CardInternationalTransactionsResult
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found",
                     Errors = new List<string> { "Invalid card ID" }
                 };
@@ -751,8 +713,7 @@ public class CardService : ICardService
             await _unitOfWork.SaveChangesAsync();
 
             return new CardInternationalTransactionsResult
-            {
-                Success = true,
+            { Success = true,
                 Message = "International transactions settings updated successfully",
                 InternationalTransactionsEnabled = card.InternationalTransactionsEnabled
             };
@@ -761,8 +722,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error updating international transactions settings for card {CardId}", request.CardId);
             return new CardInternationalTransactionsResult
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while updating international transactions settings",
                 Errors = new List<string> { ex.Message }
             };
@@ -786,23 +746,23 @@ public class CardService : ICardService
                 FromDate = fromDate,
                 ToDate = toDate,
                 TotalTransactions = transactions.Count,
-                TotalAmount = transactions.Where(t => t.IsSuccessful()).Sum(t => t.Amount),
+                TotalAmount = transactions.Where(t => t.Successful()).Sum(t => t.Amount),
                 TotalFees = transactions.Sum(t => t.Fees ?? 0),
-                PurchaseCount = transactions.Count(t => t.TransactionType == CardTransactionType.Purchase && t.IsSuccessful()),
-                PurchaseAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Purchase && t.IsSuccessful()).Sum(t => t.Amount),
-                WithdrawalCount = transactions.Count(t => t.TransactionType == CardTransactionType.Withdrawal && t.IsSuccessful()),
-                WithdrawalAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Withdrawal && t.IsSuccessful()).Sum(t => t.Amount),
-                OnlineTransactionCount = transactions.Count(t => t.IsOnline && t.IsSuccessful()),
-                OnlineTransactionAmount = transactions.Where(t => t.IsOnline && t.IsSuccessful()).Sum(t => t.Amount),
-                InternationalTransactionCount = transactions.Count(t => t.IsInternational && t.IsSuccessful()),
-                InternationalTransactionAmount = transactions.Where(t => t.IsInternational && t.IsSuccessful()).Sum(t => t.Amount)
+                PurchaseCount = transactions.Count(t => t.TransactionType == CardTransactionType.Purchase && t.Successful()),
+                PurchaseAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Purchase && t.Successful()).Sum(t => t.Amount),
+                WithdrawalCount = transactions.Count(t => t.TransactionType == CardTransactionType.Withdrawal && t.Successful()),
+                WithdrawalAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Withdrawal && t.Successful()).Sum(t => t.Amount),
+                OnlineTransactionCount = transactions.Count(t => t.IsOnline && t.Successful()),
+                OnlineTransactionAmount = transactions.Where(t => t.IsOnline && t.Successful()).Sum(t => t.Amount),
+                InternationalTransactionCount = transactions.Count(t => t.IsInternational && t.Successful()),
+                InternationalTransactionAmount = transactions.Where(t => t.IsInternational && t.Successful()).Sum(t => t.Amount)
             };
 
             // Calculate limit utilization
-            var dailySpent = transactions.Where(t => t.TransactionDate.Date == DateTime.UtcNow.Date && t.IsSuccessful()).Sum(t => t.Amount);
+            var dailySpent = transactions.Where(t => t.TransactionDate.Date == DateTime.UtcNow.Date && t.Successful()).Sum(t => t.Amount);
             var monthlySpent = transactions.Where(t => t.TransactionDate.Year == DateTime.UtcNow.Year && 
                                                       t.TransactionDate.Month == DateTime.UtcNow.Month && 
-                                                      t.IsSuccessful()).Sum(t => t.Amount);
+                                                      t.Successful()).Sum(t => t.Amount);
 
             stats.DailyLimitUtilization = card.DailyLimit > 0 ? (dailySpent / card.DailyLimit) * 100 : 0;
             stats.MonthlyLimitUtilization = card.MonthlyLimit > 0 ? (monthlySpent / card.MonthlyLimit) * 100 : 0;

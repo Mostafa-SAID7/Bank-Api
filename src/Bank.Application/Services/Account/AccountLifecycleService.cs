@@ -1,4 +1,4 @@
-using Bank.Application.Interfaces;
+﻿using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -881,7 +881,7 @@ public class AccountLifecycleService : IAccountLifecycleService
             var accounts = await GetAccountsForFeeProcessingAsync();
             var processedCount = 0;
 
-            // Use ApplyAccountFeesCoreAsync directly — accounts are already loaded, avoiding N+1.
+            // Use ApplyAccountFeesCoreAsync directly â€” accounts are already loaded, avoiding N+1.
             foreach (var account in accounts)
             {
                 if (await ApplyAccountFeesCoreAsync(account, Guid.Empty))

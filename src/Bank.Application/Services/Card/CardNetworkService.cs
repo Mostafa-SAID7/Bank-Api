@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
@@ -42,8 +42,7 @@ public class CardNetworkService : ICardNetworkService
             if (card == null)
             {
                 return new CardAuthorizationResult
-                {
-                    Success = false,
+                { Success = false,
                     ResponseCode = "14",
                     ResponseMessage = "Invalid card",
                     DeclineReason = "Card not found"
@@ -55,8 +54,7 @@ public class CardNetworkService : ICardNetworkService
             if (!validationResult.IsValid)
             {
                 return new CardAuthorizationResult
-                {
-                    Success = false,
+                { Success = false,
                     ResponseCode = validationResult.ResponseCode,
                     ResponseMessage = validationResult.ResponseMessage,
                     DeclineReason = validationResult.DeclineReason
@@ -105,8 +103,7 @@ public class CardNetworkService : ICardNetworkService
                 card.CustomerId);
 
             return new CardAuthorizationResult
-            {
-                Success = true,
+            { Success = true,
                 AuthorizationCode = authCode,
                 TransactionId = transactionId,
                 ResponseCode = "00",
@@ -120,8 +117,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error authorizing card transaction for card {CardId}", request.CardId);
             return new CardAuthorizationResult
-            {
-                Success = false,
+            { Success = false,
                 ResponseCode = "96",
                 ResponseMessage = "System error",
                 DeclineReason = "Processing error"
@@ -136,8 +132,7 @@ public class CardNetworkService : ICardNetworkService
             if (authorization == null)
             {
                 return new CardCaptureResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Authorization not found"
                 };
             }
@@ -145,8 +140,7 @@ public class CardNetworkService : ICardNetworkService
             if (authorization.Status != CardTransactionStatus.Authorized)
             {
                 return new CardCaptureResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Authorization not valid for capture"
                 };
             }
@@ -154,8 +148,7 @@ public class CardNetworkService : ICardNetworkService
             if (authorization.ExpiresAt < DateTime.UtcNow)
             {
                 return new CardCaptureResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Authorization expired"
                 };
             }
@@ -186,8 +179,7 @@ public class CardNetworkService : ICardNetworkService
             await _cardTransactionRepository.AddTransactionAsync(transaction);
 
             return new CardCaptureResult
-            {
-                Success = true,
+            { Success = true,
                 CaptureId = transaction.Id.ToString(),
                 CapturedAmount = request.CaptureAmount,
                 CaptureDate = DateTime.UtcNow
@@ -197,8 +189,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error capturing transaction with authorization code {AuthCode}", request.AuthorizationCode);
             return new CardCaptureResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Capture processing error"
             };
         }
@@ -212,8 +203,7 @@ public class CardNetworkService : ICardNetworkService
             if (authorization == null)
             {
                 return new CardVoidResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Authorization not found"
                 };
             }
@@ -221,8 +211,7 @@ public class CardNetworkService : ICardNetworkService
             if (authorization.Status != CardTransactionStatus.Authorized)
             {
                 return new CardVoidResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Authorization cannot be voided"
                 };
             }
@@ -235,8 +224,7 @@ public class CardNetworkService : ICardNetworkService
             await _cardTransactionRepository.UpdateAuthorizationAsync(authorization);
 
             return new CardVoidResult
-            {
-                Success = true,
+            { Success = true,
                 VoidId = Guid.NewGuid().ToString(),
                 VoidDate = DateTime.UtcNow
             };
@@ -245,8 +233,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error voiding transaction with authorization code {AuthCode}", request.AuthorizationCode);
             return new CardVoidResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Void processing error"
             };
         }
@@ -260,8 +247,7 @@ public class CardNetworkService : ICardNetworkService
             if (transaction == null)
             {
                 return new CardRefundResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Transaction not found"
                 };
             }
@@ -269,8 +255,7 @@ public class CardNetworkService : ICardNetworkService
             if (transaction.Status != CardTransactionStatus.Settled)
             {
                 return new CardRefundResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Transaction cannot be refunded"
                 };
             }
@@ -293,8 +278,7 @@ public class CardNetworkService : ICardNetworkService
             await _cardTransactionRepository.AddTransactionAsync(refundTransaction);
 
             return new CardRefundResult
-            {
-                Success = true,
+            { Success = true,
                 RefundId = refundTransaction.Id.ToString(),
                 RefundedAmount = request.RefundAmount,
                 RefundDate = DateTime.UtcNow
@@ -304,8 +288,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error processing refund for transaction {TransactionId}", request.TransactionId);
             return new CardRefundResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Refund processing error"
             };
         }
@@ -350,8 +333,7 @@ public class CardNetworkService : ICardNetworkService
             var netAmount = totalAmount - totalFees;
 
             return new CardSettlementResult
-            {
-                Success = failedTransactions.Count == 0,
+            { Success = failedTransactions.Count == 0,
                 SettlementId = settlementId,
                 SettlementDate = request.SettlementDate,
                 TransactionCount = processedTransactions.Count,
@@ -366,8 +348,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error processing settlement for date {SettlementDate}", request.SettlementDate);
             return new CardSettlementResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Settlement processing error"
             };
         }
@@ -417,8 +398,7 @@ public class CardNetworkService : ICardNetworkService
             if (card == null)
             {
                 return new CardTransactionResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Card not found"
                 };
             }
@@ -428,8 +408,7 @@ public class CardNetworkService : ICardNetworkService
             if (!validationResult.IsValid)
             {
                 return new CardTransactionResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = validationResult.ResponseMessage,
                     DeclineReason = validationResult.DeclineReason
                 };
@@ -484,8 +463,7 @@ public class CardNetworkService : ICardNetworkService
             await _cardTransactionRepository.UpdateTransactionAsync(transaction);
 
             return new CardTransactionResult
-            {
-                Success = true,
+            { Success = true,
                 TransactionId = transaction.Id,
                 AuthorizationCode = GenerateAuthorizationCode(),
                 Status = CardTransactionStatus.Settled,
@@ -499,8 +477,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error processing card transaction for card {CardId}", request.CardId);
             return new CardTransactionResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Transaction processing error"
             };
         }
@@ -563,8 +540,7 @@ public class CardNetworkService : ICardNetworkService
             if (card == null)
             {
                 return new CardStatementResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Card not found"
                 };
             }
@@ -600,8 +576,7 @@ public class CardNetworkService : ICardNetworkService
             await _cardTransactionRepository.AddStatementAsync(statement);
 
             return new CardStatementResult
-            {
-                Success = true,
+            { Success = true,
                 StatementId = statement.Id,
                 FileName = fileName,
                 Content = content,
@@ -613,8 +588,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error generating card statement for card {CardId}", request.CardId);
             return new CardStatementResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Statement generation error"
             };
         }
@@ -681,8 +655,7 @@ public class CardNetworkService : ICardNetworkService
                     {
                         CardId = card.Id,
                         CardNumber = card.MaskedCardNumber,
-                        OldExpiryDate = card.ExpiryDate,
-                        Success = false,
+                        OldExpiryDate = card.ExpiryDate, Success = false,
                         ErrorMessage = ex.Message
                     });
                     failedRenewals++;
@@ -690,8 +663,7 @@ public class CardNetworkService : ICardNetworkService
             }
 
             return new CardRenewalResult
-            {
-                Success = failedRenewals == 0,
+            { Success = failedRenewals == 0,
                 ProcessedCount = renewalDetails.Count,
                 SuccessfulRenewals = successfulRenewals,
                 FailedRenewals = failedRenewals,
@@ -702,8 +674,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error processing card renewals");
             return new CardRenewalResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Card renewal processing error"
             };
         }
@@ -717,8 +688,7 @@ public class CardNetworkService : ICardNetworkService
             if (oldCard == null)
             {
                 return new CardRenewalResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Card not found"
                 };
             }
@@ -757,8 +727,7 @@ public class CardNetworkService : ICardNetworkService
                 oldCard.CustomerId);
 
             return new CardRenewalResult
-            {
-                Success = true,
+            { Success = true,
                 ProcessedCount = 1,
                 SuccessfulRenewals = 1,
                 RenewalDetails = new List<CardRenewalInfo>
@@ -770,8 +739,7 @@ public class CardNetworkService : ICardNetworkService
                         NewCardId = newCard.Id,
                         NewCardNumber = newCard.MaskedCardNumber,
                         OldExpiryDate = oldCard.ExpiryDate,
-                        NewExpiryDate = newCard.ExpiryDate,
-                        Success = true
+                        NewExpiryDate = newCard.ExpiryDate, Success = true
                     }
                 }
             };
@@ -780,8 +748,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error renewing card {CardId}", cardId);
             return new CardRenewalResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Card renewal error"
             };
         }
@@ -876,8 +843,7 @@ public class CardNetworkService : ICardNetworkService
             await Task.Delay(1000);
             
             return new BatchSettlementResult
-            {
-                Success = true,
+            { Success = true,
                 BatchId = batchId,
                 ProcessedDate = processedDate,
                 TotalRecords = 100, // Simulated
@@ -891,8 +857,7 @@ public class CardNetworkService : ICardNetworkService
         {
             _logger.LogError(ex, "Error processing batch settlement file {FilePath}", settlementFilePath);
             return new BatchSettlementResult
-            {
-                Success = false,
+            { Success = false,
                 Errors = new List<string> { ex.Message }
             };
         }

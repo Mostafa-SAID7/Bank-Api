@@ -1,4 +1,4 @@
-using Bank.Application.Helpers.Shared;
+﻿using Bank.Application.Helpers.Shared;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;

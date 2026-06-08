@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -58,8 +58,7 @@ public class PaymentRetryService : IPaymentRetryService
             {
                 return new PaymentRetryResult
                 {
-                    PaymentId = request.PaymentId,
-                    Success = false,
+                    PaymentId = request.PaymentId, Success = false,
                     Message = "Payment not found"
                 };
             }
@@ -70,8 +69,7 @@ public class PaymentRetryService : IPaymentRetryService
             {
                 return new PaymentRetryResult
                 {
-                    PaymentId = request.PaymentId,
-                    Success = false,
+                    PaymentId = request.PaymentId, Success = false,
                     Message = "Maximum retry attempts reached",
                     IsMaxRetriesReached = true
                 };
@@ -112,8 +110,7 @@ public class PaymentRetryService : IPaymentRetryService
 
             return new PaymentRetryResult
             {
-                PaymentId = request.PaymentId,
-                Success = true,
+                PaymentId = request.PaymentId, Success = true,
                 AttemptNumber = attemptNumber,
                 AttemptDate = DateTime.UtcNow,
                 NextRetryDate = nextRetryDate,
@@ -129,8 +126,7 @@ public class PaymentRetryService : IPaymentRetryService
             
             return new PaymentRetryResult
             {
-                PaymentId = request.PaymentId,
-                Success = false,
+                PaymentId = request.PaymentId, Success = false,
                 Message = $"Failed to schedule retry: {ex.Message}"
             };
         }
@@ -173,8 +169,7 @@ public class PaymentRetryService : IPaymentRetryService
             
             return retries.Select(r => new PaymentRetryResult
             {
-                PaymentId = r.PaymentId,
-                Success = r.Status == BillPaymentStatus.Processed,
+                PaymentId = r.PaymentId, Success = r.Status == BillPaymentStatus.Processed,
                 AttemptNumber = r.AttemptNumber,
                 AttemptDate = r.AttemptDate,
                 NextRetryDate = r.NextRetryDate,
@@ -299,8 +294,7 @@ public class PaymentRetryService : IPaymentRetryService
                 
                 return new PaymentRetryResult
                 {
-                    PaymentId = retry.PaymentId,
-                    Success = false,
+                    PaymentId = retry.PaymentId, Success = false,
                     AttemptNumber = retry.AttemptNumber,
                     AttemptDate = DateTime.UtcNow,
                     Message = "Payment not found"
@@ -338,8 +332,7 @@ public class PaymentRetryService : IPaymentRetryService
 
                 return new PaymentRetryResult
                 {
-                    PaymentId = retry.PaymentId,
-                    Success = true,
+                    PaymentId = retry.PaymentId, Success = true,
                     AttemptNumber = retry.AttemptNumber,
                     AttemptDate = DateTime.UtcNow,
                     Message = "Retry successful"
@@ -372,8 +365,7 @@ public class PaymentRetryService : IPaymentRetryService
 
                 return new PaymentRetryResult
                 {
-                    PaymentId = retry.PaymentId,
-                    Success = false,
+                    PaymentId = retry.PaymentId, Success = false,
                     AttemptNumber = retry.AttemptNumber,
                     AttemptDate = DateTime.UtcNow,
                     IsMaxRetriesReached = retry.AttemptNumber >= _maxRetryAttempts,
@@ -391,8 +383,7 @@ public class PaymentRetryService : IPaymentRetryService
 
             return new PaymentRetryResult
             {
-                PaymentId = retry.PaymentId,
-                Success = false,
+                PaymentId = retry.PaymentId, Success = false,
                 AttemptNumber = retry.AttemptNumber,
                 AttemptDate = DateTime.UtcNow,
                 Message = $"Retry processing failed: {ex.Message}"

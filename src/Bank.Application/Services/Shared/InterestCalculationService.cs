@@ -1,4 +1,4 @@
-using Bank.Application.Interfaces;
+﻿using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -32,7 +32,7 @@ public class InterestCalculationService : IInterestCalculationService
             var days = (toDate - fromDate).TotalDays;
             if (days <= 0) return 0;
 
-            // Simple Interest = Principal × Rate × Time / 365
+            // Simple Interest = Principal Ã— Rate Ã— Time / 365
             var interest = account.Balance * (account.InterestRate / 100) * (decimal)(days / 365);
             return Math.Round(interest, 2);
         }
@@ -78,7 +78,7 @@ public class InterestCalculationService : IInterestCalculationService
             if (account.InterestRate <= 0 || account.Balance <= 0)
                 return 0;
 
-            // Daily Interest = Balance × (Annual Rate / 365)
+            // Daily Interest = Balance Ã— (Annual Rate / 365)
             var dailyRate = account.InterestRate / 100 / 365;
             var dailyInterest = account.Balance * dailyRate;
 
@@ -183,7 +183,7 @@ public class InterestCalculationService : IInterestCalculationService
             var accountsForProcessing = await GetAccountsForInterestProcessingAsync();
             var processedCount = 0;
 
-            // Use ApplyInterestCoreAsync directly — accounts are already loaded, avoiding N+1.
+            // Use ApplyInterestCoreAsync directly â€” accounts are already loaded, avoiding N+1.
             foreach (var account in accountsForProcessing)
             {
                 var success = await ApplyInterestCoreAsync(account, Guid.Empty);

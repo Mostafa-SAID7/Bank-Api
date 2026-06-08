@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.DTOs.Payment.Biller;
 using Bank.Application.Interfaces;
 using Bank.Domain.Common;
@@ -304,8 +304,7 @@ public class BillPresentmentService : IBillPresentmentService
                     // Mock synchronization result
                     var syncResult = new BillPresentmentSyncResult
                     {
-                        ExternalBillId = presentment.ExternalBillId,
-                        Success = true,
+                        ExternalBillId = presentment.ExternalBillId, Success = true,
                         Status = presentment.Status,
                         SyncDate = DateTime.UtcNow,
                         Message = "Synchronization successful"
@@ -319,8 +318,7 @@ public class BillPresentmentService : IBillPresentmentService
                     
                     results.Add(new BillPresentmentSyncResult
                     {
-                        ExternalBillId = presentment.ExternalBillId,
-                        Success = false,
+                        ExternalBillId = presentment.ExternalBillId, Success = false,
                         SyncDate = DateTime.UtcNow,
                         Message = $"Synchronization failed: {ex.Message}"
                     });

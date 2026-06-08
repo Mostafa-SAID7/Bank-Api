@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Bank.Application.DTOs;
 using Bank.Application.DTOs.Payment.Beneficiary;
 using Bank.Application.Helpers.Shared;
@@ -45,8 +45,7 @@ namespace Bank.Application.Services
             await _auditLogService.LogActivityAsync(customerId, "AddBeneficiary", "Beneficiary", beneficiary.Id.ToString(), "Added new beneficiary");
 
             return new BeneficiaryResult
-            {
-                Success = true,
+            { Success = true,
                 Beneficiary = _mapper.Map<BeneficiaryDto>(beneficiary),
                 Message = "Beneficiary added successfully"
             };
@@ -66,8 +65,7 @@ namespace Bank.Application.Services
             await _auditLogService.LogActivityAsync(updatedByUserId, "UpdateBeneficiary", "Beneficiary", beneficiary.Id.ToString(), "Updated beneficiary details");
 
             return new BeneficiaryResult
-            {
-                Success = true,
+            { Success = true,
                 Beneficiary = _mapper.Map<BeneficiaryDto>(beneficiary),
                 Message = "Beneficiary updated successfully"
             };
@@ -120,8 +118,7 @@ namespace Bank.Application.Services
             _beneficiaryRepository.Update(beneficiary);
             
             return new BeneficiaryVerificationResult
-            {
-                Success = true,
+            { Success = true,
                 IsAccountValid = true,
                 AccountHolderName = beneficiary.Name
             };
@@ -210,8 +207,7 @@ namespace Bank.Application.Services
         {
             // Implementation for account validation
             return new BeneficiaryVerificationResult
-            {
-                Success = true,
+            { Success = true,
                 IsAccountValid = true,
                 AccountHolderName = "Validation Placeholder"
             };

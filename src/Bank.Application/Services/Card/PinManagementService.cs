@@ -1,4 +1,4 @@
-using Bank.Application.DTOs;
+﻿using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
 using Bank.Application.Helpers.Shared;
@@ -40,8 +40,7 @@ public class PinManagementService : IPinManagementService
             if (card == null)
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found or access denied"
                 };
             }
@@ -49,8 +48,7 @@ public class PinManagementService : IPinManagementService
             if (card.IsBlocked())
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Cannot set PIN for blocked card",
                     IsCardBlocked = true
                 };
@@ -59,8 +57,7 @@ public class PinManagementService : IPinManagementService
             if (!string.IsNullOrEmpty(card.PinHash))
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "PIN already set. Use change PIN instead."
                 };
             }
@@ -83,8 +80,7 @@ public class PinManagementService : IPinManagementService
                 request.CardId, userId);
 
             return new PinOperationResponse
-            {
-                Success = true,
+            { Success = true,
                 Message = "PIN set successfully"
             };
         }
@@ -94,8 +90,7 @@ public class PinManagementService : IPinManagementService
                 request.CardId, userId);
             
             return new PinOperationResponse
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while setting PIN"
             };
         }
@@ -109,8 +104,7 @@ public class PinManagementService : IPinManagementService
             if (card == null)
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found or access denied"
                 };
             }
@@ -118,8 +112,7 @@ public class PinManagementService : IPinManagementService
             if (card.IsBlocked())
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Cannot change PIN for blocked card",
                     IsCardBlocked = true
                 };
@@ -128,8 +121,7 @@ public class PinManagementService : IPinManagementService
             if (string.IsNullOrEmpty(card.PinHash))
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "No PIN set. Use set PIN instead."
                 };
             }
@@ -137,8 +129,7 @@ public class PinManagementService : IPinManagementService
             if (string.IsNullOrEmpty(request.CurrentPin))
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Current PIN is required for PIN change"
                 };
             }
@@ -151,8 +142,7 @@ public class PinManagementService : IPinManagementService
                 await _unitOfWork.SaveChangesAsync();
 
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Current PIN is incorrect",
                     IsCardBlocked = card.IsBlocked(),
                     RemainingAttempts = Math.Max(0, 3 - card.FailedPinAttempts)
@@ -178,8 +168,7 @@ public class PinManagementService : IPinManagementService
                 request.CardId, userId);
 
             return new PinOperationResponse
-            {
-                Success = true,
+            { Success = true,
                 Message = "PIN changed successfully"
             };
         }
@@ -189,8 +178,7 @@ public class PinManagementService : IPinManagementService
                 request.CardId, userId);
             
             return new PinOperationResponse
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while changing PIN"
             };
         }
@@ -204,8 +192,7 @@ public class PinManagementService : IPinManagementService
             if (card == null)
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found or access denied"
                 };
             }
@@ -214,8 +201,7 @@ public class PinManagementService : IPinManagementService
             if (!await ValidateVerificationCodeAsync(request.CardId, request.VerificationCode, userId))
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Invalid or expired verification code"
                 };
             }
@@ -249,8 +235,7 @@ public class PinManagementService : IPinManagementService
                 request.CardId, userId);
 
             return new PinOperationResponse
-            {
-                Success = true,
+            { Success = true,
                 Message = "PIN reset successfully"
             };
         }
@@ -260,8 +245,7 @@ public class PinManagementService : IPinManagementService
                 request.CardId, userId);
             
             return new PinOperationResponse
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while resetting PIN"
             };
         }
@@ -426,8 +410,7 @@ public class PinManagementService : IPinManagementService
             if (card == null)
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card not found or access denied"
                 };
             }
@@ -435,8 +418,7 @@ public class PinManagementService : IPinManagementService
             if (card.Status != CardStatus.Blocked)
             {
                 return new PinOperationResponse
-                {
-                    Success = false,
+                { Success = false,
                     Message = "Card is not blocked"
                 };
             }
@@ -455,8 +437,7 @@ public class PinManagementService : IPinManagementService
             _logger.LogInformation("Card {CardId} unblocked by user {UserId}", cardId, userId);
 
             return new PinOperationResponse
-            {
-                Success = true,
+            { Success = true,
                 Message = "Card unblocked successfully"
             };
         }
@@ -465,8 +446,7 @@ public class PinManagementService : IPinManagementService
             _logger.LogError(ex, "Error unblocking card {CardId} by user {UserId}", cardId, userId);
             
             return new PinOperationResponse
-            {
-                Success = false,
+            { Success = false,
                 Message = "An error occurred while unblocking card"
             };
         }

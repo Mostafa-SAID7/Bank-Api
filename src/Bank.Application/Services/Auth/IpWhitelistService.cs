@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Bank.Application.DTOs;
@@ -40,8 +40,7 @@ public sealed class IpWhitelistService : IIpWhitelistService
             if (!ValidateIpAddress(ipAddress, ipRange))
             {
                 return new IpWhitelistResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "Invalid IP address or range format"
                 };
             }
@@ -51,8 +50,7 @@ public sealed class IpWhitelistService : IIpWhitelistService
             if (existingEntry != null)
             {
                 return new IpWhitelistResult
-                {
-                    Success = false,
+                { Success = false,
                     ErrorMessage = "IP address already exists in whitelist for this access type"
                 };
             }
@@ -81,8 +79,7 @@ public sealed class IpWhitelistService : IIpWhitelistService
                 ipAddress, type, createdByUserId);
 
             return new IpWhitelistResult
-            {
-                Success = true,
+            { Success = true,
                 WhitelistId = whitelistEntry.Id,
                 RequiresApproval = true // All entries require approval by default
             };
@@ -91,8 +88,7 @@ public sealed class IpWhitelistService : IIpWhitelistService
         {
             _logger.LogError(ex, "Error adding IP {IpAddress} to whitelist", ipAddress);
             return new IpWhitelistResult
-            {
-                Success = false,
+            { Success = false,
                 ErrorMessage = "Failed to add IP to whitelist"
             };
         }

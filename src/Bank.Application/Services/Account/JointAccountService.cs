@@ -1,4 +1,4 @@
-using Bank.Application.Interfaces;
+﻿using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
@@ -137,9 +137,9 @@ public class JointAccountService : IJointAccountService
 
     public async Task<bool> UpdateJointHolderRoleAsync(Guid accountId, Guid userId, JointAccountRole newRole, Guid updatedByUserId)
     {
+        var maskedAccountId = MaskGuid(accountId);
         try
         {
-            var maskedAccountId = MaskGuid(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
