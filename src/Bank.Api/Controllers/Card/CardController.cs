@@ -1,4 +1,6 @@
 using Bank.Api.Helpers;
+using Bank.Api.Extensions;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.DTOs.Card.Transaction;
 using Bank.Application.Interfaces;
@@ -147,7 +149,7 @@ public class CardController : ControllerBase
         
         if (cardDetails == null)
         {
-            return NotFound("Card not found");
+            return this.CreateNotFoundResponse(DomainConstants.CARD_NOT_FOUND);
         }
 
         return Ok(cardDetails);
@@ -372,5 +374,15 @@ public class CardController : ControllerBase
         return Ok(stats);
     }
 
-    private Guid GetCurrentUserId() => this.GetCurrentUserIdRequired();
+    #region Helper Methods
+
+    /// <summary>
+    /// Gets the current user's ID using the extension method
+    /// </summary>
+    private Guid GetCurrentUserId()
+    {
+        return this.GetCurrentUserId();
+    }
+
+    #endregion
 }

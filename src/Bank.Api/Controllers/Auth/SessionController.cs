@@ -1,4 +1,5 @@
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -59,7 +60,7 @@ public class SessionController : ControllerBase
 
         if (session == null)
         {
-            return NotFound("Session not found");
+            return this.CreateNotFoundResponse(DomainConstants.SESSION_NOT_FOUND);
         }
 
         await _sessionService.TerminateSessionAsync(session.SessionToken, "User requested termination");
@@ -98,14 +99,14 @@ public class SessionController : ControllerBase
     {
         if (string.IsNullOrEmpty(request.RefreshToken))
         {
-            return BadRequest("Refresh token is required");
+            return this.CreateErrorResponse(DomainConstants.REFRESH_TOKEN_REQUIRED, 400);
         }
 
         var result = await _sessionService.RefreshSessionAsync(request.RefreshToken);
         
         if (!result.Success)
         {
-            return Unauthorized(result.ErrorMessage);
+            return this.CreateUnauthorizedResponse(result.ErrorMessage);
         }
 
         return Ok(result);

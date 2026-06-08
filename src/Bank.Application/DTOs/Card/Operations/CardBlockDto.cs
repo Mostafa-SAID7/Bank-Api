@@ -1,4 +1,5 @@
-﻿using Bank.Domain.Enums;
+﻿using Bank.Application.DTOs.Common;
+using Bank.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Operations;
@@ -37,13 +38,11 @@ public class CardUnblockRequest
 /// <summary>
 /// Result of card block/unblock operation
 /// </summary>
-public class CardBlockResult
+public class CardBlockResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public CardStatus? NewStatus { get; set; }
     public DateTime? StatusChangeDate { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
+
 
 

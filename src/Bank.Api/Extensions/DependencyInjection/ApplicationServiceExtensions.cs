@@ -1,4 +1,6 @@
 using Bank.Application.Interfaces;
+using Bank.Application.Interfaces.Authorization;
+using Bank.Application.Services.Authorization;
 using Bank.Infrastructure.Services;
 
 namespace Bank.Api.Extensions.DependencyInjection;
@@ -17,6 +19,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IAuthService, Bank.Application.Services.AuthService>();
         services.AddScoped<ITwoFactorAuthService, Bank.Application.Services.TwoFactorAuthService>();
         services.AddScoped<ISessionService, Bank.Application.Services.SessionService>();
+        services.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
 
         // Account Management Services
         services.AddScoped<IAccountService, Bank.Application.Services.AccountService>();

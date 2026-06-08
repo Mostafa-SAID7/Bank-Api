@@ -1,5 +1,6 @@
-using Bank.Api.Constants;
+using Bank.Api.Extensions;
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -69,7 +70,7 @@ public class StatementController : ControllerBase
         
         if (statement == null)
         {
-            return NotFound("Statement not found");
+            return this.CreateNotFoundResponse(DomainConstants.STATEMENT_NOT_FOUND);
         }
         
         return Ok(statement);
@@ -265,7 +266,13 @@ public class StatementController : ControllerBase
 
     #region Private Helper Methods
 
-    private Guid GetCurrentUserId() => this.GetCurrentUserIdRequired();
+    /// <summary>
+    /// Gets the current user's ID using the extension method
+    /// </summary>
+    private Guid GetCurrentUserId()
+    {
+        return this.GetCurrentUserId();
+    }
 
     #endregion
 }

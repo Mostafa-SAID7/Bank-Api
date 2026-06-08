@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Account;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -216,7 +217,7 @@ public sealed class AccountValidationService : IAccountValidationService
             }
 
             // Validate checksum using mod-97 algorithm
-            result.ChecksumValid = ValidateIbanChecksum(iban);
+            result.ChecksumValid = BankingCodeValidationHelper.ValidateIbanChecksum(iban);
             if (!result.ChecksumValid)
             {
                 result.ValidationErrors.Add("Invalid IBAN checksum");
@@ -224,7 +225,9 @@ public sealed class AccountValidationService : IAccountValidationService
             }
 
             // Extract bank code and account number (country-specific)
-            ExtractIbanComponents(iban, result);
+            var (bankCode, accountNumber) = BankingCodeValidationHelper.ExtractIbanComponents(iban, result.CountryCode ?? "");
+            result.BankCode = bankCode;
+            result.AccountNumber = accountNumber;
 
             result.IsValid = result.ValidationErrors.Count == 0;
 
@@ -265,7 +268,7 @@ public sealed class AccountValidationService : IAccountValidationService
                     return result;
                 }
 
-                if (!ValidateUSRoutingNumberChecksum(routingNumber))
+                if (!BankingCodeValidationHelper.ValidateUSRoutingNumberChecksum(routingNumber))
                 {
                     result.ValidationErrors.Add("Invalid routing number checksum");
                     return result;
@@ -572,72 +575,6 @@ public sealed class AccountValidationService : IAccountValidationService
     {
         await Task.Delay(10);
         return $"Bank {bankCode}"; // Simplified for demo
-    }
-
-    private static bool ValidateIbanChecksum(string iban)
-    {
-        // Move first 4 characters to end
-        var rearranged = iban[4..] + iban[..4];
-        
-        // Replace letters with numbers (A=10, B=11, ..., Z=35)
-        var numericString = "";
-        foreach (char c in rearranged)
-        {
-            if (char.IsLetter(c))
-                numericString += (c - 'A' + 10).ToString();
-            else
-                numericString += c;
-        }
-
-        // Calculate mod 97
-        return CalculateMod97(numericString) == 1;
-    }
-
-    private static int CalculateMod97(string numericString)
-    {
-        var remainder = 0;
-        foreach (char digit in numericString)
-        {
-            remainder = (remainder * 10 + (digit - '0')) % 97;
-        }
-        return remainder;
-    }
-
-    private static void ExtractIbanComponents(string iban, IbanValidationResult result)
-    {
-        // Country-specific IBAN component extraction (simplified)
-        switch (result.CountryCode)
-        {
-            case "DE": // Germany: DE + 2 check digits + 8 bank code + 10 account number
-                result.BankCode = iban.Substring(4, 8);
-                result.AccountNumber = iban.Substring(12, 10);
-                break;
-            case "GB": // UK: GB + 2 check digits + 4 bank code + 6 sort code + 8 account number
-                result.BankCode = iban.Substring(4, 4);
-                result.AccountNumber = iban.Substring(14, 8);
-                break;
-            case "FR": // France: FR + 2 check digits + 5 bank code + 5 branch + 11 account + 2 check
-                result.BankCode = iban.Substring(4, 5);
-                result.AccountNumber = iban.Substring(14, 11);
-                break;
-            default:
-                result.BankCode = iban.Length > 8 ? iban.Substring(4, 4) : "";
-                result.AccountNumber = iban.Length > 12 ? iban[12..] : "";
-                break;
-        }
-    }
-
-    private static bool ValidateUSRoutingNumberChecksum(string routingNumber)
-    {
-        var weights = new[] { 3, 7, 1, 3, 7, 1, 3, 7, 1 };
-        var sum = 0;
-        
-        for (int i = 0; i < 9; i++)
-        {
-            sum += (routingNumber[i] - '0') * weights[i];
-        }
-        
-        return sum % 10 == 0;
     }
 
     private static string GetCountryName(string countryCode)

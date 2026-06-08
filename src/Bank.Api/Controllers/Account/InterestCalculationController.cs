@@ -1,4 +1,5 @@
 using Bank.Api.Constants;
+using Bank.Api.Extensions;
 using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
@@ -243,8 +244,15 @@ public class InterestCalculationController : ControllerBase
         return Ok(summary);
     }
 
+    #region Private Helper Methods
+
+    /// <summary>
+    /// Gets the current user's ID using the extension method
+    /// </summary>
     private Guid GetCurrentUserId()
     {
         return this.GetCurrentUserId();
     }
+
+    #endregion
 }

@@ -1,15 +1,16 @@
-﻿namespace Bank.Application.DTOs.Payment.Beneficiary;
+﻿using Bank.Application.DTOs.Common;
+
+namespace Bank.Application.DTOs.Payment.Beneficiary;
 
 /// <summary>
 /// Result of beneficiary verification
 /// </summary>
-public class BeneficiaryVerificationResult
+public class BeneficiaryVerificationResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string? Message { get; set; }
     public bool IsAccountValid { get; set; }
     public string? AccountHolderName { get; set; }
     public string? BankName { get; set; }
     public List<string> ValidationErrors { get; set; } = new();
 }
+
 

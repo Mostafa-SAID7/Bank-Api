@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Bank.Application.DTOs.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Operations;
 
@@ -40,24 +41,18 @@ public class CardPinResetRequest
 /// <summary>
 /// Result of PIN change operation
 /// </summary>
-public class CardPinChangeResult
+public class CardPinChangeResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public DateTime? PinChangeDate { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 /// <summary>
 /// Result of PIN reset operation
 /// </summary>
-public class CardPinResetResult
+public class CardPinResetResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public string? NewPin { get; set; }
     public DateTime? PinResetDate { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 

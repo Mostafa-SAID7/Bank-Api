@@ -1,4 +1,6 @@
+using Bank.Api.Extensions;
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -51,14 +53,14 @@ public class LoanInterestController : ControllerBase
         var loan = await _loanService.GetLoanByIdAsync(loanId);
         if (loan == null)
         {
-            return NotFound($"Loan {loanId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.LOAN_NOT_FOUND);
         }
 
         // Get the actual loan entity for calculations
         var loanEntity = await GetLoanEntityAsync(loanId);
         if (loanEntity == null)
         {
-            return NotFound($"Loan entity {loanId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.LOAN_NOT_FOUND);
         }
 
         var schedule = await _loanInterestService.GenerateAmortizationScheduleAsync(loanEntity);
@@ -106,7 +108,7 @@ public class LoanInterestController : ControllerBase
         var loanEntity = await GetLoanEntityAsync(loanId);
         if (loanEntity == null)
         {
-            return NotFound($"Loan {loanId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.LOAN_NOT_FOUND);
         }
 
         var remainingInterest = await _loanInterestService.CalculateRemainingInterestAsync(loanEntity);
@@ -128,21 +130,23 @@ public class LoanInterestController : ControllerBase
             return Ok(new { Success = true, Message = "Interest rate updated successfully" });
         }
         
-        return BadRequest("Failed to update interest rate");
+        return this.CreateErrorResponse(DomainConstants.OPERATION_FAILED, 400);
     }
 
     #region Private Helper Methods
 
-    private async Task<Domain.Entities.Loan?> GetLoanEntityAsync(Guid loanId)
-    {
-        return await _loanRepository.GetByIdAsync(loanId);
-    }
-
+    /// <summary>
+    /// Gets the current user's ID using the extension method
+    /// </summary>
     private Guid GetCurrentUserId()
     {
         return this.GetCurrentUserId();
     }
 
+    private async Task<Domain.Entities.Loan?> GetLoanEntityAsync(Guid loanId)
+    {
+        return await _loanRepository.GetByIdAsync(loanId);
+    }
     #endregion
 }
 

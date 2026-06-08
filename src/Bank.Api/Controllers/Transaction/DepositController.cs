@@ -1,6 +1,8 @@
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
+using Bank.Application.Interfaces.Authorization;
 using Bank.Application.Services;
 using Bank.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -19,35 +21,34 @@ public class DepositController : ControllerBase
 {
     private readonly IDepositService _depositService;
     private readonly IDepositCertificateGenerator _certificateGenerator;
+    private readonly IAuthorizationHelper _authorizationHelper;
 
-    public DepositController(IDepositService depositService, IDepositCertificateGenerator certificateGenerator)
+    public DepositController(
+        IDepositService depositService, 
+        IDepositCertificateGenerator certificateGenerator,
+        IAuthorizationHelper authorizationHelper)
     {
         _depositService = depositService;
         _certificateGenerator = certificateGenerator;
+        _authorizationHelper = authorizationHelper;
     }
 
     #region Helper Methods
 
     /// <summary>
-    /// Verifies that the current user is an admin or the owner of the deposit
+    /// Verifies deposit ownership using the centralized authorization helper
     /// </summary>
     private async Task<(bool IsAuthorized, string? ErrorMessage)> VerifyDepositOwnershipAsync(Guid depositId)
     {
         var userId = this.GetCurrentUserId();
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-        // Admins have unrestricted access
-        if (userRole == "Admin")
-            return (true, null);
-
-        var deposit = await _depositService.GetFixedDepositAsync(depositId);
-        if (deposit == null)
-            return (false, $"Deposit {depositId} not found");
-
-        if (deposit.CustomerId != userId)
-            return (false, "You can only access your own deposits");
-
-        return (true, null);
+        return await _authorizationHelper.VerifyResourceOwnershipAsync(
+            depositId,
+            userId,
+            d => _depositService.GetFixedDepositAsync(d),
+            d => d.CustomerId,
+            userRole,
+            "Deposit");
     }
 
     /// <summary>
@@ -92,7 +93,7 @@ public class DepositController : ControllerBase
     {
         var product = await _depositService.GetDepositProductAsync(productId);
         if (product == null)
-            return NotFound($"Deposit product {productId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.DEPOSIT_PRODUCT_NOT_FOUND);
 
         return Ok(product);
     }
@@ -131,7 +132,7 @@ public class DepositController : ControllerBase
         var userId = this.GetCurrentUserId();
         var success = await _depositService.DeactivateDepositProductAsync(productId, userId);
         if (!success)
-            return NotFound($"Deposit product {productId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.DEPOSIT_PRODUCT_NOT_FOUND);
 
         return NoContent();
     }
@@ -184,7 +185,7 @@ public class DepositController : ControllerBase
         var userId = this.GetCurrentUserId();
         var success = await _depositService.DeleteInterestTierAsync(tierId, userId);
         if (!success)
-            return NotFound($"Interest tier {tierId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.INTEREST_TIER_NOT_FOUND);
 
         return NoContent();
     }
@@ -211,7 +212,7 @@ public class DepositController : ControllerBase
     {
         var deposit = await _depositService.GetFixedDepositAsync(depositId);
         if (deposit == null)
-            return NotFound($"Fixed deposit {depositId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.DEPOSIT_NOT_FOUND);
 
         var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
         if (!isAuthorized)
@@ -228,7 +229,7 @@ public class DepositController : ControllerBase
     {
         var deposit = await _depositService.GetFixedDepositByNumberAsync(depositNumber);
         if (deposit == null)
-            return NotFound($"Fixed deposit {depositNumber} not found");
+            return this.CreateNotFoundResponse(DomainConstants.DEPOSIT_NOT_FOUND);
 
         var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(deposit.Id);
         if (!isAuthorized)
@@ -293,7 +294,7 @@ public class DepositController : ControllerBase
         var (userId, _) = GetCurrentUserContext();
         var success = await _depositService.ProcessMaturityAsync(depositId, action, userId);
         if (!success)
-            return BadRequest("Unable to process maturity action");
+            return this.CreateErrorResponse(DomainConstants.UNABLE_TO_PROCESS_MATURITY, 400);
 
         return Ok(new { message = "Maturity action processed successfully" });
     }
@@ -344,7 +345,7 @@ public class DepositController : ControllerBase
         var (userId, _) = GetCurrentUserContext();
         var success = await _depositService.ProcessEarlyWithdrawalAsync(depositId, request, userId);
         if (!success)
-            return BadRequest("Unable to process early withdrawal");
+            return this.CreateErrorResponse(DomainConstants.UNABLE_TO_PROCESS_EARLY_WITHDRAWAL, 400);
 
         return Ok(new { message = "Early withdrawal processed successfully" });
     }
@@ -362,7 +363,7 @@ public class DepositController : ControllerBase
         var (userId, _) = GetCurrentUserContext();
         var success = await _depositService.ProcessPartialWithdrawalAsync(depositId, request, userId);
         if (!success)
-            return BadRequest("Unable to process partial withdrawal");
+            return this.CreateErrorResponse(DomainConstants.UNABLE_TO_PROCESS_EARLY_WITHDRAWAL, 400);
 
         return Ok(new { message = "Partial withdrawal processed successfully" });
     }
@@ -393,7 +394,7 @@ public class DepositController : ControllerBase
     {
         var certificate = await _certificateGenerator.GetCertificateAsync(certificateId);
         if (certificate == null)
-            return NotFound($"Certificate {certificateId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.DEPOSIT_NOT_FOUND);
 
         var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(certificate.FixedDepositId);
         if (!isAuthorized)
@@ -410,7 +411,7 @@ public class DepositController : ControllerBase
     {
         var certificate = await _certificateGenerator.GetCertificateAsync(certificateId);
         if (certificate == null)
-            return NotFound($"Certificate {certificateId} not found");
+            return this.CreateNotFoundResponse(DomainConstants.DEPOSIT_NOT_FOUND);
 
         var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(certificate.FixedDepositId);
         if (!isAuthorized)
@@ -477,7 +478,7 @@ public class DepositController : ControllerBase
         var userId = this.GetCurrentUserId();
         var success = await _depositService.ProcessInterestCreditAsync(depositId, userId);
         if (!success)
-            return BadRequest("Unable to process interest");
+            return this.CreateErrorResponse(DomainConstants.UNABLE_TO_PROCESS_INTEREST, 400);
 
         return Ok(new { message = "Interest processed successfully" });
     }
@@ -582,7 +583,7 @@ public class DepositController : ControllerBase
         var success = await maturityService.ProcessCustomerConsentAsync(depositId, request.ConsentGiven, request.PreferredAction);
         
         if (!success)
-            return BadRequest("Unable to process customer consent");
+            return this.CreateErrorResponse(DomainConstants.OPERATION_FAILED, 400);
 
         return Ok(new { message = "Customer consent processed successfully" });
     }

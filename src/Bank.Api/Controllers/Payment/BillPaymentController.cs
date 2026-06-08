@@ -1,4 +1,5 @@
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -62,7 +63,7 @@ public class BillPaymentController : ControllerBase
         var biller = await _billPaymentService.GetBillerByIdAsync(billerId);
         if (biller == null)
         {
-            return NotFound("Biller not found");
+            return this.CreateNotFoundResponse(DomainConstants.BILLER_NOT_FOUND);
         }
         return Ok(biller);
     }
@@ -117,7 +118,7 @@ public class BillPaymentController : ControllerBase
         
         if (payment == null)
         {
-            return NotFound("Payment not found");
+            return this.CreateNotFoundResponse(DomainConstants.PAYMENT_NOT_FOUND);
         }
 
         return Ok(payment);
@@ -134,7 +135,7 @@ public class BillPaymentController : ControllerBase
         
         if (!success)
         {
-            return BadRequest("Payment cannot be cancelled");
+            return this.CreateErrorResponse(DomainConstants.OPERATION_FAILED, 400);
         }
 
         return Ok(new { message = "Payment cancelled successfully" });
@@ -151,7 +152,7 @@ public class BillPaymentController : ControllerBase
         
         if (!success)
         {
-            return BadRequest("Payment cannot be updated");
+            return this.CreateErrorResponse(DomainConstants.OPERATION_FAILED, 400);
         }
 
         return Ok(new { message = "Payment updated successfully" });

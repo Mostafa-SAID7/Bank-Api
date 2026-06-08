@@ -1,5 +1,6 @@
-using Bank.Api.Constants;
+using Bank.Api.Extensions;
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -68,14 +69,14 @@ public class BeneficiaryController : ControllerBase
         
         if (beneficiary == null)
         {
-            return NotFound(ErrorMessages.AccountNotFound);
+            return this.CreateNotFoundResponse(DomainConstants.BENEFICIARY_NOT_FOUND);
         }
 
         // Verify user has access to this beneficiary
         var currentUserId = GetCurrentUserId();
         if (beneficiary.CustomerId != currentUserId && !User.IsInRole("Admin"))
         {
-            return Forbid(ErrorMessages.YouDontHaveAccessToThisAccount);
+            return this.CreateForbiddenResponse(DomainConstants.YOU_DONT_HAVE_ACCESS_TO_THIS_ACCOUNT);
         }
 
         return Ok(beneficiary);
@@ -231,9 +232,16 @@ public class BeneficiaryController : ControllerBase
         return Ok(new { CanReceiveTransfers = canReceive });
     }
 
+    #region Helper Methods
+
+    /// <summary>
+    /// Gets the current user's ID using the extension method
+    /// </summary>
     private Guid GetCurrentUserId()
     {
         return this.GetCurrentUserId();
     }
+
+    #endregion
 }
 

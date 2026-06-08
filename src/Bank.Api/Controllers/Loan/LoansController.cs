@@ -1,4 +1,5 @@
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Validators;
@@ -84,7 +85,7 @@ public class LoansController : ControllerBase
         
         if (loan == null)
         {
-            return NotFound(new { Message = "Loan not found" });
+            return this.CreateNotFoundResponse(DomainConstants.LOAN_NOT_FOUND);
         }
 
         // Ensure customer can only access their own loans (admins bypass this check)
@@ -107,7 +108,7 @@ public class LoansController : ControllerBase
         
         if (schedule.LoanId == Guid.Empty)
         {
-            return NotFound(new { Message = "Loan not found" });
+            return this.CreateNotFoundResponse(DomainConstants.LOAN_NOT_FOUND);
         }
 
         return Ok(schedule);
@@ -161,7 +162,7 @@ public class LoansController : ControllerBase
         
         if (nextPayment == null)
         {
-            return NotFound(new { Message = "No upcoming payments found" });
+            return this.CreateNotFoundResponse(DomainConstants.NO_UPCOMING_PAYMENTS);
         }
 
         return Ok(nextPayment);
@@ -196,7 +197,7 @@ public class LoansController : ControllerBase
         var loan = await _loanService.GetLoanByIdAsync(loanId);
         if (loan == null)
         {
-            return NotFound(new { Message = "Loan not found" });
+            return this.CreateNotFoundResponse(DomainConstants.LOAN_NOT_FOUND);
         }
 
         // Get customer ID from loan (this would need to be retrieved from the loan service)

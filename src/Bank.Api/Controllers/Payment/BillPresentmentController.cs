@@ -1,4 +1,5 @@
 using Bank.Api.Helpers;
+using Bank.Application.Constants;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -70,7 +71,7 @@ public class BillPresentmentController : ControllerBase
         var presentment = await _billPresentmentService.GetBillPresentmentByIdAsync(presentmentId);
         if (presentment == null)
         {
-            return NotFound("Bill presentment not found");
+            return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
         }
 
         // Verify presentment belongs to customer (unless admin)
@@ -79,7 +80,7 @@ public class BillPresentmentController : ControllerBase
             var customerId = this.GetCurrentUserId();
             if (presentment.CustomerId != customerId)
             {
-                return NotFound("Bill presentment not found");
+                return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
             }
         }
 
@@ -107,7 +108,7 @@ public class BillPresentmentController : ControllerBase
         var success = await _billPresentmentService.UpdateBillPresentmentStatusAsync(presentmentId, request.Status);
         if (!success)
         {
-            return NotFound("Bill presentment not found");
+            return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
         }
 
         return Ok(new { message = "Bill presentment status updated successfully" });
@@ -122,7 +123,7 @@ public class BillPresentmentController : ControllerBase
         var presentment = await _billPresentmentService.GetBillPresentmentByIdAsync(presentmentId);
         if (presentment == null)
         {
-            return NotFound("Bill presentment not found");
+            return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
         }
 
         // Verify presentment belongs to customer (unless admin)
@@ -131,14 +132,14 @@ public class BillPresentmentController : ControllerBase
             var customerId = this.GetCurrentUserId();
             if (presentment.CustomerId != customerId)
             {
-                return NotFound("Bill presentment not found");
+                return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
             }
         }
 
         var success = await _billPresentmentService.MarkBillPresentmentAsPaidAsync(presentmentId, request.PaymentId);
         if (!success)
         {
-            return BadRequest("Bill presentment cannot be marked as paid");
+            return this.CreateErrorResponse(DomainConstants.OPERATION_FAILED, 400);
         }
 
         return Ok(new { message = "Bill presentment marked as paid successfully" });
@@ -153,7 +154,7 @@ public class BillPresentmentController : ControllerBase
         var presentment = await _billPresentmentService.GetBillPresentmentByIdAsync(presentmentId);
         if (presentment == null)
         {
-            return NotFound("Bill presentment not found");
+            return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
         }
 
         // Verify presentment belongs to customer (unless admin)
@@ -162,14 +163,14 @@ public class BillPresentmentController : ControllerBase
             var customerId = this.GetCurrentUserId();
             if (presentment.CustomerId != customerId)
             {
-                return NotFound("Bill presentment not found");
+                return this.CreateNotFoundResponse(DomainConstants.BILL_PRESENTMENT_NOT_FOUND);
             }
         }
 
         var success = await _billPresentmentService.CancelBillPresentmentAsync(presentmentId);
         if (!success)
         {
-            return BadRequest("Bill presentment cannot be cancelled");
+            return this.CreateErrorResponse(DomainConstants.OPERATION_FAILED, 400);
         }
 
         return Ok(new { message = "Bill presentment cancelled successfully" });

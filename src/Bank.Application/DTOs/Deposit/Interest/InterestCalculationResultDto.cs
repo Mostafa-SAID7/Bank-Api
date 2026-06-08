@@ -1,14 +1,12 @@
-﻿using Bank.Domain.Enums;
+﻿using Bank.Application.DTOs.Common;
 
 namespace Bank.Application.DTOs.Deposit.Interest;
 
 /// <summary>
 /// Result of interest calculation
 /// </summary>
-public class InterestCalculationResult
+public class InterestCalculationResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string? Message { get; set; }
     public decimal InterestAmount { get; set; }
     public decimal PrincipalAmount { get; set; }
     public decimal InterestRate { get; set; }
@@ -17,4 +15,5 @@ public class InterestCalculationResult
     public int DaysCalculated { get; set; }
     public InterestCompoundingFrequency CompoundingFrequency { get; set; }
 }
+
 

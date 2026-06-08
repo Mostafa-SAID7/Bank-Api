@@ -863,7 +863,7 @@ public class CardService : ICardService
         };
     }
 
-    private void ValidateCardStatus(Card card, List<string> validationErrors)
+    private void ValidateCardStatus(Domain.Entities.Card card, List<string> validationErrors)
     {
         if (!card.IsActive())
         {
@@ -881,7 +881,7 @@ public class CardService : ICardService
         }
     }
 
-    private void ValidateCardLimits(Card card, CardValidationRequest request, List<string> validationErrors)
+    private void ValidateCardLimits(Domain.Entities.Card card, CardValidationRequest request, List<string> validationErrors)
     {
         if (!card.IsWithinLimits(request.Amount, DateTime.UtcNow))
         {
@@ -894,7 +894,7 @@ public class CardService : ICardService
         }
     }
 
-    private void ValidateTransactionSettings(Card card, CardValidationRequest request, List<string> validationErrors)
+    private void ValidateTransactionSettings(Domain.Entities.Card card, CardValidationRequest request, List<string> validationErrors)
     {
         if (request.IsOnline && !card.OnlineTransactionsEnabled)
         {
@@ -907,7 +907,7 @@ public class CardService : ICardService
         }
     }
 
-    private void ValidatePin(Card card, CardValidationRequest request, List<string> validationErrors)
+    private void ValidatePin(Domain.Entities.Card card, CardValidationRequest request, List<string> validationErrors)
     {
         if (string.IsNullOrEmpty(request.Pin) || string.IsNullOrEmpty(card.PinHash))
         {

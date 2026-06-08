@@ -1,12 +1,13 @@
-﻿namespace Bank.Application.DTOs.Statement.Core;
+﻿using Bank.Application.DTOs.Common;
+using Bank.Domain.Enums;
+
+namespace Bank.Application.DTOs.Statement.Core;
 
 /// <summary>
 /// Statement generation result
 /// </summary>
-public class StatementGenerationResult
+public class StatementGenerationResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string? Message { get; set; }
     public Guid? StatementId { get; set; }
     public string? StatementNumber { get; set; }
     public string? FileName { get; set; }
@@ -14,7 +15,7 @@ public class StatementGenerationResult
     public long? FileSizeBytes { get; set; }
     public string? DownloadUrl { get; set; }
     public DateTime? GeneratedDate { get; set; }
-    public List<string> Errors { get; set; } = new();
     public List<string> Warnings { get; set; } = new();
 }
+
 

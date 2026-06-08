@@ -155,7 +155,7 @@ public static class BankingCodeValidationHelper
     /// <summary>
     /// Validates IBAN checksum using mod-97 algorithm
     /// </summary>
-    private static bool ValidateIbanChecksum(string iban)
+    internal static bool ValidateIbanChecksum(string iban)
     {
         // Move first 4 characters to end
         var rearranged = iban[4..] + iban[..4];
@@ -176,7 +176,7 @@ public static class BankingCodeValidationHelper
     /// <summary>
     /// Calculates mod 97 for IBAN checksum validation
     /// </summary>
-    private static int CalculateMod97(string numericString)
+    internal static int CalculateMod97(string numericString)
     {
         var remainder = 0;
         foreach (char digit in numericString)
@@ -189,7 +189,7 @@ public static class BankingCodeValidationHelper
     /// <summary>
     /// Validates US routing number checksum using weighted algorithm
     /// </summary>
-    private static bool ValidateUSRoutingNumberChecksum(string routingNumber)
+    internal static bool ValidateUSRoutingNumberChecksum(string routingNumber)
     {
         var weights = new[] { 3, 7, 1, 3, 7, 1, 3, 7, 1 };
         var sum = 0;
