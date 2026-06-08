@@ -26,6 +26,42 @@ public class DepositController : ControllerBase
         _certificateGenerator = certificateGenerator;
     }
 
+    #region Helper Methods
+
+    /// <summary>
+    /// Verifies that the current user is an admin or the owner of the deposit
+    /// </summary>
+    private async Task<(bool IsAuthorized, string? ErrorMessage)> VerifyDepositOwnershipAsync(Guid depositId)
+    {
+        var userId = this.GetCurrentUserId();
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        // Admins have unrestricted access
+        if (userRole == "Admin")
+            return (true, null);
+
+        var deposit = await _depositService.GetFixedDepositAsync(depositId);
+        if (deposit == null)
+            return (false, $"Deposit {depositId} not found");
+
+        if (deposit.CustomerId != userId)
+            return (false, "You can only access your own deposits");
+
+        return (true, null);
+    }
+
+    /// <summary>
+    /// Gets the current user ID and role
+    /// </summary>
+    private (Guid UserId, string? UserRole) GetCurrentUserContext()
+    {
+        var userId = this.GetCurrentUserId();
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        return (userId, userRole);
+    }
+
+    #endregion
+
     #region Deposit Products
 
     /// <summary>
@@ -177,11 +213,9 @@ public class DepositController : ControllerBase
         if (deposit == null)
             return NotFound($"Fixed deposit {depositId} not found");
 
-        // Ensure user can only access their own deposits (unless admin)
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (userRole != "Admin" && deposit.CustomerId != userId)
-            return Forbid("You can only access your own deposits");
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         return Ok(deposit);
     }
@@ -196,11 +230,9 @@ public class DepositController : ControllerBase
         if (deposit == null)
             return NotFound($"Fixed deposit {depositNumber} not found");
 
-        // Ensure user can only access their own deposits (unless admin)
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (userRole != "Admin" && deposit.CustomerId != userId)
-            return Forbid("You can only access your own deposits");
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(deposit.Id);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         return Ok(deposit);
     }
@@ -240,15 +272,11 @@ public class DepositController : ControllerBase
     [HttpGet("fixed-deposits/{depositId}/maturity")]
     public async Task<ActionResult<MaturityDetailsDto>> GetMaturityDetails(Guid depositId)
     {
-        var details = await _depositService.GetMaturityDetailsAsync(depositId);
-        
-        // Ensure user can only access their own deposits (unless admin)
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        var deposit = await _depositService.GetFixedDepositAsync(depositId);
-        if (userRole != "Admin" && deposit?.CustomerId != userId)
-            return Forbid("You can only access your own deposits");
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
+        var details = await _depositService.GetMaturityDetailsAsync(depositId);
         return Ok(details);
     }
 
@@ -258,17 +286,11 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/maturity")]
     public async Task<ActionResult> ProcessMaturity(Guid depositId, [FromBody] MaturityAction action)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only process their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only process your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
+        var (userId, _) = GetCurrentUserContext();
         var success = await _depositService.ProcessMaturityAsync(depositId, action, userId);
         if (!success)
             return BadRequest("Unable to process maturity action");
@@ -282,17 +304,11 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/renew")]
     public async Task<ActionResult<FixedDepositDto>> RenewFixedDeposit(Guid depositId, [FromBody] RenewDepositRequest request)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only renew their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only renew your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
+        var (userId, _) = GetCurrentUserContext();
         var renewedDeposit = await _depositService.RenewFixedDepositAsync(depositId, request, userId);
         return Ok(renewedDeposit);
     }
@@ -307,16 +323,9 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/withdrawal/calculate")]
     public async Task<ActionResult<WithdrawalDetailsDto>> CalculateEarlyWithdrawal(Guid depositId, [FromBody] decimal withdrawalAmount)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only access their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only access your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         var details = await _depositService.CalculateEarlyWithdrawalAsync(depositId, withdrawalAmount);
         return Ok(details);
@@ -328,17 +337,11 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/withdrawal/early")]
     public async Task<ActionResult> ProcessEarlyWithdrawal(Guid depositId, [FromBody] EarlyWithdrawalRequest request)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only withdraw from their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only withdraw from your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
+        var (userId, _) = GetCurrentUserContext();
         var success = await _depositService.ProcessEarlyWithdrawalAsync(depositId, request, userId);
         if (!success)
             return BadRequest("Unable to process early withdrawal");
@@ -352,17 +355,11 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/withdrawal/partial")]
     public async Task<ActionResult> ProcessPartialWithdrawal(Guid depositId, [FromBody] PartialWithdrawalRequest request)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only withdraw from their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only withdraw from your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
+        var (userId, _) = GetCurrentUserContext();
         var success = await _depositService.ProcessPartialWithdrawalAsync(depositId, request, userId);
         if (!success)
             return BadRequest("Unable to process partial withdrawal");
@@ -379,17 +376,11 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/certificate")]
     public async Task<ActionResult<DepositCertificateDto>> GenerateCertificate(Guid depositId)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only generate certificates for their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only generate certificates for your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
+        var (userId, _) = GetCurrentUserContext();
         var certificate = await _certificateGenerator.GenerateCertificateAsync(depositId, userId);
         return Ok(certificate);
     }
@@ -404,15 +395,9 @@ public class DepositController : ControllerBase
         if (certificate == null)
             return NotFound($"Certificate {certificateId} not found");
 
-        // Ensure user can only access certificates for their own deposits (unless admin)
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(certificate.FixedDepositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only access certificates for your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(certificate.FixedDepositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         return Ok(certificate);
     }
@@ -427,20 +412,13 @@ public class DepositController : ControllerBase
         if (certificate == null)
             return NotFound($"Certificate {certificateId} not found");
 
-        // Ensure user can only download certificates for their own deposits (unless admin)
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(certificate.FixedDepositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only download certificates for your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(certificate.FixedDepositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         var pdfBytes = await _certificateGenerator.GetCertificatePdfAsync(certificateId);
         return File(pdfBytes, "application/pdf", $"certificate_{certificate.CertificateNumber}.pdf");
     }
-
 
     #endregion
 
@@ -452,7 +430,7 @@ public class DepositController : ControllerBase
     [HttpGet("summary")]
     public async Task<ActionResult<DepositSummaryDto>> GetDepositSummary()
     {
-        var customerId = this.GetCurrentUserId();
+        var (customerId, _) = GetCurrentUserContext();
         var summary = await _depositService.GetDepositSummaryAsync(customerId);
         return Ok(summary);
     }
@@ -466,16 +444,9 @@ public class DepositController : ControllerBase
         [FromQuery] DateTime? fromDate, 
         [FromQuery] DateTime? toDate)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only access transactions for their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only access transactions for your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         var transactions = await _depositService.GetDepositTransactionsAsync(depositId, fromDate, toDate);
         return Ok(transactions);
@@ -487,7 +458,7 @@ public class DepositController : ControllerBase
     [HttpGet("portfolio")]
     public async Task<ActionResult<DepositPortfolioDto>> GetDepositPortfolio()
     {
-        var customerId = this.GetCurrentUserId();
+        var (customerId, _) = GetCurrentUserContext();
         var portfolio = await _depositService.GetCustomerDepositPortfolioAsync(customerId);
         return Ok(portfolio);
     }
@@ -554,18 +525,10 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/withdrawal/detailed-calculation")]
     public async Task<ActionResult<DetailedWithdrawalCalculation>> GetDetailedWithdrawalCalculation(Guid depositId, [FromBody] decimal withdrawalAmount)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only access their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only access your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
-        // Assuming we have a withdrawal service injected
         var withdrawalService = HttpContext.RequestServices.GetRequiredService<IDepositWithdrawalService>();
         var calculation = await withdrawalService.CalculateDetailedWithdrawalAsync(depositId, withdrawalAmount);
         return Ok(calculation);
@@ -577,16 +540,9 @@ public class DepositController : ControllerBase
     [HttpGet("fixed-deposits/{depositId}/penalty-free-periods")]
     public async Task<ActionResult<PenaltyFreePeriodsDto>> GetPenaltyFreePeriods(Guid depositId)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only access their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only access your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         var withdrawalService = HttpContext.RequestServices.GetRequiredService<IDepositWithdrawalService>();
         var periods = await withdrawalService.GetPenaltyFreePeriodsAsync(depositId);
@@ -599,16 +555,9 @@ public class DepositController : ControllerBase
     [HttpGet("fixed-deposits/{depositId}/withdrawal-history")]
     public async Task<ActionResult<IEnumerable<WithdrawalHistoryDto>>> GetWithdrawalHistory(Guid depositId)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only access their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only access your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         var withdrawalService = HttpContext.RequestServices.GetRequiredService<IDepositWithdrawalService>();
         var history = await withdrawalService.GetWithdrawalHistoryAsync(depositId);
@@ -625,16 +574,9 @@ public class DepositController : ControllerBase
     [HttpPost("fixed-deposits/{depositId}/consent")]
     public async Task<ActionResult> ProcessCustomerConsent(Guid depositId, [FromBody] CustomerConsentRequest request)
     {
-        var userId = this.GetCurrentUserId();
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Ensure user can only process consent for their own deposits (unless admin)
-        if (userRole != "Admin")
-        {
-            var deposit = await _depositService.GetFixedDepositAsync(depositId);
-            if (deposit?.CustomerId != userId)
-                return Forbid("You can only process consent for your own deposits");
-        }
+        var (isAuthorized, errorMessage) = await VerifyDepositOwnershipAsync(depositId);
+        if (!isAuthorized)
+            return Forbid(errorMessage);
 
         var maturityService = HttpContext.RequestServices.GetRequiredService<IDepositMaturityService>();
         var success = await maturityService.ProcessCustomerConsentAsync(depositId, request.ConsentGiven, request.PreferredAction);
