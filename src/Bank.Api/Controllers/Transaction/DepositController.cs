@@ -18,10 +18,12 @@ namespace Bank.Api.Controllers.Transaction;
 public class DepositController : ControllerBase
 {
     private readonly IDepositService _depositService;
+    private readonly IDepositCertificateGenerator _certificateGenerator;
 
-    public DepositController(IDepositService depositService)
+    public DepositController(IDepositService depositService, IDepositCertificateGenerator certificateGenerator)
     {
         _depositService = depositService;
+        _certificateGenerator = certificateGenerator;
     }
 
     #region Deposit Products
@@ -388,7 +390,7 @@ public class DepositController : ControllerBase
                 return Forbid("You can only generate certificates for your own deposits");
         }
 
-        var certificate = await _depositService.GenerateCertificateAsync(depositId, userId);
+        var certificate = await _certificateGenerator.GenerateCertificateAsync(depositId, userId);
         return Ok(certificate);
     }
 
@@ -398,7 +400,7 @@ public class DepositController : ControllerBase
     [HttpGet("certificates/{certificateId}")]
     public async Task<ActionResult<DepositCertificateDto>> GetCertificate(Guid certificateId)
     {
-        var certificate = await _depositService.GetCertificateAsync(certificateId);
+        var certificate = await _certificateGenerator.GetCertificateAsync(certificateId);
         if (certificate == null)
             return NotFound($"Certificate {certificateId} not found");
 
@@ -421,7 +423,7 @@ public class DepositController : ControllerBase
     [HttpGet("certificates/{certificateId}/pdf")]
     public async Task<ActionResult> GetCertificatePdf(Guid certificateId)
     {
-        var certificate = await _depositService.GetCertificateAsync(certificateId);
+        var certificate = await _certificateGenerator.GetCertificateAsync(certificateId);
         if (certificate == null)
             return NotFound($"Certificate {certificateId} not found");
 
@@ -435,9 +437,10 @@ public class DepositController : ControllerBase
                 return Forbid("You can only download certificates for your own deposits");
         }
 
-        var pdfBytes = await _depositService.GetCertificatePdfAsync(certificateId);
+        var pdfBytes = await _certificateGenerator.GetCertificatePdfAsync(certificateId);
         return File(pdfBytes, "application/pdf", $"certificate_{certificate.CertificateNumber}.pdf");
     }
+
 
     #endregion
 

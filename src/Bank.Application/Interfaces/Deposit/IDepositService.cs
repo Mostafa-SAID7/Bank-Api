@@ -47,12 +47,6 @@ public interface IDepositService
     Task<bool> ProcessEarlyWithdrawalAsync(Guid depositId, EarlyWithdrawalRequest request, Guid processedByUserId);
     Task<bool> ProcessPartialWithdrawalAsync(Guid depositId, PartialWithdrawalRequest request, Guid processedByUserId);
     
-    // Certificate Management
-    Task<DepositCertificateDto> GenerateCertificateAsync(Guid depositId, Guid generatedByUserId);
-    Task<DepositCertificateDto?> GetCertificateAsync(Guid certificateId);
-    Task<byte[]> GetCertificatePdfAsync(Guid certificateId);
-    Task<bool> DeliverCertificateAsync(Guid certificateId, string deliveryMethod, string deliveryAddress, Guid deliveredByUserId);
-    
     // Notice Management
     Task<MaturityNoticeDto> GenerateMaturityNoticeAsync(Guid depositId, MaturityNoticeType noticeType, Guid generatedByUserId);
     Task<bool> SendMaturityNoticesAsync();
