@@ -1,3 +1,4 @@
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Validators;
@@ -274,13 +275,5 @@ public class LoansController : ControllerBase
         });
     }
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-        {
-            throw new UnauthorizedAccessException("User ID not found in token");
-        }
-        return userId;
-    }
+    private Guid GetCurrentUserId() => this.GetCurrentUserIdRequired();
 }

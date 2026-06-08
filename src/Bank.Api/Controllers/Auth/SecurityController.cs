@@ -372,11 +372,7 @@ public class SecurityController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
-            ?? User.FindFirst("sub")?.Value 
-            ?? User.FindFirst("id")?.Value;
-
-        return userIdClaim != null && Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+        return this.GetCurrentUserId();
     }
 }
 

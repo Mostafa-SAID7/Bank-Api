@@ -1,3 +1,4 @@
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -130,8 +131,7 @@ public class LoanAnalyticsController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
-        var userIdClaim = User.FindFirst("sub") ?? User.FindFirst("id");
-        return userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId) ? userId : Guid.Empty;
+        return this.GetCurrentUserId();
     }
 
     #endregion

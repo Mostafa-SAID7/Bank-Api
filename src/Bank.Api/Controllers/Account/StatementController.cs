@@ -1,4 +1,5 @@
 using Bank.Api.Constants;
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -264,15 +265,7 @@ public class StatementController : ControllerBase
 
     #region Private Helper Methods
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
-        throw new UnauthorizedAccessException("Invalid user ID");
-    }
+    private Guid GetCurrentUserId() => this.GetCurrentUserIdRequired();
 
     #endregion
 }

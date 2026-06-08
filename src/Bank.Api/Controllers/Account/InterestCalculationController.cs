@@ -1,4 +1,5 @@
 using Bank.Api.Constants;
+using Bank.Api.Helpers;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -244,7 +245,6 @@ public class InterestCalculationController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+        return this.GetCurrentUserId();
     }
 }
