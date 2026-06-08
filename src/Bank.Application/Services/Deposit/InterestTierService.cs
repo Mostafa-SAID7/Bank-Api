@@ -1,5 +1,6 @@
 using AutoMapper;
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Deposit;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces;
@@ -129,21 +130,5 @@ public sealed class InterestTierService : IInterestTierService
     }
 
     private static InterestTierDto MapToInterestTierDto(InterestTier tier)
-    {
-        return new InterestTierDto
-        {
-            Id = tier.Id,
-            DepositProductId = tier.DepositProductId,
-            TierName = tier.TierName,
-            MinimumBalance = tier.MinimumBalance,
-            MaximumBalance = tier.MaximumBalance,
-            InterestRate = tier.InterestRate,
-            TierBasis = tier.TierBasis,
-            DisplayOrder = tier.DisplayOrder,
-            EffectiveFromDate = tier.EffectiveFromDate,
-            EffectiveToDate = tier.EffectiveToDate,
-            IsPromotional = tier.IsPromotional,
-            IsActive = tier.IsActive
-        };
-    }
+        => DepositMappingHelper.MapToInterestTierDto(tier);
 }

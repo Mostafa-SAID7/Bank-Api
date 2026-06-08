@@ -69,7 +69,7 @@ public class PaymentReceiptService : IPaymentReceiptService
             string receiptNumber;
             do
             {
-                receiptNumber = PaymentReceipt.GenerateReceiptNumber();
+                receiptNumber = GeneratorHelper.GenerateReceiptNumber();
             } while (await _paymentReceiptRepository.ReceiptNumberExistsAsync(receiptNumber));
 
             // Create receipt

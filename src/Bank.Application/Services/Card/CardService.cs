@@ -87,7 +87,7 @@ public class CardService : ICardService
             var card = new Card
             {
                 CardNumber = cardNumber,
-                MaskedCardNumber = Card.GenerateMaskedCardNumber(cardNumber),
+                MaskedCardNumber = GeneratorHelper.GenerateMaskedCardNumber(cardNumber),
                 CustomerId = request.CustomerId,
                 AccountId = request.AccountId,
                 Type = request.CardType,

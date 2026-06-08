@@ -1,5 +1,7 @@
 using AutoMapper;
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Deposit;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces;
@@ -74,10 +76,9 @@ public sealed class FixedDepositService : IFixedDepositService
             RenewalTermDays = request.RenewalTermDays,
             PenaltyType = product.PenaltyType,
             PenaltyAmount = product.PenaltyAmount,
-            PenaltyPercentage = product.PenaltyPercentage
+            PenaltyPercentage = product.PenaltyPercentage,
+            DepositNumber = GeneratorHelper.GenerateDepositNumber()
         };
-
-        deposit.GenerateDepositNumber();
 
         // Debit the linked account
         linkedAccount.Balance -= request.PrincipalAmount;
@@ -93,9 +94,9 @@ public sealed class FixedDepositService : IFixedDepositService
             Amount = request.PrincipalAmount,
             Description = $"Fixed deposit creation - {deposit.DepositNumber}",
             TransactionDate = DateTime.UtcNow,
-            Status = TransactionStatus.Completed
+            Status = TransactionStatus.Completed,
+            TransactionReference = GeneratorHelper.GenerateTransactionReference()
         };
-        transaction.GenerateTransactionReference();
 
         await _unitOfWork.Repository<DepositTransaction>().AddAsync(transaction);
         await _unitOfWork.SaveChangesAsync();
@@ -156,31 +157,6 @@ public sealed class FixedDepositService : IFixedDepositService
         }
         return result;
     }
-
     private async Task<FixedDepositDto> MapToFixedDepositDtoAsync(FixedDeposit deposit)
-    {
-        return new FixedDepositDto
-        {
-            Id = deposit.Id,
-            DepositNumber = deposit.DepositNumber,
-            CustomerId = deposit.CustomerId,
-            DepositProductId = deposit.DepositProductId,
-            LinkedAccountId = deposit.LinkedAccountId,
-            PrincipalAmount = deposit.PrincipalAmount,
-            AccruedInterest = deposit.AccruedInterest,
-            InterestRate = deposit.InterestRate,
-            TermDays = deposit.TermDays,
-            StartDate = deposit.StartDate,
-            MaturityDate = deposit.MaturityDate,
-            Status = deposit.Status,
-            InterestCalculationMethod = deposit.InterestCalculationMethod,
-            CompoundingFrequency = deposit.CompoundingFrequency,
-            MaturityAction = deposit.MaturityAction,
-            AutoRenewalEnabled = deposit.AutoRenewalEnabled,
-            RenewalTermDays = deposit.RenewalTermDays,
-            PenaltyType = deposit.PenaltyType,
-            PenaltyAmount = deposit.PenaltyAmount,
-            PenaltyPercentage = deposit.PenaltyPercentage
-        };
-    }
+        => await DepositMappingHelper.MapToFixedDepositDtoAsync(deposit);
 }

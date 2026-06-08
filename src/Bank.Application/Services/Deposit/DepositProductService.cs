@@ -1,5 +1,6 @@
 using AutoMapper;
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Deposit;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -171,37 +172,6 @@ public sealed class DepositProductService : IDepositProductService
 
         return true;
     }
-
     private static DepositProductDto MapToDepositProductDto(DepositProduct product)
-    {
-        return new DepositProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            ProductType = product.ProductType,
-            MinimumTermDays = product.MinimumTermDays,
-            MaximumTermDays = product.MaximumTermDays,
-            DefaultTermDays = product.DefaultTermDays,
-            MinimumBalance = product.MinimumBalance,
-            MaximumBalance = product.MaximumBalance,
-            MinimumOpeningBalance = product.MinimumOpeningBalance,
-            BaseInterestRate = product.BaseInterestRate,
-            InterestCalculationMethod = product.InterestCalculationMethod,
-            CompoundingFrequency = product.CompoundingFrequency,
-            HasTieredRates = product.HasTieredRates,
-            AllowPartialWithdrawals = product.AllowPartialWithdrawals,
-            PenaltyType = product.PenaltyType,
-            PenaltyAmount = product.PenaltyAmount,
-            PenaltyPercentage = product.PenaltyPercentage,
-            PenaltyFreeDays = product.PenaltyFreeDays,
-            DefaultMaturityAction = product.DefaultMaturityAction,
-            AllowAutoRenewal = product.AllowAutoRenewal,
-            AutoRenewalNoticeDays = product.AutoRenewalNoticeDays,
-            PromotionalRateStartDate = product.PromotionalRateStartDate,
-            PromotionalRateEndDate = product.PromotionalRateEndDate,
-            PromotionalRate = product.PromotionalRate,
-            IsActive = product.IsActive
-        };
-    }
+        => DepositMappingHelper.MapToDepositProductDto(product);
 }

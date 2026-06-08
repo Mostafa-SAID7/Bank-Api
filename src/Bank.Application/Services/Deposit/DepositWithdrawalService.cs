@@ -1,4 +1,5 @@
 using Bank.Application.DTOs;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -303,9 +304,9 @@ public class DepositWithdrawalService : IDepositWithdrawalService
             TransactionDate = DateTime.UtcNow,
             Status = TransactionStatus.Completed,
             ProcessedByUserId = processedByUserId,
-            ProcessedDate = DateTime.UtcNow
+            ProcessedDate = DateTime.UtcNow,
+            TransactionReference = GeneratorHelper.GenerateTransactionReference()
         };
-        withdrawalTransaction.GenerateTransactionReference();
 
         // Create penalty transactions for each penalty component
         var penaltyTransactions = new List<DepositTransaction>();
@@ -322,9 +323,9 @@ public class DepositWithdrawalService : IDepositWithdrawalService
                 PenaltyType = deposit.PenaltyType,
                 PenaltyReason = penalty.Type,
                 ProcessedByUserId = processedByUserId,
-                ProcessedDate = DateTime.UtcNow
+                ProcessedDate = DateTime.UtcNow,
+                TransactionReference = GeneratorHelper.GenerateTransactionReference()
             };
-            penaltyTransaction.GenerateTransactionReference();
             penaltyTransactions.Add(penaltyTransaction);
         }
 
