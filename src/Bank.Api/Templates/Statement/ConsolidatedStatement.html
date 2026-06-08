@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Consolidated Account Statement</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .statement-header { background-color: #fff; padding: 20px; border-bottom: 2px solid #007bff; margin-bottom: 20px; }
+        .statement-header h2 { color: #007bff; margin: 0; }
+        .bank-header { background-color: #007bff; color: white; padding: 20px; text-align: center; margin-bottom: 20px; border-radius: 5px; }
+        .account-summaries, .consolidated-summary, .transactions, .disclosures { background-color: #fff; padding: 15px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .account-summary { background-color: #f9f9f9; padding: 10px; margin-bottom: 10px; border-left: 3px solid #007bff; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #f0f0f0; padding: 10px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .credit { color: green; font-weight: bold; }
+        .debit { color: red; font-weight: bold; }
+        .transaction-table { font-size: 13px; }
+        h3 { color: #007bff; margin-top: 0; }
+        h4 { color: #333; margin: 10px 0 5px 0; }
+        small { color: #666; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <!-- BANK HEADER -->
+    <div class='bank-header'>
+        <h1>SecureBank</h1>
+        <p>Your Trusted Financial Partner</p>
+    </div>
+    
+    <!-- CONSOLIDATED STATEMENT HEADER -->
+    <div class='statement-header'>
+        <h2>Consolidated Account Statement</h2>
+        <p><strong>Generated Date:</strong> {{GeneratedDate}}</p>
+        <p><strong>Period:</strong> {{StartDate}} to {{EndDate}}</p>
+        <p><strong>Number of Accounts:</strong> {{AccountCount}}</p>
+    </div>
+    
+    <!-- ACCOUNT SUMMARIES -->
+    {{#if IncludeAccountSummaries}}
+    <div class='account-summaries'>
+        <h3>Account Summaries</h3>
+        {{#each Accounts}}
+        <div class='account-summary'>
+            <h4>Account: {{this.AccountNumber}}</h4>
+            <p><strong>Account Holder:</strong> {{this.AccountHolderName}}</p>
+            <p><strong>Opening Balance:</strong> ${{this.OpeningBalance}}</p>
+            <p><strong>Closing Balance:</strong> ${{this.ClosingBalance}}</p>
+            <p><strong>Total Transactions:</strong> {{this.TransactionCount}}</p>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+    
+    <!-- CONSOLIDATED SUMMARY -->
+    {{#if IncludeConsolidatedSummary}}
+    <div class='consolidated-summary'>
+        <h3>Consolidated Summary</h3>
+        <table>
+            <tr><td>Total Opening Balance:</td><td>${{TotalOpeningBalance}}</td></tr>
+            <tr><td>Total Closing Balance:</td><td>${{TotalClosingBalance}}</td></tr>
+            <tr><td>Net Change:</td><td>${{NetChange}}</td></tr>
+            <tr><td>Total Transactions:</td><td>{{TotalTransactionCount}}</td></tr>
+            <tr><td>Total Credits:</td><td>${{TotalCredits}}</td></tr>
+            <tr><td>Total Debits:</td><td>${{TotalDebits}}</td></tr>
+        </table>
+    </div>
+    {{/if}}
+    
+    <!-- TRANSACTION DETAILS -->
+    {{#if IncludeTransactionDetails}}
+    <div class='transactions'>
+        <h3>All Transactions</h3>
+        <table class='transaction-table'>
+            <thead>
+                <tr><th>Account</th><th>Date</th><th>Description</th><th>Reference</th><th>Amount</th><th>Category</th></tr>
+            </thead>
+            <tbody>
+                {{#each Transactions}}
+                <tr>
+                    <td>{{this.AccountNumber}}</td>
+                    <td>{{this.TransactionDate}}</td>
+                    <td>{{this.Description}}</td>
+                    <td>{{this.Reference}}</td>
+                    <td class='{{#if this.Amount >= 0}}credit{{else}}debit{{/if}}'>${{this.Amount}}</td>
+                    <td>{{this.Category}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{/if}}
+    
+    <!-- REGULATORY DISCLOSURES -->
+    {{#if IncludeDisclosures}}
+    <div class='disclosures'>
+        <h3>Important Disclosures</h3>
+        <p><small>This consolidated statement is provided for informational purposes. Please review all transactions carefully and report any discrepancies within 30 days.</small></p>
+        <p><small>FDIC Insured - Equal Housing Lender - Member FDIC</small></p>
+    </div>
+    {{/if}}
+    
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Account Statement</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .statement-header { background-color: #fff; padding: 20px; border-bottom: 2px solid #007bff; margin-bottom: 20px; }
+        .statement-header h2 { color: #007bff; margin: 0; }
+        .bank-header { background-color: #007bff; color: white; padding: 20px; text-align: center; margin-bottom: 20px; border-radius: 5px; }
+        .account-info, .balance-summary, .transactions, .disclosures, .monthly-statistics, .fee-summary { background-color: #fff; padding: 15px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #f0f0f0; padding: 10px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .credit { color: green; font-weight: bold; }
+        .debit { color: red; font-weight: bold; }
+        .total-row { background-color: #f9f9f9; font-weight: bold; border-top: 2px solid #007bff; }
+        .transaction-table { font-size: 13px; }
+        .disclosure-section { margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #007bff; }
+        h3 { color: #007bff; margin-top: 0; }
+        h4 { color: #333; margin: 10px 0 5px 0; }
+        small { color: #666; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <!-- BANK HEADER -->
+    <div class='bank-header'>
+        <h1>SecureBank</h1>
+        <p>Your Trusted Financial Partner</p>
+    </div>
+    
+    <!-- STATEMENT HEADER -->
+    <div class='statement-header'>
+        <h2>Account Statement</h2>
+        <p><strong>Statement Number:</strong> {{StatementNumber}}</p>
+        <p><strong>Statement Date:</strong> {{StatementDate}}</p>
+        <p><strong>Period:</strong> {{PeriodStartDate}} to {{PeriodEndDate}}</p>
+    </div>
+    
+    <!-- ACCOUNT INFORMATION -->
+    <div class='account-info'>
+        <h3>Account Information</h3>
+        <p><strong>Account Number:</strong> {{AccountNumber}}</p>
+        <p><strong>Account Holder:</strong> {{AccountHolderName}}</p>
+        <p><strong>Account Type:</strong> {{AccountType}}</p>
+    </div>
+    
+    <!-- BALANCE SUMMARY -->
+    <div class='balance-summary'>
+        <h3>Balance Summary</h3>
+        <table>
+            <tr><td>Opening Balance:</td><td>${{OpeningBalance}}</td></tr>
+            <tr><td>Closing Balance:</td><td>${{ClosingBalance}}</td></tr>
+            <tr><td>Average Balance:</td><td>${{AverageBalance}}</td></tr>
+            <tr><td>Minimum Balance:</td><td>${{MinimumBalance}}</td></tr>
+            <tr><td>Maximum Balance:</td><td>${{MaximumBalance}}</td></tr>
+            <tr><td>Total Credits:</td><td>${{TotalCredits}}</td></tr>
+            <tr><td>Total Debits:</td><td>${{TotalDebits}}</td></tr>
+            <tr><td>Total Fees:</td><td>${{TotalFees}}</td></tr>
+            <tr><td>Interest Earned:</td><td>${{InterestEarned}}</td></tr>
+            <tr><td>Interest Charged:</td><td>${{InterestCharged}}</td></tr>
+        </table>
+    </div>
+    
+    <!-- MONTHLY STATISTICS -->
+    {{#if IncludeMonthlyStats}}
+    <div class='monthly-statistics'>
+        <h3>Monthly Statistics</h3>
+        <table>
+            <tr><td>Average Monthly Credits:</td><td>${{AverageMonthlyCredits}}</td></tr>
+            <tr><td>Average Monthly Debits:</td><td>${{AverageMonthlyDebits}}</td></tr>
+            <tr><td>Average Transaction Amount:</td><td>${{AverageTransactionAmount}}</td></tr>
+            <tr><td>Largest Credit:</td><td>${{LargestCredit}}</td></tr>
+            <tr><td>Largest Debit:</td><td>${{LargestDebit}}</td></tr>
+            <tr><td>Days with Activity:</td><td>{{DaysWithActivity}}</td></tr>
+        </table>
+    </div>
+    {{/if}}
+    
+    <!-- FEE SUMMARY -->
+    {{#if IncludeFeeSummary}}
+    <div class='fee-summary'>
+        <h3>Fee Summary</h3>
+        <table>
+            {{#each Fees}}
+            <tr><td>{{this.Name}}:</td><td>${{this.Amount}}</td></tr>
+            {{/each}}
+            <tr class='total-row'><td><strong>Total Fees:</strong></td><td><strong>${{TotalFees}}</strong></td></tr>
+        </table>
+    </div>
+    {{/if}}
+    
+    <!-- TRANSACTION DETAILS -->
+    {{#if IncludeTransactions}}
+    <div class='transactions'>
+        <h3>Transaction Details</h3>
+        <table class='transaction-table'>
+            <thead>
+                <tr><th>Date</th><th>Description</th><th>Reference</th><th>Amount</th><th>Balance</th><th>Category</th></tr>
+            </thead>
+            <tbody>
+                {{#each Transactions}}
+                <tr>
+                    <td>{{this.TransactionDate}}</td>
+                    <td>{{this.Description}}</td>
+                    <td>{{this.Reference}}</td>
+                    <td class='{{#if this.Amount >= 0}}credit{{else}}debit{{/if}}'>${{this.Amount}}</td>
+                    <td>${{this.RunningBalance}}</td>
+                    <td>{{this.Category}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{/if}}
+    
+    <!-- REGULATORY DISCLOSURES -->
+    {{#if IncludeDisclosures}}
+    <div class='disclosures'>
+        <h3>Important Disclosures</h3>
+        
+        <div class='disclosure-section'>
+            <h4>Account Information</h4>
+            <p><small>This statement is provided for informational purposes. Please review all transactions carefully and report any discrepancies within 30 days of the statement date.</small></p>
+            <p><small>For questions about your account, please contact customer service at 1-800-BANK-123 or visit our website.</small></p>
+        </div>
+        
+        <div class='disclosure-section'>
+            <h4>Regulatory Information</h4>
+            <p><small>FDIC Insured - Equal Housing Lender - Member FDIC</small></p>
+            <p><small>Your deposits are insured up to $250,000 per depositor, per insured bank, for each account ownership category.</small></p>
+            <p><small>This institution is an Equal Opportunity Lender and complies with all applicable federal civil rights laws.</small></p>
+        </div>
+        
+        <div class='disclosure-section'>
+            <h4>Privacy Notice</h4>
+            <p><small>We are committed to protecting your privacy. We do not sell customer information to third parties.</small></p>
+            <p><small>For our complete privacy policy, visit our website or request a copy by calling customer service.</small></p>
+        </div>
+        
+        <div class='disclosure-section'>
+            <h4>Electronic Statements</h4>
+            <p><small>Electronic statements are available through online banking and mobile app.</small></p>
+            <p><small>You may opt out of electronic statements at any time by contacting customer service.</small></p>
+        </div>
+        
+        {{#if IncludeFeeInfo}}
+        <div class='disclosure-section'>
+            <h4>Fee Information</h4>
+            <p><small>Fees charged during this statement period are detailed in the Fee Summary section above.</small></p>
+            <p><small>For a complete fee schedule, please refer to your account agreement or visit our website.</small></p>
+        </div>
+        {{/if}}
+    </div>
+    {{/if}}
+    
+</body>
+</html>

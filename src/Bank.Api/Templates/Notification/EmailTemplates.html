@@ -1,0 +1,159 @@
+<!-- EMAIL TEMPLATES FOR NOTIFICATION SYSTEM -->
+<!-- Format: Each template identified by templateId and includes subject and body -->
+
+<!-- 2FA_TOKEN EMAIL TEMPLATE -->
+<!-- templateId: 2fa_token -->
+<template id="2fa_token_subject">
+Bank Verification Code
+</template>
+
+<template id="2fa_token_body">
+<h2>Your Verification Code</h2>
+<p>Hello {{UserName}},</p>
+<p>Your verification code is: <strong>{{Token}}</strong></p>
+<p>This code will expire in {{ExpiryMinutes}} minutes.</p>
+<p>If you didn't request this code, please contact support immediately.</p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- PASSWORD_RESET EMAIL TEMPLATE -->
+<!-- templateId: password_reset -->
+<template id="password_reset_subject">
+Reset Your Password
+</template>
+
+<template id="password_reset_body">
+<h2>Password Reset Request</h2>
+<p>Hello {{UserName}},</p>
+<p>We received a request to reset your password. Click the link below to proceed:</p>
+<p><a href="{{ResetLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a></p>
+<p>This link will expire in {{ExpiryHours}} hours.</p>
+<p>If you didn't request this, you can safely ignore this email.</p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- ACCOUNT_WELCOME EMAIL TEMPLATE -->
+<!-- templateId: account_welcome -->
+<template id="account_welcome_subject">
+Welcome to SecureBank
+</template>
+
+<template id="account_welcome_body">
+<h2>Welcome to SecureBank</h2>
+<p>Hello {{UserName}},</p>
+<p>Thank you for creating an account with us. Your account has been successfully activated.</p>
+<h3>Your Account Details</h3>
+<ul>
+    <li>Email: {{Email}}</li>
+    <li>Account Created: {{CreatedDate}}</li>
+    <li>Customer ID: {{CustomerId}}</li>
+</ul>
+<p>You can now log in and start using our banking services. For security, we recommend setting up two-factor authentication in your account settings.</p>
+<p><a href="{{LoginLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In Now</a></p>
+<p>If you have any questions, please contact our support team.</p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- TRANSACTION_CONFIRMATION EMAIL TEMPLATE -->
+<!-- templateId: transaction_confirmation -->
+<template id="transaction_confirmation_subject">
+Transaction Confirmation - {{TransactionReference}}
+</template>
+
+<template id="transaction_confirmation_body">
+<h2>Transaction Confirmation</h2>
+<p>Hello {{CustomerName}},</p>
+<p>Your transaction has been successfully processed.</p>
+<h3>Transaction Details</h3>
+<ul>
+    <li>Reference Number: {{TransactionReference}}</li>
+    <li>Type: {{TransactionType}}</li>
+    <li>Amount: ${{Amount}}</li>
+    <li>Date: {{TransactionDate}}</li>
+    <li>From Account: {{FromAccount}}</li>
+    <li>To Account: {{ToAccount}}</li>
+    <li>Status: {{Status}}</li>
+</ul>
+<p>If you did not authorize this transaction, please contact us immediately.</p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- BILL_PAYMENT_CONFIRMATION EMAIL TEMPLATE -->
+<!-- templateId: bill_payment_confirmation -->
+<template id="bill_payment_confirmation_subject">
+Bill Payment Confirmation - {{BillerName}}
+</template>
+
+<template id="bill_payment_confirmation_body">
+<h2>Bill Payment Confirmation</h2>
+<p>Hello {{CustomerName}},</p>
+<p>Your bill payment has been successfully submitted.</p>
+<h3>Payment Details</h3>
+<ul>
+    <li>Biller: {{BillerName}}</li>
+    <li>Account Number: {{BillerAccountNumber}}</li>
+    <li>Amount: ${{Amount}}</li>
+    <li>Payment Date: {{PaymentDate}}</li>
+    <li>Reference Number: {{PaymentReference}}</li>
+    <li>Expected Settlement: {{SettlementDate}}</li>
+</ul>
+<p>You will receive another confirmation once the payment is cleared.</p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- SECURITY_ALERT EMAIL TEMPLATE -->
+<!-- templateId: security_alert -->
+<template id="security_alert_subject">
+Security Alert - Unusual Activity
+</template>
+
+<template id="security_alert_body">
+<h2>Security Alert</h2>
+<p>Hello {{CustomerName}},</p>
+<p>We detected unusual activity on your account. Please review the details below:</p>
+<h3>Activity Details</h3>
+<ul>
+    <li>Type: {{ActivityType}}</li>
+    <li>Location: {{Location}}</li>
+    <li>Device: {{Device}}</li>
+    <li>Time: {{ActivityTime}}</li>
+</ul>
+<p>If this was not you, please change your password immediately and contact our security team.</p>
+<p><a href="{{SecurityLink}}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Review Account Security</a></p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- STATEMENT_READY EMAIL TEMPLATE -->
+<!-- templateId: statement_ready -->
+<template id="statement_ready_subject">
+Your Account Statement is Ready
+</template>
+
+<template id="statement_ready_body">
+<h2>Your Account Statement</h2>
+<p>Hello {{CustomerName}},</p>
+<p>Your account statement for the period {{PeriodStart}} to {{PeriodEnd}} is now ready.</p>
+<h3>Statement Summary</h3>
+<ul>
+    <li>Account Number: {{AccountNumber}}</li>
+    <li>Opening Balance: ${{OpeningBalance}}</li>
+    <li>Closing Balance: ${{ClosingBalance}}</li>
+    <li>Total Transactions: {{TransactionCount}}</li>
+</ul>
+<p><a href="{{StatementLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Statement</a></p>
+<footer>
+    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
