@@ -60,8 +60,8 @@ public static class ApplicationServiceExtensions
 
         // Deposit Services
         services.AddScoped<IDepositService, Bank.Application.Services.DepositService>();
-        services.AddScoped<Bank.Application.Services.IDepositMaturityService, Bank.Application.Services.DepositMaturityService>();
-        services.AddScoped<Bank.Application.Services.IDepositWithdrawalService, Bank.Application.Services.DepositWithdrawalService>();
+        services.AddScoped<IDepositMaturityService, Bank.Application.Services.DepositMaturityService>();
+        services.AddScoped<IDepositWithdrawalService, Bank.Application.Services.DepositWithdrawalService>();
 
         // HTTP Client for external integrations
         services.AddHttpClient<Bank.Application.Services.BillerIntegrationService>();

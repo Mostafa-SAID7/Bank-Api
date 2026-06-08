@@ -346,14 +346,3 @@ public class DepositWithdrawalService : IDepositWithdrawalService
         return transaction.TransactionType == DepositTransactionType.PenaltyCharge ? transaction.Amount : 0;
     }
 }
-
-/// <summary>
-/// Interface for deposit withdrawal service
-/// </summary>
-public interface IDepositWithdrawalService
-{
-    Task<DetailedWithdrawalCalculation> CalculateDetailedWithdrawalAsync(Guid depositId, decimal withdrawalAmount);
-    Task<WithdrawalResult> ProcessEarlyWithdrawalWithDetailsAsync(Guid depositId, EarlyWithdrawalRequest request, Guid processedByUserId);
-    Task<PenaltyFreePeriodsDto> GetPenaltyFreePeriodsAsync(Guid depositId);
-    Task<IEnumerable<WithdrawalHistoryDto>> GetWithdrawalHistoryAsync(Guid depositId);
-}
