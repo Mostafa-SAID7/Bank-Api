@@ -60,8 +60,15 @@ public static class ApplicationServiceExtensions
 
         // Deposit Services
         services.AddScoped<IDepositService, Bank.Application.Services.DepositService>();
+        services.AddScoped<IDepositProductService, Bank.Application.Services.DepositProductService>();
+        services.AddScoped<IInterestTierService, Bank.Application.Services.InterestTierService>();
+        services.AddScoped<IFixedDepositService, Bank.Application.Services.FixedDepositService>();
         services.AddScoped<IDepositMaturityService, Bank.Application.Services.DepositMaturityService>();
         services.AddScoped<IDepositWithdrawalService, Bank.Application.Services.DepositWithdrawalService>();
+        // TODO: Implement remaining deposit specialized services in Phase 1b
+        // services.AddScoped<IDepositCertificateService, Bank.Application.Services.DepositCertificateService>();
+        // services.AddScoped<IDepositNotificationService, Bank.Application.Services.DepositNotificationService>();
+        // services.AddScoped<IDepositReportingService, Bank.Application.Services.DepositReportingService>();
 
         // HTTP Client for external integrations
         services.AddHttpClient<Bank.Application.Services.BillerIntegrationService>();
