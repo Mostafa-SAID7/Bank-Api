@@ -1,6 +1,7 @@
 using AutoMapper;
 using Bank.Application.DTOs.Payment.Core;
 using Bank.Application.DTOs.Payment.Beneficiary;
+using Bank.Application.DTOs.Payment.BillPayment;
 using Bank.Application.DTOs.Payment.Biller;
 using Bank.Application.DTOs.Payment.Batch;
 using Bank.Application.DTOs.Payment.Routing;

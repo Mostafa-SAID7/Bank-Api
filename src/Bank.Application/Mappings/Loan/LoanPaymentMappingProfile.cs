@@ -6,6 +6,7 @@ using Bank.Application.DTOs.Loan.Disbursement;
 using Bank.Application.DTOs.Loan.Repayment;
 using Bank.Application.DTOs.Loan.Analytics;
 using Bank.Application.DTOs.Loan.Configuration;
+using Bank.Application.DTOs.Loan.Payment;
 using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Loan;

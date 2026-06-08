@@ -3,6 +3,7 @@ using Bank.Application.DTOs.Auth.Core;
 using Bank.Application.DTOs.Auth.TwoFactor;
 using Bank.Application.DTOs.Auth.Security;
 using Bank.Application.DTOs.Auth.Session;
+using Bank.Application.DTOs.Account.User;
 using Bank.Domain.Entities;
 
 namespace Bank.Application.Mappings.Auth;
