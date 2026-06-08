@@ -1,3 +1,4 @@
+using Bank.Application.Helpers.Shared;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
@@ -5,7 +6,8 @@ using System.Text;
 namespace Bank.Application.Services;
 
 /// <summary>
-/// Service for secure logging of sensitive information without exposing actual values
+/// Service for secure logging of sensitive information without exposing actual values.
+/// Delegates to centralized MaskingHelper for consistent masking patterns.
 /// </summary>
 public static class SecureLoggingService
 {
@@ -47,27 +49,19 @@ public static class SecureLoggingService
     }
 
     /// <summary>
-    /// Mask an email address (show only domain)
+    /// Mask an email address (delegates to centralized MaskingHelper)
     /// </summary>
     public static string MaskEmail(string email)
     {
-        if (string.IsNullOrEmpty(email) || !email.Contains("@"))
-            return "[email]";
-
-        var parts = email.Split('@');
-        return $"[***@{parts[1]}]";
+        return MaskingHelper.MaskEmail(email);
     }
 
     /// <summary>
-    /// Mask a card number (show only last 4 digits)
+    /// Mask a card number (delegates to centralized MaskingHelper)
     /// </summary>
     public static string MaskCardNumber(string cardNumber)
     {
-        if (string.IsNullOrEmpty(cardNumber) || cardNumber.Length < 4)
-            return "[****]";
-
-        var lastFour = cardNumber[^4..];
-        return $"[****...{lastFour}]";
+        return MaskingHelper.MaskCardNumber(cardNumber);
     }
 
     /// <summary>
