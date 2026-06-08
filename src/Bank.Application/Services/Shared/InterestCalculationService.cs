@@ -91,6 +91,12 @@ public class InterestCalculationService : IInterestCalculationService
         }
     }
 
+    private static string MaskGuid(Guid value)
+    {
+        var text = value.ToString("N");
+        return $"***{text[^4..]}";
+    }
+
     public async Task<bool> ApplyInterestAsync(Guid accountId, Guid userId)
     {
         try
@@ -98,7 +104,7 @@ public class InterestCalculationService : IInterestCalculationService
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for interest application", accountId);
+                _logger.LogWarning("Account {AccountId} not found for interest application", MaskGuid(accountId));
                 return false;
             }
 
@@ -106,7 +112,7 @@ public class InterestCalculationService : IInterestCalculationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error applying interest to account {AccountId}", accountId);
+            _logger.LogError(ex, "Error applying interest to account {AccountId}", MaskGuid(accountId));
             return false;
         }
     }
