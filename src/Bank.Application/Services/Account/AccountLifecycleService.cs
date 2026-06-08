@@ -3,6 +3,8 @@ using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Bank.Application.Services;
 
@@ -25,27 +27,41 @@ public class AccountLifecycleService : IAccountLifecycleService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Masks a sensitive identifier (accountId or userId) for logging purposes.
+    /// Returns a hash prefix to avoid storing full sensitive identifiers in logs.
+    /// </summary>
+    private static string MaskSensitiveId(Guid id)
+    {
+        using (var sha256 = SHA256.Create())
+        {
+            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(id.ToString()));
+            return BitConverter.ToString(hash, 0, 4).Replace("-", "").ToLowerInvariant();
+        }
+    }
+
     public async Task<bool> CloseAccountAsync(Guid accountId, string reason, Guid userId)
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for closure", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for closure", maskedId);
                 return false;
             }
 
             if (account.Status == AccountStatus.Closed)
             {
-                _logger.LogWarning("Account {AccountId} is already closed", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is already closed", maskedId);
                 return false;
             }
 
             // Check for pending transactions or holds
             if (account.HasHolds)
             {
-                _logger.LogWarning("Cannot close account {AccountId} with active holds", accountId);
+                _logger.LogWarning("Cannot close account {MaskedAccountId} with active holds", maskedId);
                 return false;
             }
 
@@ -82,13 +98,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 $"Reason: {reason}");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} closed successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} closed successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error closing account {AccountId}", accountId);
+            _logger.LogError(ex, "Error closing account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -97,16 +113,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for reopening", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for reopening", maskedId);
                 return false;
             }
 
             if (account.Status != AccountStatus.Closed)
             {
-                _logger.LogWarning("Account {AccountId} is not closed", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is not closed", maskedId);
                 return false;
             }
 
@@ -140,13 +157,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 "Account reopened");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} reopened successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} reopened successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error reopening account {AccountId}", accountId);
+            _logger.LogError(ex, "Error reopening account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -155,16 +172,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for dormancy marking", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for dormancy marking", maskedId);
                 return false;
             }
 
             if (account.Status == AccountStatus.Dormant)
             {
-                _logger.LogWarning("Account {AccountId} is already dormant", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is already dormant", maskedId);
                 return false;
             }
 
@@ -194,13 +212,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 "Account marked dormant due to inactivity");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} marked as dormant", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} marked as dormant", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error marking account {AccountId} as dormant", accountId);
+            _logger.LogError(ex, "Error marking account {MaskedAccountId} as dormant", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -209,16 +227,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for reactivation", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for reactivation", maskedId);
                 return false;
             }
 
             if (account.Status != AccountStatus.Dormant)
             {
-                _logger.LogWarning("Account {AccountId} is not dormant", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is not dormant", maskedId);
                 return false;
             }
 
@@ -252,13 +271,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 "Account reactivated from dormant status");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} reactivated successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} reactivated successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error reactivating account {AccountId}", accountId);
+            _logger.LogError(ex, "Error reactivating account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -267,16 +286,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for suspension", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for suspension", maskedId);
                 return false;
             }
 
             if (account.Status == AccountStatus.Suspended)
             {
-                _logger.LogWarning("Account {AccountId} is already suspended", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is already suspended", maskedId);
                 return false;
             }
 
@@ -308,13 +328,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 $"Reason: {reason}");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} suspended successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} suspended successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error suspending account {AccountId}", accountId);
+            _logger.LogError(ex, "Error suspending account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -323,16 +343,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for unsuspension", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for unsuspension", maskedId);
                 return false;
             }
 
             if (account.Status != AccountStatus.Suspended)
             {
-                _logger.LogWarning("Account {AccountId} is not suspended", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is not suspended", maskedId);
                 return false;
             }
 
@@ -364,13 +385,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 "Account unsuspended");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} unsuspended successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} unsuspended successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error unsuspending account {AccountId}", accountId);
+            _logger.LogError(ex, "Error unsuspending account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -379,16 +400,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for freezing", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for freezing", maskedId);
                 return false;
             }
 
             if (account.Status == AccountStatus.Frozen)
             {
-                _logger.LogWarning("Account {AccountId} is already frozen", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is already frozen", maskedId);
                 return false;
             }
 
@@ -420,13 +442,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 $"Reason: {reason}");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} frozen successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} frozen successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error freezing account {AccountId}", accountId);
+            _logger.LogError(ex, "Error freezing account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -435,16 +457,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for unfreezing", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for unfreezing", maskedId);
                 return false;
             }
 
             if (account.Status != AccountStatus.Frozen)
             {
-                _logger.LogWarning("Account {AccountId} is not frozen", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} is not frozen", maskedId);
                 return false;
             }
 
@@ -476,13 +499,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 "Account unfrozen");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Account {AccountId} unfrozen successfully", accountId);
+            _logger.LogInformation("Account {MaskedAccountId} unfrozen successfully", maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error unfreezing account {AccountId}", accountId);
+            _logger.LogError(ex, "Error unfreezing account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -491,16 +514,17 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for hold application", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for hold application", maskedId);
                 return false;
             }
 
             if (amount <= 0)
             {
-                _logger.LogWarning("Invalid hold amount {Amount} for account {AccountId}", amount, accountId);
+                _logger.LogWarning("Invalid hold amount {Amount} for account {MaskedAccountId}", amount, maskedId);
                 return false;
             }
 
@@ -533,13 +557,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 $"Hold amount: {amount:C}, Reason: {reason}");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Hold applied to account {AccountId} for amount {Amount}", accountId, amount);
+            _logger.LogInformation("Hold applied to account {MaskedAccountId} for amount {Amount}", maskedId, amount);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error applying hold to account {AccountId}", accountId);
+            _logger.LogError(ex, "Error applying hold to account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -604,10 +628,11 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for restriction addition", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for restriction addition", maskedId);
                 return false;
             }
 
@@ -617,7 +642,7 @@ public class AccountLifecycleService : IAccountLifecycleService
 
             if (existingRestriction != null)
             {
-                _logger.LogWarning("Restriction {RestrictionType} already exists for account {AccountId}", restrictionType, accountId);
+                _logger.LogWarning("Restriction {RestrictionType} already exists for account {MaskedAccountId}", restrictionType, maskedId);
                 return false;
             }
 
@@ -649,13 +674,13 @@ public class AccountLifecycleService : IAccountLifecycleService
                 $"Restriction: {restrictionType}, Reason: {reason}");
 
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("Restriction {RestrictionType} added to account {AccountId}", restrictionType, accountId);
+            _logger.LogInformation("Restriction {RestrictionType} added to account {MaskedAccountId}", restrictionType, maskedId);
 
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error adding restriction to account {AccountId}", accountId);
+            _logger.LogError(ex, "Error adding restriction to account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -720,10 +745,11 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for fee calculation", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for fee calculation", maskedId);
                 return 0;
             }
 
@@ -743,7 +769,7 @@ public class AccountLifecycleService : IAccountLifecycleService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating fees for account {AccountId}", accountId);
+            _logger.LogError(ex, "Error calculating fees for account {MaskedAccountId}", MaskSensitiveId(accountId));
             return 0;
         }
     }
@@ -752,10 +778,11 @@ public class AccountLifecycleService : IAccountLifecycleService
     {
         try
         {
+            var maskedId = MaskSensitiveId(accountId);
             var account = await _unitOfWork.Repository<Account>().GetByIdAsync(accountId);
             if (account == null)
             {
-                _logger.LogWarning("Account {AccountId} not found for fee application", accountId);
+                _logger.LogWarning("Account {MaskedAccountId} not found for fee application", maskedId);
                 return false;
             }
 
@@ -763,7 +790,7 @@ public class AccountLifecycleService : IAccountLifecycleService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error applying fees to account {AccountId}", accountId);
+            _logger.LogError(ex, "Error applying fees to account {MaskedAccountId}", MaskSensitiveId(accountId));
             return false;
         }
     }
@@ -804,7 +831,7 @@ public class AccountLifecycleService : IAccountLifecycleService
                 null, $"Fees applied: {totalFees:C}");
 
             _logger.LogInformation(
-                "Fees {Amount} applied to account {AccountId}", totalFees, account.Id);
+                "Fees {Amount} applied to account {MaskedAccountId}", totalFees, MaskSensitiveId(account.Id));
         }
 
         await _unitOfWork.SaveChangesAsync();
