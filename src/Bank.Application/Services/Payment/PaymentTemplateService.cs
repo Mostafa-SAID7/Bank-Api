@@ -33,14 +33,14 @@ public class PaymentTemplateService : IPaymentTemplateService
     public async Task<PaymentTemplate> CreateTemplateAsync(CreatePaymentTemplateRequest request)
     {
         // Validate from account exists
-        var fromAccount = await _accountService.GetAccountAsync(request.FromAccountId);
+        var fromAccount = await _accountService.GetAccountByIdAsync(request.FromAccountId);
         if (fromAccount == null)
             throw new ArgumentException("Invalid from account specified");
 
         // Validate to account if specified
         if (request.ToAccountId.HasValue)
         {
-            var toAccount = await _accountService.GetAccountAsync(request.ToAccountId.Value);
+            var toAccount = await _accountService.GetAccountByIdAsync(request.ToAccountId.Value);
             if (toAccount == null)
                 throw new ArgumentException("Invalid to account specified");
         }
@@ -114,7 +114,7 @@ public class PaymentTemplateService : IPaymentTemplateService
         if (request.ToAccountId.HasValue)
         {
             // Validate account exists
-            var toAccount = await _accountService.GetAccountAsync(request.ToAccountId.Value);
+            var toAccount = await _accountService.GetAccountByIdAsync(request.ToAccountId.Value);
             if (toAccount == null)
                 throw new ArgumentException("Invalid to account specified");
             template.ToAccountId = request.ToAccountId.Value;

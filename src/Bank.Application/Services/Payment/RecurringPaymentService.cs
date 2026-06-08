@@ -34,8 +34,8 @@ public class RecurringPaymentService : IRecurringPaymentService
     public async Task<RecurringPayment> CreateRecurringPaymentAsync(CreateRecurringPaymentRequest request)
     {
         // Validate accounts exist and are active
-        var fromAccount = await _accountService.GetAccountAsync(request.FromAccountId);
-        var toAccount = await _accountService.GetAccountAsync(request.ToAccountId);
+        var fromAccount = await _accountService.GetAccountByIdAsync(request.FromAccountId);
+        var toAccount = await _accountService.GetAccountByIdAsync(request.ToAccountId);
         
         if (fromAccount == null || toAccount == null)
             throw new ArgumentException("Invalid account specified");

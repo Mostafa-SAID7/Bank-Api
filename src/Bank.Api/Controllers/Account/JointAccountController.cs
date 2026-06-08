@@ -89,13 +89,13 @@ public class JointAccountController : ControllerBase
     [HttpPut("update-holder")]
     public async Task<ActionResult<bool>> UpdateJointHolder([FromBody] UpdateJointHolderRequest request)
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         
         // Verify current user has access to the account
         var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
         if (!hasAccess)
         {
-            return Forbid(ErrorMessages.YouDontHaveAccessToThisAccount);
+            return this.CreateForbiddenResponse(ErrorMessages.YouDontHaveAccessToThisAccount);
         }
 
         var success = await _jointAccountService.UpdateJointHolderRoleAsync(
@@ -115,13 +115,13 @@ public class JointAccountController : ControllerBase
     [HttpGet("{accountId}/holders")]
     public async Task<ActionResult<List<JointAccountHolderDto>>> GetJointHolders(Guid accountId)
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         
         // Verify current user has access to the account
         var hasAccess = await _accountService.CanUserAccessAccountAsync(accountId, currentUserId);
         if (!hasAccess)
         {
-            return Forbid(ErrorMessages.YouDontHaveAccessToThisAccount);
+            return this.CreateForbiddenResponse(ErrorMessages.YouDontHaveAccessToThisAccount);
         }
 
         var jointHolders = await _jointAccountService.GetJointHoldersAsync(accountId);
@@ -164,12 +164,12 @@ public class JointAccountController : ControllerBase
     [HttpPost("check-transaction-permission")]
     public async Task<ActionResult<TransactionPermissionResult>> CheckTransactionPermission([FromBody] TransactionPermissionRequest request)
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         
         // Only allow checking permissions for current user or if user is admin
         if (request.UserId != currentUserId && !User.IsInRole("Admin"))
         {
-            return Forbid("You can only check your own transaction permissions");
+            return this.CreateForbiddenResponse("You can only check your own transaction permissions");
         }
 
         var canPerform = await _jointAccountService.CanUserPerformTransactionAsync(
@@ -196,7 +196,7 @@ public class JointAccountController : ControllerBase
     [HttpGet("my-accounts")]
     public async Task<ActionResult<List<AccountDto>>> GetMyAccounts()
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         var accounts = await _jointAccountService.GetAccountsForUserAsync(currentUserId);
         
         var accountDtos = accounts.Select(a => new AccountDto
@@ -221,13 +221,13 @@ public class JointAccountController : ControllerBase
     [HttpPost("convert-to-joint")]
     public async Task<ActionResult<bool>> ConvertToJointAccount([FromBody] ConvertToJointAccountRequest request)
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         
         // Verify current user has access to the account
         var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
         if (!hasAccess)
         {
-            return Forbid(ErrorMessages.YouDontHaveAccessToThisAccount);
+            return this.CreateForbiddenResponse(ErrorMessages.YouDontHaveAccessToThisAccount);
         }
 
         var success = await _jointAccountService.ConvertToJointAccountAsync(request.AccountId, currentUserId);
@@ -260,13 +260,13 @@ public class JointAccountController : ControllerBase
     [HttpPost("convert-to-single")]
     public async Task<ActionResult<bool>> ConvertToSingleAccount([FromBody] ConvertToSingleAccountRequest request)
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         
         // Verify current user has access to the account
         var hasAccess = await _accountService.CanUserAccessAccountAsync(request.AccountId, currentUserId);
         if (!hasAccess)
         {
-            return Forbid(ErrorMessages.YouDontHaveAccessToThisAccount);
+            return this.CreateForbiddenResponse(ErrorMessages.YouDontHaveAccessToThisAccount);
         }
 
         var success = await _jointAccountService.ConvertToSingleAccountAsync(
@@ -286,19 +286,19 @@ public class JointAccountController : ControllerBase
     [HttpGet("{accountId}/summary")]
     public async Task<ActionResult<JointAccountSummary>> GetJointAccountSummary(Guid accountId)
     {
-        var currentUserId = this.GetCurrentUserId();
+        var currentUserId = this.GetCurrentUserIdRequired();
         
         // Verify current user has access to the account
         var hasAccess = await _accountService.CanUserAccessAccountAsync(accountId, currentUserId);
         if (!hasAccess)
         {
-            return Forbid(ErrorMessages.YouDontHaveAccessToThisAccount);
+            return this.CreateForbiddenResponse(ErrorMessages.YouDontHaveAccessToThisAccount);
         }
 
         var account = await _accountService.GetAccountByIdAsync(accountId);
         if (account == null)
         {
-            return NotFound(ErrorMessages.AccountNotFound);
+            return this.CreateNotFoundResponse(ErrorMessages.AccountNotFound);
         }
 
         var jointHolders = await _jointAccountService.GetJointHoldersAsync(accountId);

@@ -28,7 +28,7 @@ public class SessionController : ControllerBase
     [HttpGet("active")]
     public async Task<ActionResult<List<SessionInfo>>> GetActiveSessions()
     {
-        var userId = GetCurrentUserId();
+        var userId = this.GetCurrentUserIdRequired();
         var sessions = await _sessionService.GetUserActiveSessionsAsync(userId);
 
         var sessionInfos = sessions.Select(s => new SessionInfo
@@ -53,7 +53,7 @@ public class SessionController : ControllerBase
     [HttpDelete("{sessionId}")]
     public async Task<ActionResult> TerminateSession(Guid sessionId)
     {
-        var userId = GetCurrentUserId();
+        var userId = this.GetCurrentUserIdRequired();
         var sessions = await _sessionService.GetUserActiveSessionsAsync(userId);
         var session = sessions.FirstOrDefault(s => s.Id == sessionId);
 
@@ -72,8 +72,8 @@ public class SessionController : ControllerBase
     [HttpDelete("terminate-all")]
     public async Task<ActionResult> TerminateAllOtherSessions()
     {
-        var userId = GetCurrentUserId();
-        var currentSessionToken = GetCurrentSessionToken();
+        var userId = this.GetCurrentUserIdRequired();
+        var currentSessionToken = this.GetCurrentSessionToken();
 
         await _sessionService.TerminateAllUserSessionsAsync(userId, "User requested termination of all other sessions", currentSessionToken);
         return Ok(new { message = "All other sessions terminated successfully" });
@@ -117,35 +117,12 @@ public class SessionController : ControllerBase
     [HttpPost("activity")]
     public async Task<ActionResult> UpdateActivity()
     {
-        var sessionToken = GetCurrentSessionToken();
+        var sessionToken = this.GetCurrentSessionToken();
         if (!string.IsNullOrEmpty(sessionToken))
         {
             await _sessionService.UpdateSessionActivityAsync(sessionToken);
         }
         return Ok();
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        return this.GetCurrentUserId();
-    }
-
-    private string? GetCurrentSessionToken()
-    {
-        var sessionTokenClaim = User.FindFirst("session_token")?.Value;
-        if (!string.IsNullOrEmpty(sessionTokenClaim))
-        {
-            return sessionTokenClaim;
-        }
-
-        // Extract Bearer token from Authorization header if present
-        var authHeader = Request.Headers.Authorization.ToString();
-        if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-        {
-            return authHeader.Substring("Bearer ".Length);
-        }
-
-        return null;
     }
 }
 

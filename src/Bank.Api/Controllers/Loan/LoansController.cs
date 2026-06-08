@@ -52,7 +52,7 @@ public class LoansController : ControllerBase
             });
         }
 
-        var customerId = GetCurrentUserId();
+        var customerId = this.GetCurrentUserIdRequired();
         var result = await _loanService.SubmitApplicationAsync(customerId, request);
         
         if (result.IsSuccess)
@@ -69,7 +69,7 @@ public class LoansController : ControllerBase
     [HttpGet("my-loans")]
     public async Task<ActionResult<List<LoanDto>>> GetMyLoans()
     {
-        var customerId = GetCurrentUserId();
+        var customerId = this.GetCurrentUserIdRequired();
         var loans = await _loanService.GetCustomerLoansAsync(customerId);
         return Ok(loans);
     }
@@ -88,7 +88,7 @@ public class LoansController : ControllerBase
         }
 
         // Ensure customer can only access their own loans (admins bypass this check)
-        var customerId = GetCurrentUserId();
+        var customerId = this.GetCurrentUserIdRequired();
         if (!User.IsInRole("Admin") && loan.CustomerId != customerId)
         {
             return Forbid();
@@ -140,7 +140,7 @@ public class LoansController : ControllerBase
             });
         }
 
-        var customerId = GetCurrentUserId();
+        var customerId = this.GetCurrentUserIdRequired();
         var result = await _loanService.ProcessPaymentAsync(request, customerId);
         
         if (result.IsSuccess)
@@ -229,7 +229,7 @@ public class LoansController : ControllerBase
             });
         }
 
-        var approvedBy = GetCurrentUserId();
+        var approvedBy = this.GetCurrentUserIdRequired();
         var result = await _loanService.ProcessApprovalAsync(loanId, decision, approvedBy);
         
         if (result.IsSuccess)
@@ -247,7 +247,7 @@ public class LoansController : ControllerBase
     [Authorize(Roles = "Admin,Employee")]
     public async Task<ActionResult<DisbursementResult>> DisburseLoan(Guid loanId)
     {
-        var disbursedBy = GetCurrentUserId();
+        var disbursedBy = this.GetCurrentUserIdRequired();
         var result = await _loanService.DisburseLoanAsync(loanId, disbursedBy);
         
         if (result.IsSuccess)
@@ -274,6 +274,4 @@ public class LoansController : ControllerBase
             ProcessedAt = DateTime.UtcNow
         });
     }
-
-    private Guid GetCurrentUserId() => this.GetCurrentUserIdRequired();
 }

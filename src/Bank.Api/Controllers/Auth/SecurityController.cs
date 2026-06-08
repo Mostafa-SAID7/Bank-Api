@@ -218,24 +218,35 @@ public class SecurityController : ControllerBase
     }
 
     /// <summary>
-    /// Validates a password against the current policy
+    /// Validates a password against the current policy (does NOT expose validation details publicly)
     /// </summary>
     [HttpPost("password-policies/validate")]
+    [AllowAnonymous]
     public async Task<ActionResult<PasswordValidationResult>> ValidatePassword([FromBody] ValidatePasswordRequest request)
     {
-        var userId = GetCurrentUserId();
-        var result = await _passwordPolicyService.ValidatePasswordAsync(request.Password, userId, request.ComplexityLevel);
+        if (string.IsNullOrEmpty(request.Password))
+        {
+            return BadRequest(new
+            {
+                IsValid = false,
+                Errors = new[] { "Password is required" },
+                RequiredComplexityLevel = "High",
+                PasswordStrengthScore = 0
+            });
+        }
+
+        // For anonymous requests, don't validate against specific user (only policy)
+        // Use Guid.Empty as placeholder since policy service expects a userId parameter
+        var result = await _passwordPolicyService.ValidatePasswordAsync(request.Password, Guid.Empty, request.ComplexityLevel);
         
-        // Don't return the actual password in the response for security
+        // For security, only return minimal information when unauthenticated
         return Ok(new
         {
             result.IsValid,
             result.Errors,
             result.RequiredComplexityLevel,
-            result.IsPasswordRecentlyUsed,
-            result.IsCommonPassword,
-            result.ContainsUserInfo,
             result.PasswordStrengthScore
+            // Don't return: IsPasswordRecentlyUsed, ContainsUserInfo (security risk)
         });
     }
 
@@ -372,7 +383,7 @@ public class SecurityController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
-        return this.GetCurrentUserId();
+        return this.GetCurrentUserIdRequired();
     }
 }
 

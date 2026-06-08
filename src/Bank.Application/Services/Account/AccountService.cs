@@ -21,11 +21,6 @@ public class AccountService : IAccountService
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<Account?> GetAccountAsync(Guid id)
-    {
-        return await GetAccountByIdAsync(id); // Alias for consistency
-    }
-
     public async Task<Account?> GetAccountByNumberAsync(string accountNumber)
     {
         return await _unitOfWork.Repository<Account>()
