@@ -14,7 +14,7 @@ namespace Bank.Application.Services;
 /// <summary>
 /// Service for managing two-factor authentication with SMS, email, and authenticator app support
 /// </summary>
-public class TwoFactorAuthService : ITwoFactorAuthService
+public sealed class TwoFactorAuthService : ITwoFactorAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly IUnitOfWork _unitOfWork;

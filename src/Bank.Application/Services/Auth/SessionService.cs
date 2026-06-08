@@ -16,7 +16,7 @@ namespace Bank.Application.Services;
 /// <summary>
 /// Service for managing user sessions with timeout and concurrent session limits
 /// </summary>
-public class SessionService : ISessionService
+public sealed class SessionService : ISessionService
 {
     private readonly ISessionRepository _sessionRepository;
     private readonly IUserRepository _userRepository;

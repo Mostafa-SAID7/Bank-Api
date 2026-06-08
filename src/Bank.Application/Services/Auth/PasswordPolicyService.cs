@@ -14,7 +14,7 @@ namespace Bank.Application.Services;
 /// <summary>
 /// Service for managing password policies and validation
 /// </summary>
-public class PasswordPolicyService : IPasswordPolicyService
+public sealed class PasswordPolicyService : IPasswordPolicyService
 {
     private readonly IPasswordPolicyRepository _passwordPolicyRepository;
     private readonly IPasswordHistoryRepository _passwordHistoryRepository;

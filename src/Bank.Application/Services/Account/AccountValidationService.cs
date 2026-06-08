@@ -9,7 +9,7 @@ namespace Bank.Application.Services;
 /// <summary>
 /// Service for validating external bank accounts and international banking codes
 /// </summary>
-public class AccountValidationService : IAccountValidationService
+public sealed class AccountValidationService : IAccountValidationService
 {
     private readonly ILogger<AccountValidationService> _logger;
     private readonly IAuditLogService _auditLogService;

@@ -12,7 +12,7 @@ namespace Bank.Application.Services;
 /// <summary>
 /// Service for managing account lockouts and failed login attempts
 /// </summary>
-public class AccountLockoutService : IAccountLockoutService
+public sealed class AccountLockoutService : IAccountLockoutService
 {
     private readonly IAccountLockoutRepository _accountLockoutRepository;
     private readonly IPasswordPolicyService _passwordPolicyService;

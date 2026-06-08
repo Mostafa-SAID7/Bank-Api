@@ -13,7 +13,7 @@ namespace Bank.Application.Services;
 /// <summary>
 /// Service for managing IP whitelist for administrative and secure access
 /// </summary>
-public class IpWhitelistService : IIpWhitelistService
+public sealed class IpWhitelistService : IIpWhitelistService
 {
     private readonly IIpWhitelistRepository _ipWhitelistRepository;
     private readonly IAuditEventPublisher _auditEventPublisher;
