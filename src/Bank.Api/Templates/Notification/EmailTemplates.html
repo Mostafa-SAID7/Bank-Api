@@ -1,5 +1,6 @@
 <!-- EMAIL TEMPLATES FOR NOTIFICATION SYSTEM -->
 <!-- Format: Each template identified by templateId and includes subject and body -->
+<!-- Use {ParameterName} for variable substitution -->
 
 <!-- 2FA_TOKEN EMAIL TEMPLATE -->
 <!-- templateId: 2fa_token -->
@@ -12,9 +13,9 @@ Bank Verification Code
 <p>Hello {{UserName}},</p>
 <p>Your verification code is: <strong>{{Token}}</strong></p>
 <p>This code will expire in {{ExpiryMinutes}} minutes.</p>
-<p>If you didn't request this code, please contact support immediately.</p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<p style="color: #d9534f; font-weight: bold;">If you didn't request this code, please contact support immediately.</p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
 </footer>
 </template>
 
@@ -30,33 +31,38 @@ Reset Your Password
 <p>We received a request to reset your password. Click the link below to proceed:</p>
 <p><a href="{{ResetLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a></p>
 <p>This link will expire in {{ExpiryHours}} hours.</p>
-<p>If you didn't request this, you can safely ignore this email.</p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<p><strong>If you didn't request this, you can safely ignore this email.</strong> Your password will not be changed.</p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
 </footer>
 </template>
 
 <!-- ACCOUNT_WELCOME EMAIL TEMPLATE -->
-<!-- templateId: account_welcome -->
-<template id="account_welcome_subject">
+<!-- templateId: welcome, account_welcome -->
+<template id="welcome_subject">
 Welcome to SecureBank
 </template>
 
-<template id="account_welcome_body">
+<template id="welcome_body">
 <h2>Welcome to SecureBank</h2>
 <p>Hello {{UserName}},</p>
-<p>Thank you for creating an account with us. Your account has been successfully activated.</p>
+<p>Thank you for creating an account with us. Your account has been successfully activated and is ready to use.</p>
 <h3>Your Account Details</h3>
 <ul>
-    <li>Email: {{Email}}</li>
-    <li>Account Created: {{CreatedDate}}</li>
-    <li>Customer ID: {{CustomerId}}</li>
+    <li><strong>Email:</strong> {{Email}}</li>
+    <li><strong>Account Created:</strong> {{CreatedDate}}</li>
+    <li><strong>Customer ID:</strong> {{CustomerId}}</li>
 </ul>
-<p>You can now log in and start using our banking services. For security, we recommend setting up two-factor authentication in your account settings.</p>
+<h3>Next Steps</h3>
+<ol>
+    <li>Set up two-factor authentication for added security</li>
+    <li>Link your bank accounts or create new accounts</li>
+    <li>Explore our features and services</li>
+</ol>
 <p><a href="{{LoginLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In Now</a></p>
-<p>If you have any questions, please contact our support team.</p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<p>If you have any questions, our support team is here to help: 1-800-BANK-123</p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
 </footer>
 </template>
 
@@ -69,20 +75,41 @@ Transaction Confirmation - {{TransactionReference}}
 <template id="transaction_confirmation_body">
 <h2>Transaction Confirmation</h2>
 <p>Hello {{CustomerName}},</p>
-<p>Your transaction has been successfully processed.</p>
+<p>Your transaction has been successfully processed. Here are the details:</p>
 <h3>Transaction Details</h3>
-<ul>
-    <li>Reference Number: {{TransactionReference}}</li>
-    <li>Type: {{TransactionType}}</li>
-    <li>Amount: ${{Amount}}</li>
-    <li>Date: {{TransactionDate}}</li>
-    <li>From Account: {{FromAccount}}</li>
-    <li>To Account: {{ToAccount}}</li>
-    <li>Status: {{Status}}</li>
-</ul>
-<p>If you did not authorize this transaction, please contact us immediately.</p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<table style="width: 100%; border-collapse: collapse;">
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Reference Number:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{TransactionReference}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Type:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{TransactionType}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Amount:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${{Amount}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{TransactionDate}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>From Account:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{FromAccount}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>To Account:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{ToAccount}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Status:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{Status}}</td>
+    </tr>
+</table>
+<p style="margin-top: 15px; color: #d9534f;"><strong>If you did not authorize this transaction, please contact us immediately.</strong></p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
 </footer>
 </template>
 
@@ -95,43 +122,83 @@ Bill Payment Confirmation - {{BillerName}}
 <template id="bill_payment_confirmation_body">
 <h2>Bill Payment Confirmation</h2>
 <p>Hello {{CustomerName}},</p>
-<p>Your bill payment has been successfully submitted.</p>
+<p>Your bill payment has been successfully submitted. Below are the payment details:</p>
 <h3>Payment Details</h3>
-<ul>
-    <li>Biller: {{BillerName}}</li>
-    <li>Account Number: {{BillerAccountNumber}}</li>
-    <li>Amount: ${{Amount}}</li>
-    <li>Payment Date: {{PaymentDate}}</li>
-    <li>Reference Number: {{PaymentReference}}</li>
-    <li>Expected Settlement: {{SettlementDate}}</li>
-</ul>
-<p>You will receive another confirmation once the payment is cleared.</p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<table style="width: 100%; border-collapse: collapse;">
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Biller:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{BillerName}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Account Number:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{BillerAccountNumber}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Amount:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${{Amount}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Payment Date:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{PaymentDate}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Reference Number:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{PaymentReference}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Expected Settlement:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{SettlementDate}}</td>
+    </tr>
+</table>
+<p style="margin-top: 15px;">You will receive another confirmation once the payment is cleared and settled with the biller.</p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
 </footer>
 </template>
 
 <!-- SECURITY_ALERT EMAIL TEMPLATE -->
 <!-- templateId: security_alert -->
 <template id="security_alert_subject">
-Security Alert - Unusual Activity
+SECURITY ALERT - Unusual Activity on Your Account
 </template>
 
 <template id="security_alert_body">
-<h2>Security Alert</h2>
+<h2 style="color: #d9534f;">Security Alert</h2>
 <p>Hello {{CustomerName}},</p>
-<p>We detected unusual activity on your account. Please review the details below:</p>
+<p style="color: #d9534f; font-weight: bold;">We detected unusual activity on your account. Please review the details below:</p>
 <h3>Activity Details</h3>
-<ul>
-    <li>Type: {{ActivityType}}</li>
-    <li>Location: {{Location}}</li>
-    <li>Device: {{Device}}</li>
-    <li>Time: {{ActivityTime}}</li>
-</ul>
-<p>If this was not you, please change your password immediately and contact our security team.</p>
+<table style="width: 100%; border-collapse: collapse;">
+    <tr style="background-color: #fff3cd;">
+        <td style="padding: 8px; border: 1px solid #ffc107;"><strong>Type:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ffc107;">{{ActivityType}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Location:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{Location}}</td>
+    </tr>
+    <tr style="background-color: #fff3cd;">
+        <td style="padding: 8px; border: 1px solid #ffc107;"><strong>Device:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ffc107;">{{Device}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Time:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{ActivityTime}}</td>
+    </tr>
+</table>
+<h3 style="color: #d9534f;">Action Required</h3>
+<ol>
+    <li><strong>If this was you:</strong> No action needed. You can dismiss this alert.</li>
+    <li><strong>If this was NOT you:</strong> 
+        <ul>
+            <li>Change your password immediately</li>
+            <li>Review your recent transactions</li>
+            <li>Contact our security team</li>
+        </ul>
+    </li>
+</ol>
 <p><a href="{{SecurityLink}}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Review Account Security</a></p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email. For security concerns, contact us directly at 1-800-BANK-123.</p>
 </footer>
 </template>
 
@@ -144,16 +211,73 @@ Your Account Statement is Ready
 <template id="statement_ready_body">
 <h2>Your Account Statement</h2>
 <p>Hello {{CustomerName}},</p>
-<p>Your account statement for the period {{PeriodStart}} to {{PeriodEnd}} is now ready.</p>
+<p>Your account statement for the period <strong>{{PeriodStart}} to {{PeriodEnd}}</strong> is now ready for download.</p>
 <h3>Statement Summary</h3>
-<ul>
-    <li>Account Number: {{AccountNumber}}</li>
-    <li>Opening Balance: ${{OpeningBalance}}</li>
-    <li>Closing Balance: ${{ClosingBalance}}</li>
-    <li>Total Transactions: {{TransactionCount}}</li>
-</ul>
-<p><a href="{{StatementLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Statement</a></p>
-<footer>
-    <p style="color: #666; font-size: 12px; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+<table style="width: 100%; border-collapse: collapse;">
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Account Number:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{AccountNumber}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Opening Balance:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${{OpeningBalance}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Closing Balance:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${{ClosingBalance}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Total Transactions:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{TransactionCount}}</td>
+    </tr>
+</table>
+<p style="margin-top: 15px;"><a href="{{StatementLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Download Statement</a></p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
+</footer>
+</template>
+
+<!-- DEPOSIT_MATURITY_NOTICE EMAIL TEMPLATE -->
+<!-- templateId: deposit_maturity_notice -->
+<template id="deposit_maturity_notice_subject">
+Your Fixed Deposit is Maturing - Action Required
+</template>
+
+<template id="deposit_maturity_notice_body">
+<h2>Fixed Deposit Maturity Notice</h2>
+<p>Hello {{CustomerName}},</p>
+<p><strong>Your fixed deposit is maturing soon.</strong> Please choose an action for your deposit.</p>
+<h3>Deposit Details</h3>
+<table style="width: 100%; border-collapse: collapse;">
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Deposit Account:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{DepositNumber}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Principal Amount:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${{PrincipalAmount}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Accrued Interest:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${{AccruedInterest}}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Total Maturity Amount:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>${{MaturityAmount}}</strong></td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Maturity Date:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">{{MaturityDate}}</td>
+    </tr>
+</table>
+<h3>Your Options</h3>
+<ol>
+    <li><strong>Renew:</strong> Automatically renew for another term at current rates</li>
+    <li><strong>Withdraw:</strong> Receive all funds in your linked account</li>
+    <li><strong>Partial Withdrawal:</strong> Withdraw part of the amount and renew the rest</li>
+</ol>
+<p><a href="{{ActionLink}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Take Action Now</a></p>
+<footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+    <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
 </footer>
 </template>

@@ -210,8 +210,20 @@ public class EmailService : IEmailService, IDisposable
         // Simple template system - in production, load from database or files
         return templateId switch
         {
-            "2fa_token" => "<h2>Your Verification Code</h2><p>Hello {UserName},</p><p>Your verification code is: <strong>{Token}</strong></p><p>This code will expire in {ExpiryMinutes} minutes.</p><p>If you didn't request this code, please contact support immediately.</p>",
-            "welcome" => "<h2>Welcome to Bank Management System</h2><p>Hello {UserName},</p><p>Welcome to our banking platform. Your account has been successfully created.</p>",
+            "2fa_token" => "<h2>Your Verification Code</h2><p>Hello {UserName},</p><p>Your verification code is: <strong>{Token}</strong></p><p>This code will expire in {ExpiryMinutes} minutes.</p><p>If you didn't request this code, please contact support immediately.</p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
+            "password_reset" => "<h2>Password Reset Request</h2><p>Hello {UserName},</p><p>We received a request to reset your password. Click the link below to proceed:</p><p><a href=\"{ResetLink}\" style=\"background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">Reset Password</a></p><p>This link will expire in {ExpiryHours} hours.</p><p>If you didn't request this, you can safely ignore this email.</p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
+            "welcome" => "<h2>Welcome to SecureBank</h2><p>Hello {UserName},</p><p>Thank you for creating an account with us. Your account has been successfully activated.</p><h3>Your Account Details</h3><ul><li>Email: {Email}</li><li>Account Created: {CreatedDate}</li><li>Customer ID: {CustomerId}</li></ul><p>You can now log in and start using our banking services. For security, we recommend setting up two-factor authentication in your account settings.</p><p><a href=\"{LoginLink}\" style=\"background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">Log In Now</a></p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
+            "transaction_confirmation" => "<h2>Transaction Confirmation</h2><p>Hello {CustomerName},</p><p>Your transaction has been successfully processed.</p><h3>Transaction Details</h3><ul><li>Reference Number: {TransactionReference}</li><li>Type: {TransactionType}</li><li>Amount: ${Amount}</li><li>Date: {TransactionDate}</li><li>From Account: {FromAccount}</li><li>To Account: {ToAccount}</li><li>Status: {Status}</li></ul><p>If you did not authorize this transaction, please contact us immediately.</p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
+            "bill_payment_confirmation" => "<h2>Bill Payment Confirmation</h2><p>Hello {CustomerName},</p><p>Your bill payment has been successfully submitted.</p><h3>Payment Details</h3><ul><li>Biller: {BillerName}</li><li>Account Number: {BillerAccountNumber}</li><li>Amount: ${Amount}</li><li>Payment Date: {PaymentDate}</li><li>Reference Number: {PaymentReference}</li><li>Expected Settlement: {SettlementDate}</li></ul><p>You will receive another confirmation once the payment is cleared.</p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
+            "security_alert" => "<h2>Security Alert</h2><p>Hello {CustomerName},</p><p>We detected unusual activity on your account. Please review the details below:</p><h3>Activity Details</h3><ul><li>Type: {ActivityType}</li><li>Location: {Location}</li><li>Device: {Device}</li><li>Time: {ActivityTime}</li></ul><p>If this was not you, please change your password immediately and contact our security team.</p><p><a href=\"{SecurityLink}\" style=\"background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">Review Account Security</a></p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
+            "statement_ready" => "<h2>Your Account Statement</h2><p>Hello {CustomerName},</p><p>Your account statement for the period {PeriodStart} to {PeriodEnd} is now ready.</p><h3>Statement Summary</h3><ul><li>Account Number: {AccountNumber}</li><li>Opening Balance: ${OpeningBalance}</li><li>Closing Balance: ${ClosingBalance}</li><li>Total Transactions: {TransactionCount}</li></ul><p><a href=\"{StatementLink}\" style=\"background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">View Statement</a></p><footer><p style=\"color: #666; font-size: 12px; margin-top: 20px;\">This is an automated message. Please do not reply to this email.</p></footer>",
+            
             _ => string.Empty
         };
     }
@@ -221,7 +233,16 @@ public class EmailService : IEmailService, IDisposable
         return templateId switch
         {
             "2fa_token" => "Bank Verification Code",
-            "welcome" => "Welcome to Bank Management System",
+            "password_reset" => "Reset Your Password",
+            "welcome" => "Welcome to SecureBank",
+            "account_welcome" => "Welcome to SecureBank",
+            "transaction_confirmation" => "Transaction Confirmation - {TransactionReference}",
+            "bill_payment_confirmation" => "Bill Payment Confirmation - {BillerName}",
+            "security_alert" => "Security Alert - Unusual Activity",
+            "statement_ready" => "Your Account Statement is Ready",
+            "deposit_maturity_notice" => "Your Deposit is Maturing - Action Required",
+            "loan_payment_due" => "Loan Payment Due Reminder",
+            "low_balance_alert" => "Balance Alert - Low Account Balance",
             _ => "Bank Notification"
         };
     }

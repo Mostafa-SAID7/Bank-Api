@@ -93,8 +93,29 @@ public class SmsService : ISmsService
         return templateId switch
         {
             "2fa_token" => "Your Bank verification code is: {Token}. Valid for {ExpiryMinutes} minutes.",
-            "welcome" => "Welcome to Bank Management System, {UserName}! Your account is now active.",
-            "transaction_alert" => "Transaction alert: {Amount} {TransactionType} on your account ending in {AccountSuffix}.",
+            
+            "password_reset" => "Your password reset code is: {ResetCode}. Valid for {ExpiryMinutes} minutes. Never share this code.",
+            
+            "welcome" => "Welcome to SecureBank, {UserName}! Your account is now active. Log in to get started.",
+            
+            "transaction_alert" => "Transaction alert: ${Amount} {TransactionType} from account {AccountLast4} on {TransactionDate}. If not you, contact support.",
+            
+            "payment_confirmation" => "Bill payment confirmed: ${Amount} to {BillerName} on {PaymentDate}. Reference: {PaymentReference}",
+            
+            "account_locked" => "Your account has been locked due to security concerns. Contact support at 1-800-BANK-123 to unlock your account.",
+            
+            "suspicious_activity" => "Suspicious activity detected on your account. Please verify your recent transactions or reset your password immediately.",
+            
+            "deposit_maturity_notice" => "Your fixed deposit (Account: {DepositNumber}) matures on {MaturityDate}. Action required: Choose renewal or withdrawal.",
+            
+            "low_balance_alert" => "Balance alert: Your account balance is now ${CurrentBalance}. Minimum balance is ${MinimumBalance}.",
+            
+            "loan_payment_due" => "Loan payment due: ${Amount} for loan {LoanNumber} is due on {DueDate}. Pay now to avoid late fees.",
+            
+            "card_blocked" => "Your card ending in {CardLast4} has been blocked for security. Call {SupportNumber} to unblock it.",
+            
+            "card_activated" => "Your new {CardType} card ending in {CardLast4} has been activated and is ready to use.",
+            
             _ => string.Empty
         };
     }

@@ -3,32 +3,60 @@ SMS TEMPLATE DEFINITIONS
 
 Template ID: 2fa_token
 Message: Your Bank verification code is: {Token}. Valid for {ExpiryMinutes} minutes.
+Parameters: Token, ExpiryMinutes
 ---
 
 Template ID: password_reset
 Message: Your password reset code is: {ResetCode}. Valid for {ExpiryMinutes} minutes. Never share this code.
+Parameters: ResetCode, ExpiryMinutes
+---
+
+Template ID: welcome
+Message: Welcome to SecureBank, {UserName}! Your account is now active. Log in to get started.
+Parameters: UserName
 ---
 
 Template ID: transaction_alert
 Message: Transaction alert: ${Amount} {TransactionType} from account {AccountLast4} on {TransactionDate}. If not you, contact support.
+Parameters: Amount, TransactionType, AccountLast4, TransactionDate
 ---
 
 Template ID: payment_confirmation
 Message: Bill payment confirmed: ${Amount} to {BillerName} on {PaymentDate}. Reference: {PaymentReference}
+Parameters: Amount, BillerName, PaymentDate, PaymentReference
 ---
 
 Template ID: account_locked
 Message: Your account has been locked due to security concerns. Contact support at 1-800-BANK-123 to unlock your account.
+Parameters: None
 ---
 
 Template ID: suspicious_activity
 Message: Suspicious activity detected on your account. Please verify your recent transactions or reset your password immediately.
+Parameters: None
 ---
 
 Template ID: deposit_maturity_notice
 Message: Your fixed deposit (Account: {DepositNumber}) matures on {MaturityDate}. Action required: Choose renewal or withdrawal.
+Parameters: DepositNumber, MaturityDate
 ---
 
 Template ID: low_balance_alert
 Message: Balance alert: Your account balance is now ${CurrentBalance}. Minimum balance is ${MinimumBalance}.
+Parameters: CurrentBalance, MinimumBalance
+---
+
+Template ID: loan_payment_due
+Message: Loan payment due: ${Amount} for loan {LoanNumber} is due on {DueDate}. Pay now to avoid late fees.
+Parameters: Amount, LoanNumber, DueDate
+---
+
+Template ID: card_blocked
+Message: Your card ending in {CardLast4} has been blocked for security. Call {SupportNumber} to unblock it.
+Parameters: CardLast4, SupportNumber
+---
+
+Template ID: card_activated
+Message: Your new {CardType} card ending in {CardLast4} has been activated and is ready to use.
+Parameters: CardType, CardLast4
 ---
