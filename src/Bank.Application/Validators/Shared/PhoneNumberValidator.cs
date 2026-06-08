@@ -1,14 +1,12 @@
-using System.Text.RegularExpressions;
+using Bank.Application.Helpers.Shared;
 
 namespace Bank.Application.Validators.Shared;
 
 /// <summary>
-/// Validator for phone number format
+/// Validator for phone number format (delegates to centralized ValidationHelper)
 /// </summary>
 public static class PhoneNumberValidator
 {
-    private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(500);
-
     /// <summary>
     /// Validates phone number format
     /// </summary>
@@ -16,13 +14,6 @@ public static class PhoneNumberValidator
     /// <returns>True if phone number format is valid</returns>
     public static bool ValidateFormat(string phoneNumber)
     {
-        if (string.IsNullOrWhiteSpace(phoneNumber))
-            return false;
-
-        // Remove common formatting characters
-        var cleaned = Regex.Replace(phoneNumber, @"[\s\-\(\)\+\.]", "", RegexOptions.None, RegexTimeout);
-        
-        // Check if it's all digits and reasonable length
-        return cleaned.All(char.IsDigit) && cleaned.Length >= 10 && cleaned.Length <= 15;
+        return ValidationHelper.IsValidPhoneNumber(phoneNumber);
     }
 }
