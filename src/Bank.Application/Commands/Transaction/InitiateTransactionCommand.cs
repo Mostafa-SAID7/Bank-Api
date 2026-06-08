@@ -12,7 +12,7 @@ public record InitiateTransactionCommand(
     TransactionType Type, 
     string Description) : IRequest<Bank.Domain.Entities.Transaction>;
 
-public class InitiateTransactionCommandHandler : IRequestHandler<InitiateTransactionCommand, Bank.Domain.Entities.Transaction>
+public sealed class InitiateTransactionCommandHandler : IRequestHandler<InitiateTransactionCommand, Bank.Domain.Entities.Transaction>
 {
     private readonly ITransactionService _transactionService;
 
