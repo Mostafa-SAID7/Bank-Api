@@ -2,6 +2,7 @@ using Bank.Application.DTOs;
 using Bank.Application.DTOs.Statement.Core;
 using Bank.Application.DTOs.Statement.Delivery;
 using Bank.Application.DTOs.Statement.Analytics;
+using Bank.Application.Helpers.Statement;
 using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
@@ -400,26 +401,7 @@ public class StatementGenerator : IStatementGenerator
 
     private string GetDefaultCssStyles()
     {
-        return @"
-            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
-            .bank-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-            .statement-header { margin-bottom: 20px; }
-            .account-info, .balance-summary, .monthly-statistics, .fee-summary { margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-            th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-            th { background-color: #f2f2f2; font-weight: bold; }
-            .transaction-table { margin-top: 10px; }
-            .credit { color: green; font-weight: bold; }
-            .debit { color: red; font-weight: bold; }
-            .total-row { border-top: 2px solid #333; font-weight: bold; }
-            .disclosures { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 12px; }
-            .disclosure-section { margin-bottom: 15px; }
-            .disclosure-section h4 { margin-bottom: 5px; color: #555; font-size: 13px; }
-            .monthly-statistics table, .fee-summary table { background-color: #f9f9f9; }
-            .monthly-statistics h3, .fee-summary h3 { color: #2c5aa0; }
-            h1, h2, h3 { color: #333; }
-            h4 { color: #555; margin-top: 15px; margin-bottom: 5px; }
-        ";
+        return StatementHtmlHelper.GetDefaultCssStyles();
     }
 
     private async Task<(byte[] Content, string FileName)> GenerateConsolidatedPdfAsync(
@@ -727,28 +709,7 @@ public class StatementGenerator : IStatementGenerator
 
     private string DetermineFeeType(string description)
     {
-        var desc = description.ToLower();
-        
-        if (desc.Contains("maintenance") || desc.Contains("monthly"))
-            return "Monthly Maintenance Fee";
-        if (desc.Contains("overdraft") || desc.Contains("nsf"))
-            return "Overdraft Fee";
-        if (desc.Contains("atm") || desc.Contains("withdrawal"))
-            return "ATM/Withdrawal Fee";
-        if (desc.Contains("transfer") || desc.Contains("wire"))
-            return "Transfer Fee";
-        if (desc.Contains("foreign") || desc.Contains("international"))
-            return "Foreign Transaction Fee";
-        if (desc.Contains("minimum") || desc.Contains("balance"))
-            return "Minimum Balance Fee";
-        if (desc.Contains("dormancy") || desc.Contains("inactive"))
-            return "Dormancy Fee";
-        if (desc.Contains("stop") || desc.Contains("payment"))
-            return "Stop Payment Fee";
-        if (desc.Contains("check") || desc.Contains("returned"))
-            return "Returned Check Fee";
-        
-        return "Other Fees";
+        return StatementHtmlHelper.DetermineFeeType(description);
     }
 
     #endregion

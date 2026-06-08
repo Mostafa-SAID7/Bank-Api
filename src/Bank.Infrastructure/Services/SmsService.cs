@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -8,12 +8,13 @@ namespace Bank.Infrastructure.Services;
 /// SMS service implementation - mock implementation for development
 /// In production, integrate with services like Twilio, AWS SNS, etc.
 /// Uses centralized template service for template management.
+/// Uses centralized ValidationHelper for phone number validation.
+/// Uses centralized MaskingHelper for safe phone number logging.
 /// </summary>
 public sealed class SmsService : ISmsService
 {
     private readonly ILogger<SmsService> _logger;
     private readonly ITemplateService _templateService;
-    private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(500);
 
     public SmsService(ILogger<SmsService> logger, ITemplateService templateService)
     {
@@ -25,16 +26,16 @@ public sealed class SmsService : ISmsService
     {
         try
         {
-            if (!IsValidPhoneNumber(phoneNumber))
+            if (!ValidationHelper.IsValidPhoneNumber(phoneNumber))
             {
-                _logger.LogWarning("Invalid phone number format provided for SMS (masked: {PhoneNumberMasked})", MaskPhoneNumber(phoneNumber));
+                _logger.LogWarning("Invalid phone number format provided for SMS (masked: {PhoneNumberMasked})", MaskingHelper.MaskPhoneNumber(phoneNumber));
                 return false;
             }
 
             // Mock implementation - log the SMS instead of actually sending
             // In production, integrate with SMS provider (Twilio, AWS SNS, etc.)
             // Never log the full phone number or message content (may contain OTP codes)
-            _logger.LogInformation("SMS dispatched to {PhoneNumberMasked}", MaskPhoneNumber(phoneNumber));
+            _logger.LogInformation("SMS dispatched to {PhoneNumberMasked}", MaskingHelper.MaskPhoneNumber(phoneNumber));
 
             // Simulate API call delay
             await Task.Delay(100);
@@ -45,7 +46,7 @@ public sealed class SmsService : ISmsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send SMS to {PhoneNumberMasked}", MaskPhoneNumber(phoneNumber));
+            _logger.LogError(ex, "Failed to send SMS to {PhoneNumberMasked}", MaskingHelper.MaskPhoneNumber(phoneNumber));
             return false;
         }
     }
@@ -66,41 +67,13 @@ public sealed class SmsService : ISmsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send templated SMS to {PhoneNumberMasked} with template {TemplateId}", MaskPhoneNumber(phoneNumber), templateId);
+            _logger.LogError(ex, "Failed to send templated SMS to {PhoneNumberMasked} with template {TemplateId}", MaskingHelper.MaskPhoneNumber(phoneNumber), templateId);
             return false;
         }
     }
 
     public bool IsValidPhoneNumber(string phoneNumber)
     {
-        if (string.IsNullOrWhiteSpace(phoneNumber))
-            return false;
-
-        try
-        {
-            // Basic phone number validation - supports international format
-            var phoneRegex = new Regex(@"^\+?[1-9]\d{1,14}$", RegexOptions.None, RegexTimeout);
-            var cleanedNumber = phoneNumber.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
-            return phoneRegex.IsMatch(cleanedNumber);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// Masks a phone number for safe logging: keeps country code prefix and last 4 digits.
-    /// e.g. "+12025551234" → "+1******1234"
-    /// </summary>
-    private static string MaskPhoneNumber(string? phoneNumber)
-    {
-        if (string.IsNullOrEmpty(phoneNumber)) return "[empty]";
-        var cleaned = phoneNumber.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
-        if (cleaned.Length <= 4) return "[redacted]";
-        var prefix = cleaned.StartsWith('+') ? cleaned[..2] : cleaned[..1];
-        var suffix = cleaned[^4..];
-        var masked = new string('*', Math.Max(0, cleaned.Length - prefix.Length - 4));
-        return $"{prefix}{masked}{suffix}";
+        return ValidationHelper.IsValidPhoneNumber(phoneNumber);
     }
 }

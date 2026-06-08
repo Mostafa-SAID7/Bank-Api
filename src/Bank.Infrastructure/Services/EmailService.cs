@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Mail;
-using System.Text.RegularExpressions;
+using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,6 +10,7 @@ namespace Bank.Infrastructure.Services;
 /// <summary>
 /// Email service implementation using SMTP with mandatory SSL/TLS encryption.
 /// Uses centralized template service for template management.
+/// Uses centralized ValidationHelper for email validation.
 /// 
 /// SECURITY: EnableSsl is ALWAYS set to true. SMTP connections MUST use encrypted channels.
 /// This protects email credentials and message content from interception (OWASP A2, CWE-319, STIG V-222596).
@@ -20,7 +21,6 @@ public sealed class EmailService : IEmailService, IDisposable
     private readonly ILogger<EmailService> _logger;
     private readonly ITemplateService _templateService;
     private readonly SmtpClient _smtpClient;
-    private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(500);
 
     public EmailService(IConfiguration configuration, ILogger<EmailService> logger, ITemplateService templateService)
     {
@@ -191,19 +191,7 @@ public sealed class EmailService : IEmailService, IDisposable
 
     public bool IsValidEmail(string email)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            return false;
-
-        try
-        {
-            // Use regex for basic email validation
-            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase, RegexTimeout);
-            return emailRegex.IsMatch(email);
-        }
-        catch
-        {
-            return false;
-        }
+        return ValidationHelper.IsValidEmail(email);
     }
 
     public void Dispose()
@@ -212,7 +200,7 @@ public sealed class EmailService : IEmailService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposing)
         {
