@@ -1,4 +1,4 @@
-using Bank.Application.Interfaces;
+using Bank.Domain.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Infrastructure.Data;
