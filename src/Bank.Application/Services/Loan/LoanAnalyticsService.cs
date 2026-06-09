@@ -289,13 +289,13 @@ public class LoanAnalyticsService : ILoanAnalyticsService
     private static decimal CalculateDelinquencyRate(List<Loan> loans)
     {
         var delinquentCount = loans.Count(l => l.Status == LoanStatus.Delinquent);
-        return RiskCalculationHelper.CalculateDelinquencyRate(delinquentCount, loans.Count);
+        return Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateDelinquencyRate(delinquentCount, loans.Count);
     }
 
     private static decimal CalculateDefaultRate(List<Loan> loans)
     {
         var defaultCount = loans.Count(l => l.Status == LoanStatus.DefaultStatus);
-        return RiskCalculationHelper.CalculateDefaultRate(defaultCount, loans.Count);
+        return Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateDefaultRate(defaultCount, loans.Count);
     }
 
     private static LoanRiskLevel CalculateRiskLevel(Loan loan, int onTimePayments, int totalPayments)

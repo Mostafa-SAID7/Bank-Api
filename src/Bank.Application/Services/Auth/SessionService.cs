@@ -385,7 +385,7 @@ public sealed class SessionService : ISessionService
 
     private static string GenerateSecureToken()
     {
-        return TokenGenerationHelper.GenerateSecureToken(32);
+        return Bank.Application.Helpers.Auth.AuthGeneratorHelper.GenerateSecureToken(32);
     }
 
     /// <summary>

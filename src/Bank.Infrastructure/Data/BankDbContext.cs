@@ -2,17 +2,27 @@ using Bank.Domain.Entities;
 using Bank.Infrastructure.Data.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bank.Infrastructure.Data;
 
 /// <summary>
 /// Application database context using ASP.NET Core Identity with Guid keys.
 /// Includes automatic soft delete filtering and audit field population.
+/// Configured for Neon serverless PostgreSQL with automatic retry and scaling support.
 /// </summary>
 public class BankDbContext : IdentityDbContext<User, Role, Guid>
 {
+    private readonly IConfiguration? _configuration;
+
+    public BankDbContext(DbContextOptions<BankDbContext> options, IConfiguration configuration) : base(options)
+    {
+        _configuration = configuration;
+    }
+
     public BankDbContext(DbContextOptions<BankDbContext> options) : base(options)
     {
+        _configuration = null;
     }
 
     public DbSet<Account> Accounts => Set<Account>();

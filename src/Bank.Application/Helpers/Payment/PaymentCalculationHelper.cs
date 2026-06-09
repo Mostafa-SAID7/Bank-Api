@@ -3,10 +3,13 @@ using Bank.Domain.Enums;
 namespace Bank.Application.Helpers.Payment;
 
 /// <summary>
-/// Utility for payment calculations and allocations
+/// Consolidated helper for payment calculations and fee allocations.
+/// Combines functionality from PaymentCalculationHelper and CalculationHelper payment methods.
 /// </summary>
 public static class PaymentCalculationHelper
 {
+    #region Payment Allocation
+
     /// <summary>
     /// Calculates loan payment allocation between principal and interest
     /// </summary>
@@ -30,6 +33,27 @@ public static class PaymentCalculationHelper
     }
 
     /// <summary>
+    /// Calculates principal and interest allocations for a payment (alternative method)
+    /// </summary>
+    public static (decimal principalAmount, decimal interestAmount) CalculatePaymentComponents(
+        decimal outstandingBalance, decimal paymentAmount, decimal monthlyInterestRate)
+    {
+        var interestAmount = Math.Round(outstandingBalance * monthlyInterestRate, 2);
+        var principalAmount = paymentAmount - interestAmount;
+        if (principalAmount < 0)
+        {
+            principalAmount = 0;
+            interestAmount = paymentAmount;
+        }
+        
+        return (principalAmount, interestAmount);
+    }
+
+    #endregion
+
+    #region Fee Calculations
+
+    /// <summary>
     /// Calculates processing fee based on amount and payment method
     /// </summary>
     /// <param name="amount">Transaction amount</param>
@@ -48,4 +72,6 @@ public static class PaymentCalculationHelper
             _ => 1.00m
         };
     }
+
+    #endregion
 }

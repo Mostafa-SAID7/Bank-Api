@@ -26,7 +26,7 @@ public class PaymentReceiptGenerationService : IPaymentReceiptGenerationService
     {
         try
         {
-            var confirmationNumber = TokenGenerationHelper.GenerateConfirmationNumber();
+            var confirmationNumber = Bank.Application.Helpers.Shared.TokenHelper.GeneratePaymentConfirmationNumber();
             _logger.LogInformation("Receipt confirmation number generated: {ConfirmationNumber}", confirmationNumber);
             return confirmationNumber;
         }

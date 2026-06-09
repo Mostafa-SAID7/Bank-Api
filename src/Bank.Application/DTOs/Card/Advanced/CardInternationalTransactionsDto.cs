@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Bank.Application.DTOs.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Advanced;
 
@@ -20,12 +21,9 @@ public class CardInternationalTransactionsRequest
 /// <summary>
 /// Result of international transactions settings update
 /// </summary>
-public class CardInternationalTransactionsResult
+public class CardInternationalTransactionsResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public bool InternationalTransactionsEnabled { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 

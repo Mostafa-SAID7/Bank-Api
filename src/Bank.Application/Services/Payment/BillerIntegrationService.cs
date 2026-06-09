@@ -1,4 +1,4 @@
-﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs;
 using Bank.Application.DTOs.Payment.Biller;
 using Bank.Application.DTOs.Payment.Routing;
 using Bank.Application.DTOs.Payment.Batch;
@@ -527,12 +527,12 @@ public class BillerIntegrationService : IBillerIntegrationService
         {
             return new BillerPaymentResponse
             { Success = true,
-                ExternalReference = TokenGenerationHelper.GenerateExternalReference(),
-                ConfirmationNumber = TokenGenerationHelper.GenerateConfirmationNumber(),
+                ExternalReference = Bank.Application.Helpers.Shared.TokenHelper.GeneratePaymentExternalReference(),
+                ConfirmationNumber = Bank.Application.Helpers.Shared.TokenHelper.GeneratePaymentConfirmationNumber(),
                 Status = BillPaymentStatus.Processing,
                 ProcessedDate = DateTime.UtcNow,
                 Message = "Payment submitted successfully",
-                ProcessingFee = CalculationHelper.CalculateProcessingFee(request.Amount, request.PaymentMethod),
+                ProcessingFee = Bank.Application.Helpers.Payment.PaymentCalculationHelper.CalculateProcessingFee(request.Amount, request.PaymentMethod),
                 ExpectedDeliveryDate = DateTime.UtcNow.AddDays(biller.ProcessingDays)
             };
         }

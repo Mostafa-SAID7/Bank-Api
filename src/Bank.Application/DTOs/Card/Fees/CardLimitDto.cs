@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Bank.Application.DTOs.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Fees;
 
@@ -26,14 +27,11 @@ public class CardLimitUpdateRequest
 /// <summary>
 /// Result of card limit update operation
 /// </summary>
-public class CardLimitUpdateResult
+public class CardLimitUpdateResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public decimal? NewDailyLimit { get; set; }
     public decimal? NewMonthlyLimit { get; set; }
     public decimal? NewAtmDailyLimit { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 

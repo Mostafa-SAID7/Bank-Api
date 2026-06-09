@@ -9,7 +9,7 @@ public abstract class BaseResultDto
     /// <summary>
     /// Whether the operation was successful
     /// </summary>
-    public bool IsSuccess { get; set; }
+    public bool Success { get; set; }
 
     /// <summary>
     /// Human-readable message about the operation result

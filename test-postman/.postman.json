@@ -1,0 +1,24 @@
+{
+  "collectionName": "Bank API - Complete Test Collection",
+  "collectionFile": "Bank-API-Complete-Collection.postman_collection.json",
+  "environmentName": "Bank API - Local Development",
+  "environmentFile": "Bank-API-Environment.postman_environment.json",
+  "baseUrl": "http://localhost:5000",
+  "status": "Ready to import into Postman",
+  "createdDate": "2024-06-09",
+  "totalEndpoints": 70,
+  "totalFolders": 8,
+  "features": [
+    "Authentication & Sessions",
+    "Account Management",
+    "Card Operations",
+    "Loan Management",
+    "Deposits & Savings",
+    "Payments & Transfers",
+    "Transactions",
+    "Statements",
+    "Profile & Security",
+    "Admin Operations"
+  ],
+  "notes": "Import both JSON files into Postman. See POSTMAN_TESTING_GUIDE.md for detailed instructions."
+}

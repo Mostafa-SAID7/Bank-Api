@@ -1,4 +1,4 @@
-﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs;
 using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
 using Bank.Domain.Enums;
@@ -111,10 +111,10 @@ public sealed class DepositService : IDepositService
 
         return deposit.InterestCalculationMethod switch
         {
-            Bank.Domain.Enums.InterestCalculationMethod.Simple => CalculationHelper.CalculateSimpleInterest(principal, rate, days),
-            Bank.Domain.Enums.InterestCalculationMethod.CompoundDaily => CalculationHelper.CalculateCompoundInterest(principal, rate, days, 365),
-            Bank.Domain.Enums.InterestCalculationMethod.CompoundMonthly => CalculationHelper.CalculateCompoundInterest(principal, rate, days, 12),
-            _ => CalculationHelper.CalculateSimpleInterest(principal, rate, days)
+            Bank.Domain.Enums.InterestCalculationMethod.Simple => Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateSimpleInterest(principal, rate, days),
+            Bank.Domain.Enums.InterestCalculationMethod.CompoundDaily => Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateCompoundInterest(principal, rate, 365, days),
+            Bank.Domain.Enums.InterestCalculationMethod.CompoundMonthly => Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateCompoundInterest(principal, rate, 12, days),
+            _ => Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateSimpleInterest(principal, rate, days)
         };
     }
 
@@ -151,7 +151,7 @@ public sealed class DepositService : IDepositService
             InterestDays = (toDate - fromDate).Days,
             ProcessedByUserId = processedByUserId,
             ProcessedDate = DateTime.UtcNow,
-            TransactionReference = GeneratorHelper.GenerateTransactionReference()
+            TransactionReference = TokenHelper.GenerateTransactionReference()
         };
 
         _unitOfWork.Repository<Bank.Domain.Entities.FixedDeposit>().Update(deposit);
@@ -285,7 +285,7 @@ public sealed class DepositService : IDepositService
             Status = Bank.Domain.Enums.TransactionStatus.Completed,
             ProcessedByUserId = processedByUserId,
             ProcessedDate = DateTime.UtcNow,
-            TransactionReference = GeneratorHelper.GenerateTransactionReference()
+            TransactionReference = TokenHelper.GenerateTransactionReference()
         };
 
         _unitOfWork.Repository<Bank.Domain.Entities.FixedDeposit>().Update(deposit);
@@ -374,7 +374,7 @@ public sealed class DepositService : IDepositService
             PenaltyPercentage = originalDeposit.PenaltyPercentage,
             RenewedFromDepositId = originalDeposit.Id,
             RenewalCount = originalDeposit.RenewalCount + 1,
-            DepositNumber = GeneratorHelper.GenerateDepositNumber()
+            DepositNumber = TokenHelper.GenerateDepositNumber()
         };
 
         originalDeposit.RenewedToDepositId = renewedDeposit.Id;
@@ -488,7 +488,7 @@ public sealed class DepositService : IDepositService
             Status = Bank.Domain.Enums.TransactionStatus.Completed,
             ProcessedByUserId = processedByUserId,
             ProcessedDate = DateTime.UtcNow,
-            TransactionReference = GeneratorHelper.GenerateTransactionReference()
+            TransactionReference = TokenHelper.GenerateTransactionReference()
         };
 
         _unitOfWork.Repository<Bank.Domain.Entities.FixedDeposit>().Update(deposit);
@@ -529,7 +529,7 @@ public sealed class DepositService : IDepositService
             DeliveryChannel = Bank.Domain.Enums.NotificationChannel.Email,
             DeliveryAddress = deposit.Customer?.Email ?? string.Empty,
             GeneratedByUserId = generatedByUserId,
-            NoticeNumber = GeneratorHelper.GenerateNoticeNumber(noticeType)
+            NoticeNumber = TokenHelper.GenerateNoticeNumber(noticeType)
         };
 
         await _unitOfWork.Repository<Bank.Domain.Entities.MaturityNotice>().AddAsync(notice);

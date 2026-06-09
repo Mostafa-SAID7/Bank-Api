@@ -77,7 +77,7 @@ public sealed class FixedDepositService : IFixedDepositService
             PenaltyType = product.PenaltyType,
             PenaltyAmount = product.PenaltyAmount,
             PenaltyPercentage = product.PenaltyPercentage,
-            DepositNumber = GeneratorHelper.GenerateDepositNumber()
+            DepositNumber = TokenHelper.GenerateDepositNumber()
         };
 
         // Debit the linked account
@@ -95,7 +95,7 @@ public sealed class FixedDepositService : IFixedDepositService
             Description = $"Fixed deposit creation - {deposit.DepositNumber}",
             TransactionDate = DateTime.UtcNow,
             Status = TransactionStatus.Completed,
-            TransactionReference = GeneratorHelper.GenerateTransactionReference()
+            TransactionReference = TokenHelper.GenerateTransactionReference()
         };
 
         await _unitOfWork.Repository<DepositTransaction>().AddAsync(transaction);

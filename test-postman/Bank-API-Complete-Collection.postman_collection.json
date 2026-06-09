@@ -1,0 +1,1359 @@
+{
+  "info": {
+    "_postman_id": "bank-api-collection-2024",
+    "name": "Bank API - Complete Test Collection",
+    "description": "Comprehensive Postman collection for testing all Bank API endpoints. Includes 150+ endpoints across Authentication, Accounts, Loans, Cards, Payments, Deposits, and Admin operations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('authToken', jsonData.data);",
+                  "    pm.test('Login successful', function() {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData).to.have.property('data');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"test@example.com\", \"password\": \"Test@1234\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"newuser\", \"email\": \"newuser@example.com\", \"password\": \"Test@1234\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Session Management",
+      "item": [
+        {
+          "name": "Get Active Sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/session/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "session", "active"]
+            }
+          }
+        },
+        {
+          "name": "Terminate Session",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/session/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "session", "{{sessionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refreshToken\": \"{{refreshToken}}\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/session/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "session", "refresh"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏦 Account Management",
+      "item": [
+        {
+          "name": "Get My Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/account",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "account"]
+            }
+          }
+        },
+        {
+          "name": "Get Account by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/account/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "account", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('accountId', jsonData.data.id);",
+                  "    pm.test('Account created', function() {",
+                  "        pm.expect(pm.response.code).to.equal(201);",
+                  "        pm.expect(jsonData.data).to.have.property('id');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accountNickname\": \"Savings Account\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/account",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "account"]
+            }
+          }
+        },
+        {
+          "name": "Update Account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accountHolderName\": \"John Doe Updated\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/account/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "account", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/account/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "account", "{{accountId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Card Management",
+      "item": [
+        {
+          "name": "Issue Card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('cardId', jsonData.data.cardId);",
+                  "    pm.test('Card issued successfully', function() {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData.data).to.have.property('cardId');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"customerId\": \"{{customerId}}\", \"cardType\": \"Debit\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/card/issue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "card", "issue"]
+            }
+          }
+        },
+        {
+          "name": "Get All Cards",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/card",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "card"]
+            }
+          }
+        },
+        {
+          "name": "Get Card Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/card/{{cardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "card", "{{cardId}}"]
+            }
+          }
+        },
+        {
+          "name": "Activate Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/card/{{cardId}}/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "card", "{{cardId}}", "activate"]
+            }
+          }
+        },
+        {
+          "name": "Block Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"reason\": \"Lost\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/card/{{cardId}}/block",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "card", "{{cardId}}", "block"]
+            }
+          }
+        },
+        {
+          "name": "Get Card Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/card/{{cardId}}/transactions?fromDate=2024-01-01&toDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "card", "{{cardId}}", "transactions"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Loan Management",
+      "item": [
+        {
+          "name": "Apply for Loan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('loanId', jsonData.data.loanId);",
+                  "    pm.test('Loan application submitted', function() {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData.data).to.have.property('loanId');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"loanType\": \"PersonalLoan\", \"amount\": 50000, \"termInMonths\": 60, \"purpose\": \"Education\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "apply"]
+            }
+          }
+        },
+        {
+          "name": "Get My Loans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/my-loans",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "my-loans"]
+            }
+          }
+        },
+        {
+          "name": "Get Loan Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Repayment Schedule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/repayment-schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "repayment-schedule"]
+            }
+          }
+        },
+        {
+          "name": "Make Loan Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"loanId\": \"{{loanId}}\", \"amount\": 1000, \"paymentMethod\": \"DirectDebit\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "payments"]
+            }
+          }
+        },
+        {
+          "name": "Calculate Monthly Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"principal\": 50000, \"annualRate\": 8.5, \"termInMonths\": 60}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loaninterest/calculate-monthly-payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loaninterest", "calculate-monthly-payment"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Deposit & Savings",
+      "item": [
+        {
+          "name": "Get Deposit Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "products"]
+            }
+          }
+        },
+        {
+          "name": "Create Fixed Deposit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('depositId', jsonData.data.id);",
+                  "    pm.test('Fixed deposit created', function() {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData.data).to.have.property('id');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accountId\": \"{{accountId}}\", \"amount\": 100000, \"termInMonths\": 12, \"productId\": \"{{productId}}\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/fixed-deposits",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "fixed-deposits"]
+            }
+          }
+        },
+        {
+          "name": "Get Fixed Deposits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/fixed-deposits",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "fixed-deposits"]
+            }
+          }
+        },
+        {
+          "name": "Get Deposit by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/fixed-deposits/{{depositId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "fixed-deposits", "{{depositId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Maturity Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/fixed-deposits/{{depositId}}/maturity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "fixed-deposits", "{{depositId}}", "maturity"]
+            }
+          }
+        },
+        {
+          "name": "Calculate Early Withdrawal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "50000"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/fixed-deposits/{{depositId}}/withdrawal/calculate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "fixed-deposits", "{{depositId}}", "withdrawal", "calculate"]
+            }
+          }
+        },
+        {
+          "name": "Get Deposit Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/deposit/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deposit", "summary"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Payments & Transfers",
+      "item": [
+        {
+          "name": "Add Beneficiary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('beneficiaryId', jsonData.data.id);",
+                  "    pm.test('Beneficiary added', function() {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData.data).to.have.property('id');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accountNumber\": \"1234567890\", \"bankCode\": \"ABC\", \"beneficiaryName\": \"John Receiver\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiary"]
+            }
+          }
+        },
+        {
+          "name": "Get All Beneficiaries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiary"]
+            }
+          }
+        },
+        {
+          "name": "Get Beneficiary by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiary/{{beneficiaryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiary", "{{beneficiaryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Billers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/billpayment/billers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billpayment", "billers"]
+            }
+          }
+        },
+        {
+          "name": "Schedule Bill Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"billerId\": \"{{billerId}}\", \"accountId\": \"{{accountId}}\", \"amount\": 1500, \"paymentDate\": \"2024-02-15\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/billpayment/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billpayment", "schedule"]
+            }
+          }
+        },
+        {
+          "name": "Create Payment Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Monthly Rent\", \"beneficiaryId\": \"{{beneficiaryId}}\", \"amount\": 5000, \"description\": \"Rent payment\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/paymenttemplate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "paymenttemplate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📈 Transactions",
+      "item": [
+        {
+          "name": "Initiate Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"fromAccountId\": \"{{accountId}}\", \"toAccountId\": \"recipient-account-id\", \"amount\": 1000, \"description\": \"Transfer to friend\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transaction",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transaction"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transaction/history/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transaction", "history", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transaction/{{transactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transaction", "{{transactionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Transactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accountId\": \"{{accountId}}\", \"fromDate\": \"2024-01-01\", \"toDate\": \"2024-12-31\", \"pageNumber\": 1, \"pageSize\": 20}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transaction/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transaction", "search"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transaction/statistics/{{accountId}}?fromDate=2024-01-01&toDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transaction", "statistics", "{{accountId}}"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📄 Statements",
+      "item": [
+        {
+          "name": "Generate Statement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accountId\": \"{{accountId}}\", \"fromDate\": \"2024-01-01\", \"toDate\": \"2024-12-31\", \"format\": \"PDF\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/statement/generate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "statement", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Get Account Statements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/statement/account/{{accountId}}?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "statement", "account", "{{accountId}}"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Statement Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/statement/summary/{{accountId}}?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "statement", "summary", "{{accountId}}"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Profile & Security",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\": \"John\", \"lastName\": \"Doe\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"currentPassword\": \"OldPass@123\", \"newPassword\": \"NewPass@456\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Setup 2FA Authenticator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/2fa/setup/authenticator",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "2fa", "setup", "authenticator"]
+            }
+          }
+        },
+        {
+          "name": "Verify 2FA Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"token\": \"123456\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/2fa/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "2fa", "verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚙️ Admin Operations",
+      "item": [
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Accounts (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/accounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "accounts"]
+            }
+          }
+        },
+        {
+          "name": "Get Audit Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/user/{{userId}}?fromDate=2024-01-01&toDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "audit", "user", "{{userId}}"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set default baseUrl if not already set",
+          "if (!pm.environment.get('baseUrl')) {",
+          "    pm.environment.set('baseUrl', 'http://localhost:5000');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "loanId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "depositId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "beneficiaryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "billerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

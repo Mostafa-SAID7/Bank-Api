@@ -1,4 +1,4 @@
-﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
 using Bank.Application.Helpers.Shared;
@@ -84,7 +84,7 @@ public class CardService : ICardService
             var card = new Card
             {
                 CardNumber = cardNumber,
-                MaskedCardNumber = GeneratorHelper.GenerateMaskedCardNumber(cardNumber),
+                MaskedCardNumber = TokenHelper.GenerateMaskedCardNumber(cardNumber),
                 CustomerId = request.CustomerId,
                 AccountId = request.AccountId,
                 Type = request.CardType,
@@ -746,23 +746,23 @@ public class CardService : ICardService
                 FromDate = fromDate,
                 ToDate = toDate,
                 TotalTransactions = transactions.Count,
-                TotalAmount = transactions.Where(t => t.Successful()).Sum(t => t.Amount),
+                TotalAmount = transactions.Where(t => t.IsSuccessful()).Sum(t => t.Amount),
                 TotalFees = transactions.Sum(t => t.Fees ?? 0),
-                PurchaseCount = transactions.Count(t => t.TransactionType == CardTransactionType.Purchase && t.Successful()),
-                PurchaseAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Purchase && t.Successful()).Sum(t => t.Amount),
-                WithdrawalCount = transactions.Count(t => t.TransactionType == CardTransactionType.Withdrawal && t.Successful()),
-                WithdrawalAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Withdrawal && t.Successful()).Sum(t => t.Amount),
-                OnlineTransactionCount = transactions.Count(t => t.IsOnline && t.Successful()),
-                OnlineTransactionAmount = transactions.Where(t => t.IsOnline && t.Successful()).Sum(t => t.Amount),
-                InternationalTransactionCount = transactions.Count(t => t.IsInternational && t.Successful()),
-                InternationalTransactionAmount = transactions.Where(t => t.IsInternational && t.Successful()).Sum(t => t.Amount)
+                PurchaseCount = transactions.Count(t => t.TransactionType == CardTransactionType.Purchase && t.IsSuccessful()),
+                PurchaseAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Purchase && t.IsSuccessful()).Sum(t => t.Amount),
+                WithdrawalCount = transactions.Count(t => t.TransactionType == CardTransactionType.Withdrawal && t.IsSuccessful()),
+                WithdrawalAmount = transactions.Where(t => t.TransactionType == CardTransactionType.Withdrawal && t.IsSuccessful()).Sum(t => t.Amount),
+                OnlineTransactionCount = transactions.Count(t => t.IsOnline && t.IsSuccessful()),
+                OnlineTransactionAmount = transactions.Where(t => t.IsOnline && t.IsSuccessful()).Sum(t => t.Amount),
+                InternationalTransactionCount = transactions.Count(t => t.IsInternational && t.IsSuccessful()),
+                InternationalTransactionAmount = transactions.Where(t => t.IsInternational && t.IsSuccessful()).Sum(t => t.Amount)
             };
 
             // Calculate limit utilization
-            var dailySpent = transactions.Where(t => t.TransactionDate.Date == DateTime.UtcNow.Date && t.Successful()).Sum(t => t.Amount);
+            var dailySpent = transactions.Where(t => t.TransactionDate.Date == DateTime.UtcNow.Date && t.IsSuccessful()).Sum(t => t.Amount);
             var monthlySpent = transactions.Where(t => t.TransactionDate.Year == DateTime.UtcNow.Year && 
                                                       t.TransactionDate.Month == DateTime.UtcNow.Month && 
-                                                      t.Successful()).Sum(t => t.Amount);
+                                                      t.IsSuccessful()).Sum(t => t.Amount);
 
             stats.DailyLimitUtilization = card.DailyLimit > 0 ? (dailySpent / card.DailyLimit) * 100 : 0;
             stats.MonthlyLimitUtilization = card.MonthlyLimit > 0 ? (monthlySpent / card.MonthlyLimit) * 100 : 0;
@@ -919,20 +919,20 @@ public class CardService : ICardService
     {
         // Generate a 3-digit CVV using centralized helper
         await Task.CompletedTask; // Placeholder for async operation
-        return TokenGenerationHelper.GenerateNumericToken(3);
+        return Bank.Application.Helpers.Auth.AuthGeneratorHelper.GenerateNumericToken(3);
     }
 
     // Private helper methods
     private static string GenerateActivationCode()
     {
         // Generate 6-digit activation code using centralized helper
-        return TokenGenerationHelper.GenerateNumericToken(6);
+        return Bank.Application.Helpers.Auth.AuthGeneratorHelper.GenerateNumericToken(6);
     }
 
     private static string GenerateRandomPin()
     {
         // Generate 4-digit PIN using centralized helper
-        return TokenGenerationHelper.GenerateRandomPin(4);
+        return Bank.Application.Helpers.Auth.AuthGeneratorHelper.GenerateRandomPin(4);
     }
 
     private static string HashSecurityCode(string securityCode)
@@ -996,3 +996,6 @@ public class CardService : ICardService
         };
     }
 }
+
+
+

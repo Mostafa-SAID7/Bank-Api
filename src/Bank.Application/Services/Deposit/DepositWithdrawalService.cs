@@ -305,7 +305,7 @@ public class DepositWithdrawalService : IDepositWithdrawalService
             Status = TransactionStatus.Completed,
             ProcessedByUserId = processedByUserId,
             ProcessedDate = DateTime.UtcNow,
-            TransactionReference = GeneratorHelper.GenerateTransactionReference()
+            TransactionReference = TokenHelper.GenerateTransactionReference()
         };
 
         // Create penalty transactions for each penalty component
@@ -324,7 +324,7 @@ public class DepositWithdrawalService : IDepositWithdrawalService
                 PenaltyReason = penalty.Type,
                 ProcessedByUserId = processedByUserId,
                 ProcessedDate = DateTime.UtcNow,
-                TransactionReference = GeneratorHelper.GenerateTransactionReference()
+                TransactionReference = TokenHelper.GenerateTransactionReference()
             };
             penaltyTransactions.Add(penaltyTransaction);
         }

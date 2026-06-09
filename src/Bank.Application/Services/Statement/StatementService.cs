@@ -1,4 +1,4 @@
-﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs;
 using Bank.Application.DTOs.Statement.Core;
 using Bank.Application.DTOs.Statement.Search;
 using Bank.Application.DTOs.Statement.Analytics;
@@ -49,7 +49,7 @@ public class StatementService : IStatementService
     {
         try
         {
-            // Validate parameters only (no DB call) â€” avoids the double-fetch that
+            // Validate parameters only (no DB call) — avoids the double-fetch that
             // would occur if we called ValidateStatementRequestAsync here (which also
             // fetches the account) and then fetched again below.
             var paramErrors = ValidateStatementParameters(request);
@@ -148,7 +148,7 @@ public class StatementService : IStatementService
                 };
 
                 var result = await GenerateStatementAsync(individualRequest, requestedByUserId);
-                if (result.IsSuccess && result.StatementId.HasValue)
+                if (result.Success && result.StatementId.HasValue)
                 {
                     var statement = await _unitOfWork.Repository<AccountStatement>().GetByIdAsync(result.StatementId.Value);
                     if (statement != null)
@@ -839,4 +839,6 @@ public class StatementService : IStatementService
 
     #endregion
 }
+
+
 

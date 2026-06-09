@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Bank.Application.DTOs;
@@ -447,3 +447,5 @@ public static class Base32Extensions
         return result.ToString();
     }
 }
+
+

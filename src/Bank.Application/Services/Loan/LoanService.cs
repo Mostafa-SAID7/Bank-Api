@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers.Loan;
@@ -630,7 +630,7 @@ public class LoanService : ILoanService
             _ => 10.0m
         };
 
-        return InterestCalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate / 100, 0.25m) * 100;
+        return Bank.Application.Helpers.Loan.LoanCalculationHelper.CalculateInterestRateFromScore(creditScore, baseRate / 100, 0.25m) * 100;
     }
 
     private static decimal CalculateMaxLoanAmount(int creditScore, decimal requestedAmount)
@@ -709,7 +709,7 @@ public class LoanService : ILoanService
     private static (decimal principalAmount, decimal interestAmount) CalculatePaymentAllocation(Loan loan, decimal paymentAmount)
     {
         var monthlyInterestRate = loan.InterestRate / 100 / 12;
-        return CalculationHelper.CalculatePaymentAllocation(loan.OutstandingBalance, paymentAmount, monthlyInterestRate);
+        return Bank.Application.Helpers.Payment.PaymentCalculationHelper.CalculatePaymentAllocation(loan.OutstandingBalance, paymentAmount, monthlyInterestRate);
     }
 
     private LoanDto MapToLoanDto(Loan loan)
@@ -719,3 +719,4 @@ public class LoanService : ILoanService
 
     #endregion
 }
+

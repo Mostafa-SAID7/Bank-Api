@@ -1,4 +1,4 @@
-﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs;
 using Bank.Application.DTOs.Payment.Receipt;
 using Bank.Application.Interfaces;
 using Bank.Application.Helpers;
@@ -69,7 +69,7 @@ public class PaymentReceiptService : IPaymentReceiptService
             string receiptNumber;
             do
             {
-                receiptNumber = GeneratorHelper.GenerateReceiptNumber();
+                receiptNumber = TokenHelper.GenerateReceiptNumber();
             } while (await _paymentReceiptRepository.ReceiptNumberExistsAsync(receiptNumber));
 
             // Create receipt
@@ -287,7 +287,7 @@ public class PaymentReceiptService : IPaymentReceiptService
 
     private string GenerateConfirmationNumber()
     {
-        return TokenGenerationHelper.GenerateConfirmationNumber();
+        return Bank.Application.Helpers.Shared.TokenHelper.GeneratePaymentConfirmationNumber();
     }
 
     private byte[] GenerateMockPdfContent(PaymentReceipt receipt)

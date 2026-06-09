@@ -1,4 +1,5 @@
-﻿using Bank.Domain.Enums;
+﻿using Bank.Application.DTOs.Common;
+using Bank.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Activation;
@@ -37,15 +38,12 @@ public class CardIssuanceRequest
 /// <summary>
 /// Result of card issuance operation
 /// </summary>
-public class CardIssuanceResult
+public class CardIssuanceResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public Guid? CardId { get; set; }
     public string? MaskedCardNumber { get; set; }
     public DateTime? ExpiryDate { get; set; }
     public string? ActivationCode { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 

@@ -1,4 +1,4 @@
-﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs;
 using Bank.Application.Helpers.Deposit;
 using Bank.Application.Helpers.Shared;
 using Bank.Application.Interfaces;
@@ -50,7 +50,7 @@ public sealed class DepositCertificateGenerator : IDepositCertificateGenerator
             CertificateTemplate = "StandardDepositCertificate",
             CertificateContent = GenerateCertificateContent(deposit),
             GeneratedByUserId = generatedByUserId,
-            CertificateNumber = GeneratorHelper.GenerateCertificateNumber()
+            CertificateNumber = TokenHelper.GenerateCertificateNumber()
         };
 
         // Generate security hash after setting certificate number
@@ -169,7 +169,7 @@ public sealed class DepositCertificateGenerator : IDepositCertificateGenerator
             CertificateTemplate = oldCertificate.CertificateTemplate,
             CertificateContent = GenerateCertificateContent(deposit),
             GeneratedByUserId = replacedByUserId,
-            CertificateNumber = GeneratorHelper.GenerateCertificateNumber(),
+            CertificateNumber = TokenHelper.GenerateCertificateNumber(),
             ReplacedCertificateId = certificateId
         };
 

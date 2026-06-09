@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Bank.Application.DTOs.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Advanced;
 
@@ -20,12 +21,9 @@ public class CardContactlessRequest
 /// <summary>
 /// Result of contactless settings update
 /// </summary>
-public class CardContactlessResult
+public class CardContactlessResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public bool ContactlessEnabled { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 

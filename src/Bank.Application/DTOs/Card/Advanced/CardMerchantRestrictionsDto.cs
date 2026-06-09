@@ -1,4 +1,5 @@
-﻿using Bank.Domain.Enums;
+﻿using Bank.Application.DTOs.Common;
+using Bank.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Advanced;
@@ -20,12 +21,9 @@ public class CardMerchantRestrictionsRequest
 /// <summary>
 /// Result of merchant restrictions update
 /// </summary>
-public class CardMerchantRestrictionsResult
+public class CardMerchantRestrictionsResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public List<MerchantCategory> BlockedCategories { get; set; } = new();
-    public List<string> Errors { get; set; } = new();
 }
 
 

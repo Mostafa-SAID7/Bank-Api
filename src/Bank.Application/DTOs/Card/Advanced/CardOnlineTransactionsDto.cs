@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Bank.Application.DTOs.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bank.Application.DTOs.Card.Advanced;
 
@@ -20,12 +21,9 @@ public class CardOnlineTransactionsRequest
 /// <summary>
 /// Result of online transactions settings update
 /// </summary>
-public class CardOnlineTransactionsResult
+public class CardOnlineTransactionsResult : BaseResultDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
     public bool OnlineTransactionsEnabled { get; set; }
-    public List<string> Errors { get; set; } = new();
 }
 
 

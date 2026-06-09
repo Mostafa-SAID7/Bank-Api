@@ -47,8 +47,7 @@ public class LoansController : ControllerBase
         if (!validationResult.IsValid)
         {
             return BadRequest(new LoanApplicationResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
             });
         }
@@ -56,7 +55,7 @@ public class LoansController : ControllerBase
         var customerId = this.GetCurrentUserIdRequired();
         var result = await _loanService.SubmitApplicationAsync(customerId, request);
         
-        if (result.IsSuccess)
+        if (result.Success)
         {
             return Ok(result);
         }
@@ -135,8 +134,7 @@ public class LoansController : ControllerBase
         if (!validationResult.IsValid)
         {
             return BadRequest(new PaymentResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
             });
         }
@@ -144,7 +142,7 @@ public class LoansController : ControllerBase
         var customerId = this.GetCurrentUserIdRequired();
         var result = await _loanService.ProcessPaymentAsync(request, customerId);
         
-        if (result.IsSuccess)
+        if (result.Success)
         {
             return Ok(result);
         }
@@ -204,7 +202,7 @@ public class LoansController : ControllerBase
         // For now, we'll use a placeholder approach
         var result = await _loanService.PerformCreditScoringAsync(Guid.Empty, loanId);
         
-        if (result.IsSuccess)
+        if (result.Success)
         {
             return Ok(result);
         }
@@ -224,8 +222,7 @@ public class LoansController : ControllerBase
         if (!validationResult.IsValid)
         {
             return BadRequest(new LoanApprovalResult
-            {
-                IsSuccess = false,
+            { Success = false,
                 Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
             });
         }
@@ -233,7 +230,7 @@ public class LoansController : ControllerBase
         var approvedBy = this.GetCurrentUserIdRequired();
         var result = await _loanService.ProcessApprovalAsync(loanId, decision, approvedBy);
         
-        if (result.IsSuccess)
+        if (result.Success)
         {
             return Ok(result);
         }
@@ -251,7 +248,7 @@ public class LoansController : ControllerBase
         var disbursedBy = this.GetCurrentUserIdRequired();
         var result = await _loanService.DisburseLoanAsync(loanId, disbursedBy);
         
-        if (result.IsSuccess)
+        if (result.Success)
         {
             return Ok(result);
         }

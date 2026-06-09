@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "sonarqube": {
+      "command": "sonar",
+      "args": ["run", "mcp"],
+      "env": {
+        "SONAR_TOKEN": "8a8661b74e58e772c1aa638b9d984f806622da1e",
+        "SONARQUBE_URL": "https://sonarqube.us"
+      }
+    },
+    "postman": {
+      "url": "https://mcp.postman.com/minimal",
+      "disabled": false
+    }
+  }
+}

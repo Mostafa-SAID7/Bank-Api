@@ -20,45 +20,8 @@ public static class AutoMapperServiceExtensions
     /// </summary>
     public static IServiceCollection AddAutoMapperServices(this IServiceCollection services)
     {
-        services.AddAutoMapper(config =>
-        {
-            // Account Mappings
-            config.AddProfile<AccountMappingProfile>();
-            config.AddProfile<ProfileMappingProfile>();
-            config.AddProfile<JointAccountMappingProfile>();
-
-            // Auth Mappings
-            config.AddProfile<UserMappingProfile>();
-            config.AddProfile<SessionMappingProfile>();
-            config.AddProfile<TwoFactorMappingProfile>();
-
-            // Card Mappings
-            config.AddProfile<CardMappingProfile>();
-            config.AddProfile<CardTransactionMappingProfile>();
-
-            // Loan Mappings
-            config.AddProfile<LoanMappingProfile>();
-            config.AddProfile<LoanPaymentMappingProfile>();
-
-            // Payment Mappings
-            config.AddProfile<BeneficiaryMappingProfile>();
-            config.AddProfile<BillPaymentMappingProfile>();
-            config.AddProfile<RecurringPaymentMappingProfile>();
-
-            // Transaction Mappings
-            config.AddProfile<TransactionMappingProfile>();
-
-            // Deposit Mappings
-            config.AddProfile<DepositMappingProfile>();
-            config.AddProfile<DepositTransactionMappingProfile>();
-
-            // Statement Mappings
-            config.AddProfile<StatementMappingProfile>();
-
-            // Shared Mappings
-            config.AddProfile<NotificationMappingProfile>();
-            config.AddProfile<AuditLogMappingProfile>();
-        });
+        services.AddAutoMapper(
+            typeof(AccountMappingProfile).Assembly);
 
         return services;
     }

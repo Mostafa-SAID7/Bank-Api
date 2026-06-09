@@ -484,6 +484,6 @@ public class PinManagementService : IPinManagementService
 
     private static string GenerateRandomCode(int length)
     {
-        return TokenGenerationHelper.GenerateNumericToken(length);
+        return Bank.Application.Helpers.Auth.AuthGeneratorHelper.GenerateNumericToken(length);
     }
 }
