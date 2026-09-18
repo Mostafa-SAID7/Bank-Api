@@ -21,4 +21,7 @@ public class Transaction : BaseEntity
 
     public Guid? BatchJobId { get; set; }
     public BatchJob? BatchJob { get; set; }
+
+    // Concurrency Token
+    public byte[] RowVersion { get; set; } = null!;
 }

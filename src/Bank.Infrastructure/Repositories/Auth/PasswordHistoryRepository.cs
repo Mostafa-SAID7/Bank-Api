@@ -55,8 +55,6 @@ public class PasswordHistoryRepository : Repository<PasswordHistory>, IPasswordH
         {
             password.MarkAsOldPassword();
         }
-
-        await _context.SaveChangesAsync();
     }
 
     public async Task CleanupOldPasswordsAsync(Guid userId, int keepCount)
@@ -70,7 +68,6 @@ public class PasswordHistoryRepository : Repository<PasswordHistory>, IPasswordH
         if (passwordsToDelete.Any())
         {
             _context.PasswordHistories.RemoveRange(passwordsToDelete);
-            await _context.SaveChangesAsync();
         }
     }
 

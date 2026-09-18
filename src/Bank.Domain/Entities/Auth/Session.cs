@@ -8,7 +8,7 @@ namespace Bank.Domain.Entities;
 /// </summary>
 public class Session : BaseEntity
 {
-    public string Token { get; set; }
+
     public Guid UserId { get; private set; }
     public string SessionToken { get; private set; } = string.Empty;
     public string? RefreshTokenHash { get; private set; }

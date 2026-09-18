@@ -61,14 +61,12 @@ public class RecurringPaymentRepository : IRecurringPaymentRepository
     public async Task<RecurringPayment> AddAsync(RecurringPayment recurringPayment)
     {
         _context.RecurringPayments.Add(recurringPayment);
-        await _context.SaveChangesAsync();
         return recurringPayment;
     }
 
     public async Task UpdateAsync(RecurringPayment recurringPayment)
     {
         _context.RecurringPayments.Update(recurringPayment);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)
@@ -77,14 +75,12 @@ public class RecurringPaymentRepository : IRecurringPaymentRepository
         if (recurringPayment != null)
         {
             _context.RecurringPayments.Remove(recurringPayment);
-            await _context.SaveChangesAsync();
         }
     }
 
     public async Task<RecurringPaymentExecution> AddExecutionAsync(RecurringPaymentExecution execution)
     {
         _context.RecurringPaymentExecutions.Add(execution);
-        await _context.SaveChangesAsync();
         return execution;
     }
 

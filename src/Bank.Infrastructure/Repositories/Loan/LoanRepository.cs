@@ -119,14 +119,12 @@ public class LoanRepository : ILoanRepository
     public async Task<Loan> AddAsync(Loan loan)
     {
         _context.Loans.Add(loan);
-        await _context.SaveChangesAsync();
         return loan;
     }
 
     public async Task UpdateAsync(Loan loan)
     {
         _context.Loans.Update(loan);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)
@@ -135,7 +133,6 @@ public class LoanRepository : ILoanRepository
         if (loan != null)
         {
             loan.IsDeleted = true;
-            await _context.SaveChangesAsync();
         }
     }
 

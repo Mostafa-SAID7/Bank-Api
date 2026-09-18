@@ -23,14 +23,12 @@ public class CardTransactionRepository : ICardTransactionRepository
     public async Task<CardTransaction> AddTransactionAsync(CardTransaction transaction)
     {
         _context.CardTransactions.Add(transaction);
-        await _context.SaveChangesAsync();
         return transaction;
     }
 
     public async Task UpdateTransactionAsync(CardTransaction transaction)
     {
         _context.CardTransactions.Update(transaction);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<CardTransaction?> GetTransactionByIdAsync(Guid transactionId)
@@ -153,14 +151,12 @@ public class CardTransactionRepository : ICardTransactionRepository
     public async Task<CardAuthorization> AddAuthorizationAsync(CardAuthorization authorization)
     {
         _context.CardAuthorizations.Add(authorization);
-        await _context.SaveChangesAsync();
         return authorization;
     }
 
     public async Task UpdateAuthorizationAsync(CardAuthorization authorization)
     {
         _context.CardAuthorizations.Update(authorization);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<CardAuthorization?> GetAuthorizationByCodeAsync(string authorizationCode)
@@ -173,7 +169,6 @@ public class CardTransactionRepository : ICardTransactionRepository
     public async Task<CardStatement> AddStatementAsync(CardStatement statement)
     {
         _context.CardStatements.Add(statement);
-        await _context.SaveChangesAsync();
         return statement;
     }
 

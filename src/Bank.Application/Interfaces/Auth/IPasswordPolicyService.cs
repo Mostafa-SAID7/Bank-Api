@@ -57,12 +57,12 @@ public interface IPasswordPolicyService
     /// <summary>
     /// Records a password change in history
     /// </summary>
-    Task RecordPasswordChangeAsync(Guid userId, string passwordHash, string? passwordSalt = null);
+    Task RecordPasswordChangeAsync(User user, string password);
 
     /// <summary>
     /// Checks if a password has been used recently (password history check)
     /// </summary>
-    Task<bool> IsPasswordRecentlyUsedAsync(Guid userId, string passwordHash);
+    Task<bool> IsPasswordRecentlyUsedAsync(User user, string password);
 
     /// <summary>
     /// Gets password history for a user

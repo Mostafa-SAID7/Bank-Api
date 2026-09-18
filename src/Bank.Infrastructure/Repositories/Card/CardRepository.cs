@@ -225,7 +225,6 @@ public class CardRepository : Repository<Card>, ICardRepository
             };
 
             _context.CardStatusHistories.Add(statusHistory);
-            await _context.SaveChangesAsync();
 
             _logger.LogInformation("Card {CardId} status updated from {PreviousStatus} to {NewStatus}", 
                 cardId, previousStatus, newStatus);

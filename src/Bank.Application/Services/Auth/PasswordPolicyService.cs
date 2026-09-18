@@ -7,6 +7,7 @@ using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
+using Bank.Application.Interfaces.Security;
 using Microsoft.Extensions.Logging;
 
 namespace Bank.Application.Services;
@@ -19,6 +20,7 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
     private readonly IPasswordPolicyRepository _passwordPolicyRepository;
     private readonly IPasswordHistoryRepository _passwordHistoryRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IIdentityService _identityService;
     private readonly IAuditEventPublisher _auditEventPublisher;
     private readonly ILogger<PasswordPolicyService> _logger;
     private readonly IUnitOfWork _unitOfWork;
@@ -35,6 +37,7 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
         IPasswordPolicyRepository passwordPolicyRepository,
         IPasswordHistoryRepository passwordHistoryRepository,
         IUserRepository userRepository,
+        IIdentityService identityService,
         IAuditEventPublisher auditEventPublisher,
         ILogger<PasswordPolicyService> logger,
         IUnitOfWork unitOfWork)
@@ -42,6 +45,7 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
         _passwordPolicyRepository = passwordPolicyRepository;
         _passwordHistoryRepository = passwordHistoryRepository;
         _userRepository = userRepository;
+        _identityService = identityService;
         _auditEventPublisher = auditEventPublisher;
         _logger = logger;
         _unitOfWork = unitOfWork;
@@ -194,8 +198,7 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
         }
 
         // Password history check
-        var passwordHash = HashPassword(password);
-        var isRecentlyUsed = await IsPasswordRecentlyUsedAsync(userId, passwordHash);
+        var isRecentlyUsed = await IsPasswordRecentlyUsedAsync(user, password);
         if (isRecentlyUsed)
         {
             errors.Add($"Password has been used recently. Please choose a different password");
@@ -366,15 +369,18 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
         }
     }
 
-    public async Task RecordPasswordChangeAsync(Guid userId, string passwordHash, string? passwordSalt = null)
+    public async Task RecordPasswordChangeAsync(User user, string password)
     {
         try
         {
             // Mark current password as old
-            await _passwordHistoryRepository.MarkCurrentPasswordAsOldAsync(userId);
+            await _passwordHistoryRepository.MarkCurrentPasswordAsOldAsync(user.Id);
+
+            // Hash the password using Identity's canonical hasher
+            var passwordHash = _identityService.HashPassword(user, password);
 
             // Add new password to history
-            var passwordHistory = new PasswordHistory(userId, passwordHash, passwordSalt, true);
+            var passwordHistory = new PasswordHistory(user.Id, passwordHash, null, true);
             await _passwordHistoryRepository.AddAsync(passwordHistory);
             await _unitOfWork.SaveChangesAsync();
 
@@ -382,25 +388,25 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
             var policy = await GetDefaultPasswordPolicyAsync();
             if (policy != null)
             {
-                await CleanupPasswordHistoryAsync(userId, policy.PasswordHistoryCount);
+                await CleanupPasswordHistoryAsync(user.Id, policy.PasswordHistoryCount);
             }
 
             await _auditEventPublisher.PublishSecurityEventAsync(
-                userId,
+                user.Id,
                 "PasswordChanged",
                 "User",
-                userId.ToString());
+                user.Id.ToString());
 
-            _logger.LogInformation("Password changed for user {UserId}", userId);
+            _logger.LogInformation("Password changed for user {UserId}", user.Id);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error recording password change for user {UserId}", userId);
+            _logger.LogError(ex, "Error recording password change for user {UserId}", user.Id);
             throw;
         }
     }
 
-    public async Task<bool> IsPasswordRecentlyUsedAsync(Guid userId, string passwordHash)
+    public async Task<bool> IsPasswordRecentlyUsedAsync(User user, string password)
     {
         try
         {
@@ -408,12 +414,22 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
             if (policy == null)
                 return false;
 
-            var recentPasswords = await _passwordHistoryRepository.GetRecentPasswordsAsync(userId, policy.PasswordHistoryCount);
-            return recentPasswords.Any(p => p.PasswordHash == passwordHash);
+            var recentPasswords = await _passwordHistoryRepository.GetRecentPasswordsAsync(user.Id, policy.PasswordHistoryCount);
+            
+            // Check provided password against all recent stored hashes using canonical hasher
+            foreach (var history in recentPasswords)
+            {
+                if (_identityService.VerifyPassword(user, history.PasswordHash, password))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking if password was recently used for user {UserId}", userId);
+            _logger.LogError(ex, "Error checking if password was recently used for user {UserId}", user.Id);
             return false;
         }
     }
@@ -481,12 +497,7 @@ public sealed class PasswordPolicyService : IPasswordPolicyService
         return userInfo.Any(info => !string.IsNullOrEmpty(info) && passwordLower.Contains(info));
     }
 
-    private static string HashPassword(string password)
-    {
-        using var sha256 = SHA256.Create();
-        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return Convert.ToBase64String(hashedBytes);
-    }
+
 
     private static int CalculatePasswordStrength(string password)
     {

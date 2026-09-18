@@ -42,13 +42,23 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
         var validationResult = await _identityService.ValidateCredentialsAsync(user, request.Password);
         if (validationResult.IsLockedOut)
         {
-            await _auditLogService.LogSecurityEventAsync("AccountLocked", $"Account locked for {user.Email}", user.Id, request.IpAddress);
+            await _auditLogService.LogSecurityEventAsync(
+                user.Id,
+                "AccountLocked",
+                "User",
+                user.Id.ToString(),
+                request.IpAddress);
             return Result<AuthResponse>.Failure("Account is temporarily locked due to too many failed attempts.");
         }
 
         if (!validationResult.Success)
         {
-            await _auditLogService.LogSecurityEventAsync("FailedLogin", $"Failed login attempt for {user.Email}", user.Id, request.IpAddress);
+            await _auditLogService.LogSecurityEventAsync(
+                user.Id,
+                "FailedLogin",
+                "User",
+                user.Id.ToString(),
+                request.IpAddress);
             return Result<AuthResponse>.Failure("Invalid credentials.");
         }
 
@@ -61,7 +71,12 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
             // In a real system, you'd store this in a temporary cache (like Redis) linked to the UserId.
             // For now, we return it to complete the MFA flow.
             
-            await _auditLogService.LogSecurityEventAsync("MfaChallengeIssued", $"MFA challenge issued for {user.Email}", user.Id, request.IpAddress);
+            await _auditLogService.LogSecurityEventAsync(
+                user.Id,
+                "MfaChallengeIssued",
+                "User",
+                user.Id.ToString(),
+                request.IpAddress);
             return Result<AuthResponse>.Success(new AuthResponse(
                 null, null, true, challengeToken));
         }
@@ -69,12 +84,17 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
         var roles = await _identityService.GetRolesAsync(user);
 
         // Generate tokens
-        var accessToken = _tokenService.GenerateToken(user, roles);
+        var accessToken = await _tokenService.GenerateAccessTokenAsync(user, roles);
         
         // Create session and get refresh token
         var sessionResult = await _sessionService.CreateSessionAsync(user.Id, request.IpAddress, request.UserAgent);
         
-        await _auditLogService.LogSecurityEventAsync("SuccessfulLogin", $"Successful login for {user.Email}", user.Id, request.IpAddress);
+        await _auditLogService.LogSecurityEventAsync(
+                user.Id,
+                "SuccessfulLogin",
+                "User",
+                user.Id.ToString(),
+                request.IpAddress);
 
         return Result<AuthResponse>.Success(new AuthResponse(
             accessToken,

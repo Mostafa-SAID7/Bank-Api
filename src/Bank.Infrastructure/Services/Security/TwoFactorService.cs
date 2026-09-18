@@ -21,9 +21,20 @@ public class TwoFactorService : ITwoFactorAuthService
 
     public Task<TwoFactorTokenResult> GenerateTokenAsync(Guid userId, TwoFactorMethod method, string? destination = null)
     {
-        // For TOTP, token generation for login is handled by Identity's SignInManager typically.
-        // If needed for manual sending (like SMS/Email):
-        throw new NotImplementedException("SMS/Email 2FA not implemented. Use Authenticator App.");
+        if (method != TwoFactorMethod.AuthenticatorApp)
+        {
+            return Task.FromResult(new TwoFactorTokenResult 
+            { 
+                Success = false, 
+                Message = $"{method} 2FA not implemented. Use Authenticator App." 
+            });
+        }
+        
+        return Task.FromResult(new TwoFactorTokenResult 
+        { 
+            Success = false, 
+            Message = "Token generation for Authenticator App is handled by Identity." 
+        });
     }
 
     public async Task<TwoFactorVerificationResult> VerifyTokenAsync(Guid userId, string token, string? ipAddress = null, string? userAgent = null)

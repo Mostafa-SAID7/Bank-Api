@@ -10,15 +10,15 @@ namespace Bank.Api.Controllers.Admin;
 [Route("api/[controller]")]
 public class AdminController : ControllerBase
 {
-    private readonly IAuthService _authService;
     private readonly IAccountService _accountService;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AdminController(IAuthService authService, IAccountService accountService, IUserRepository userRepository)
+    public AdminController(IAccountService accountService, IUserRepository userRepository, IUnitOfWork unitOfWork)
     {
-        _authService = authService;
         _accountService = accountService;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public class AdminController : ControllerBase
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await _authService.GetAllUsersAsync();
+        var users = await _userRepository.GetAllUsersAsync();
         return Ok(users);
     }
 
@@ -37,8 +37,7 @@ public class AdminController : ControllerBase
     [HttpGet("users/{id}")]
     public async Task<IActionResult> GetUserById(Guid id)
     {
-        var users = await _authService.GetAllUsersAsync();
-        var user = users.FirstOrDefault(u => u.Id == id);
+        var user = await _userRepository.GetByIdAsync(id);
         if (user == null) return NotFound();
         return Ok(user);
     }
@@ -49,12 +48,12 @@ public class AdminController : ControllerBase
     [HttpDelete("users/{id}")]
     public async Task<IActionResult> SuspendUser(Guid id)
     {
-        var users = await _authService.GetAllUsersAsync();
-        var user = users.FirstOrDefault(u => u.Id == id);
+        var user = await _userRepository.GetByIdAsync(id);
         if (user == null) return NotFound();
 
         user.SoftDelete("Admin");
         await _userRepository.UpdateAsync(user);
+        await _unitOfWork.SaveChangesAsync();
         return Ok(new { Message = "User suspended successfully." });
     }
 

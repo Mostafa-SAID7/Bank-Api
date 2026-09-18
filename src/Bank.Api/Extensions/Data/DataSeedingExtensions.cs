@@ -146,8 +146,16 @@ public static class DataSeedingExtensions
     {
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var dbContext = serviceProvider.GetRequiredService<BankDbContext>();
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
-        var adminEmail = "admin@finbank.com";
+        var adminEmail = configuration["BOOTSTRAP_ADMIN_EMAIL"];
+        var adminPassword = configuration["BOOTSTRAP_ADMIN_PASSWORD"];
+
+        if (string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(adminPassword))
+        {
+            // Do not seed admin user if credentials are not provided via environment variables
+            return;
+        }
         
         if (await userManager.FindByEmailAsync(adminEmail) == null)
         {
@@ -162,7 +170,7 @@ public static class DataSeedingExtensions
                 PhoneNumberConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(adminUser, "Admin123!");
+            var result = await userManager.CreateAsync(adminUser, adminPassword);
             
             if (result.Succeeded)
             {

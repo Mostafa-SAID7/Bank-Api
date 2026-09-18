@@ -3,8 +3,9 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Bank.Application.Interfaces.Security;
+using Bank.Application.Common.Options;
 using Bank.Domain.Entities;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Bank.Infrastructure.Services.Security;
@@ -15,11 +16,11 @@ namespace Bank.Infrastructure.Services.Security;
 /// </summary>
 public class JwtTokenService : ITokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly JwtOptions _options;
 
-    public JwtTokenService(IConfiguration configuration)
+    public JwtTokenService(IOptions<JwtOptions> options)
     {
-        _configuration = configuration;
+        _options = options.Value;
     }
 
     /// <inheritdoc />
@@ -29,9 +30,7 @@ public class JwtTokenService : ITokenService
     /// <inheritdoc />
     public Task<string> GenerateAccessTokenAsync(User user, IList<string> roles)
     {
-        var jwtSection = _configuration.GetSection("Jwt");
-
-        var rawKey = jwtSection["Key"];
+        var rawKey = _options.Key;
         if (string.IsNullOrWhiteSpace(rawKey))
             throw new InvalidOperationException(
                 "JWT signing key is not configured. Set the 'Jwt:Key' configuration value (min 32 bytes).");
@@ -41,7 +40,7 @@ public class JwtTokenService : ITokenService
             throw new InvalidOperationException(
                 "JWT signing key must be at least 32 bytes (256 bits). Update 'Jwt:Key'.");
 
-        var expiryMinutes = int.TryParse(jwtSection["ExpiryMinutes"], out var mins) ? mins : 60;
+        var expiryMinutes = _options.ExpiryMinutes;
 
         var claims = new List<Claim>
         {
@@ -60,8 +59,8 @@ public class JwtTokenService : ITokenService
         var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: jwtSection["Issuer"],
-            audience: jwtSection["Audience"],
+            issuer: _options.Issuer,
+            audience: _options.Audience,
             claims: claims,
             notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
@@ -83,7 +82,7 @@ public class JwtTokenService : ITokenService
     /// <inheritdoc />
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
-        var rawKey = _configuration["Jwt:Key"];
+        var rawKey = _options.Key;
         if (string.IsNullOrWhiteSpace(rawKey))
             throw new InvalidOperationException("JWT signing key is not configured.");
 

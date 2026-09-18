@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Bank.Domain.Entities;
 using Bank.Infrastructure.Data;
+using Bank.Application.Common.Options;
+using Microsoft.Extensions.Options;
 
 namespace Bank.Api.Extensions.Infrastructure;
 
@@ -37,29 +39,34 @@ public static class AuthenticationServiceExtensions
         .AddEntityFrameworkStores<BankDbContext>()
         .AddDefaultTokenProviders();
 
+        // Register options validation
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        // Bind locally for JwtBearer config
+        var jwtSettings = new JwtOptions();
+        configuration.GetSection(JwtOptions.SectionName).Bind(jwtSettings);
+
+        if (string.IsNullOrWhiteSpace(jwtSettings.Key) || jwtSettings.Key.Length < 32)
+            throw new InvalidOperationException("JWT signing key must be at least 32 bytes (256 bits).");
+
+        var key = System.Text.Encoding.ASCII.GetBytes(jwtSettings.Key);
+
         // JWT Authentication — explicit, strict validation parameters
         services.AddAuthentication(opts => {
             opts.DefaultAuthenticateScheme = "Bearer";
             opts.DefaultChallengeScheme = "Bearer";
         }).AddJwtBearer(options => {
-            var jwtSettings = configuration.GetSection("Jwt");
-
-            var rawKey = jwtSettings["Key"];
-            if (string.IsNullOrWhiteSpace(rawKey))
-                throw new InvalidOperationException("JWT signing key is not configured. Set the Jwt:Key configuration value.");
-
-            var key = System.Text.Encoding.ASCII.GetBytes(rawKey);
-            if (key.Length < 32)
-                throw new InvalidOperationException("JWT signing key must be at least 32 bytes (256 bits).");
-
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = jwtSettings["Issuer"],
+                ValidIssuer = jwtSettings.Issuer,
                 ValidateAudience = true,
-                ValidAudience = jwtSettings["Audience"],
+                ValidAudience = jwtSettings.Audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromSeconds(30),
                 RequireExpirationTime = true,

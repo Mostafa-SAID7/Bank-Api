@@ -13,10 +13,12 @@ namespace Bank.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly Bank.Application.Interfaces.Security.ICurrentUser _currentUser;
 
-    public TransactionService(IUnitOfWork unitOfWork)
+    public TransactionService(IUnitOfWork unitOfWork, Bank.Application.Interfaces.Security.ICurrentUser currentUser)
     {
         _unitOfWork = unitOfWork;
+        _currentUser = currentUser;
     }
 
     public async Task<Transaction> InitiateTransactionAsync(Guid fromAccountId, Guid toAccountId, decimal amount, TransactionType type, string description)
@@ -28,6 +30,9 @@ public class TransactionService : ITransactionService
                 ?? throw new Exception("Sender account not found.");
             var toAccount = await _unitOfWork.Repository<Account>().GetByIdAsync(toAccountId) 
                 ?? throw new Exception("Recipient account not found.");
+
+            if (fromAccount.UserId != _currentUser.UserId && !_currentUser.IsInRole("Admin"))
+                throw new UnauthorizedAccessException("You do not have permission to access this account.");
 
             if (fromAccount.Balance < amount)
                 throw new Exception("Insufficient funds.");

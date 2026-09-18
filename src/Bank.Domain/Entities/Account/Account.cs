@@ -56,4 +56,7 @@ public class Account : BaseEntity
     public ICollection<JointAccountHolder> JointHolders { get; set; } = new List<JointAccountHolder>();
     
     // Business rules have been extracted to AccountTransactionPolicy, AccountDormancyPolicy, and JointAccountPolicy
+
+    // Concurrency Token
+    public byte[] RowVersion { get; set; } = null!;
 }

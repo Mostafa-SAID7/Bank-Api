@@ -42,22 +42,32 @@ public sealed class VerifyMfaCommandHandler : IRequestHandler<VerifyMfaCommand, 
             return Result<AuthResponse>.Failure("Invalid MFA verification.");
         }
 
-        var isValid = await _twoFactorService.VerifyTwoFactorTokenAsync(user.Id, request.Code);
-        if (!isValid)
+        var mfaResult = await _twoFactorService.VerifyTokenAsync(user.Id, request.Code, request.IpAddress, request.UserAgent);
+        if (!mfaResult.Success)
         {
-            await _auditLogService.LogSecurityEventAsync("FailedMfa", $"Failed MFA verification for {user.Email}", user.Id, request.IpAddress);
+            await _auditLogService.LogSecurityEventAsync(
+                user.Id,
+                "FailedMfa",
+                "User",
+                user.Id.ToString(),
+                request.IpAddress);
             return Result<AuthResponse>.Failure("Invalid MFA code.");
         }
 
         var roles = await _identityService.GetRolesAsync(user);
 
         // Generate tokens
-        var accessToken = _tokenService.GenerateToken(user, roles);
+        var accessToken = await _tokenService.GenerateAccessTokenAsync(user, roles);
         
         // Create session and get refresh token
         var sessionResult = await _sessionService.CreateSessionAsync(user.Id, request.IpAddress, request.UserAgent);
         
-        await _auditLogService.LogSecurityEventAsync("SuccessfulLoginMfa", $"Successful login with MFA for {user.Email}", user.Id, request.IpAddress);
+        await _auditLogService.LogSecurityEventAsync(
+            user.Id,
+            "SuccessfulLoginMfa",
+            "User",
+            user.Id.ToString(),
+            request.IpAddress);
 
         return Result<AuthResponse>.Success(new AuthResponse(
             accessToken,

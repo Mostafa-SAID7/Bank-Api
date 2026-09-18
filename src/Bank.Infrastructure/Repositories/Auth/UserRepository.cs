@@ -52,7 +52,6 @@ public class UserRepository : IUserRepository
         // This would typically be handled by UserManager.CreateAsync
         // but we provide this for consistency
         await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<List<User>> GetUsersByRoleAsync(string roleName)

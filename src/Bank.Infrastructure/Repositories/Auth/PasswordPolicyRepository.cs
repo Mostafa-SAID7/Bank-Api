@@ -45,8 +45,6 @@ public class PasswordPolicyRepository : Repository<PasswordPolicy>, IPasswordPol
         {
             policy.Deactivate(); // This also clears the default flag
         }
-
-        await _context.SaveChangesAsync();
     }
 
     public async Task<PasswordPolicy?> GetByNameAsync(string name)

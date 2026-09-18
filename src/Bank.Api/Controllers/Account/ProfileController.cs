@@ -12,16 +12,13 @@ namespace Bank.Api.Controllers.Account;
 [Route("api/[controller]")]
 public class ProfileController : ControllerBase
 {
-    private readonly IAuthService _authService;
     private readonly IUserRepository _userRepository;
     private readonly ISessionService _sessionService;
 
     public ProfileController(
-        IAuthService authService,
         IUserRepository userRepository,
         ISessionService sessionService)
     {
-        _authService = authService;
         _userRepository = userRepository;
         _sessionService = sessionService;
     }

@@ -75,12 +75,13 @@ public sealed class SessionService : ISessionService
             // Generate secure tokens
             var sessionToken = GenerateSecureToken();
             var refreshToken = GenerateSecureToken();
+            var refreshTokenHash = HashToken(refreshToken);
 
             // Create new session
             var session = new Session(
                 userId,
                 sessionToken,
-                refreshToken,
+                refreshTokenHash,
                 sessionTimeout,
                 _defaultRefreshTokenTimeout,
                 ipAddress,
@@ -244,9 +245,34 @@ public sealed class SessionService : ISessionService
     {
         try
         {
-            var session = await _sessionRepository.GetByRefreshTokenAsync(refreshToken);
+            var refreshTokenHash = HashToken(refreshToken);
+            var session = await _sessionRepository.GetByRefreshTokenHashAsync(refreshTokenHash);
             
-            if (session == null || session.IsRefreshTokenExpired() || session.Status != SessionStatus.Active)
+            if (session == null)
+            {
+                return new SessionResult { Success = false, ErrorMessage = "Invalid or expired refresh token" };
+            }
+
+            if (session.IsRevoked)
+            {
+                // Refresh token reuse detected! Revoke the entire session family.
+                session.RevokeFamily("Refresh token reuse detected");
+                _sessionRepository.Update(session);
+                await _unitOfWork.SaveChangesAsync();
+                
+                await _auditEventPublisher.PublishSecurityEventAsync(
+                    session.UserId,
+                    "SessionFamilyRevoked",
+                    "Session",
+                    session.Id.ToString(),
+                    session.IpAddress,
+                    session.UserAgent,
+                    "Refresh token reuse detected");
+
+                return new SessionResult { Success = false, ErrorMessage = "Invalid or expired refresh token" };
+            }
+
+            if (session.IsRefreshTokenExpired() || session.Status != SessionStatus.Active)
             {
                 return new SessionResult { Success = false, ErrorMessage = "Invalid or expired refresh token" };
             }
@@ -254,13 +280,28 @@ public sealed class SessionService : ISessionService
             // Generate new tokens
             var newSessionToken = GenerateSecureToken();
             var newRefreshToken = GenerateSecureToken();
+            var newRefreshTokenHash = HashToken(newRefreshToken);
 
             // Determine session timeout based on admin status
             var sessionTimeout = session.IsAdminSession ? _adminSessionTimeout : _defaultSessionTimeout;
 
-            // Refresh the session
-            session.RefreshTokens(newSessionToken, newRefreshToken, sessionTimeout, _defaultRefreshTokenTimeout);
+            // Refresh the old session (terminates it and sets ReplacedByToken)
+            session.RefreshTokens(newSessionToken, newRefreshTokenHash, newRefreshTokenHash, sessionTimeout, _defaultRefreshTokenTimeout);
             _sessionRepository.Update(session);
+
+            // Create the new session
+            var newSession = new Session(
+                session.UserId,
+                newSessionToken,
+                newRefreshTokenHash,
+                sessionTimeout,
+                _defaultRefreshTokenTimeout,
+                session.IpAddress, // Using last known IP/UserAgent since refresh doesn't provide them
+                session.UserAgent,
+                session.DeviceFingerprint,
+                session.IsAdminSession);
+
+            await _sessionRepository.AddAsync(newSession);
             await _unitOfWork.SaveChangesAsync();
 
             // Publish audit event
@@ -386,6 +427,13 @@ public sealed class SessionService : ISessionService
     private static string GenerateSecureToken()
     {
         return Bank.Application.Helpers.Auth.AuthGeneratorHelper.GenerateSecureToken(32);
+    }
+
+    private static string HashToken(string token)
+    {
+        using var sha256 = SHA256.Create();
+        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(token));
+        return Convert.ToBase64String(hashedBytes);
     }
 
     /// <summary>

@@ -21,6 +21,9 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
 
         builder.HasIndex(a => a.AccountNumber)
             .IsUnique();
+
+        builder.Property(a => a.RowVersion)
+            .IsRowVersion();
     }
 }
 

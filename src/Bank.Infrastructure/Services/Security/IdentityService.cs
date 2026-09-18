@@ -101,4 +101,15 @@ public class IdentityService : IIdentityService
             User = user
         };
     }
+
+    public string HashPassword(User user, string password)
+    {
+        return _userManager.PasswordHasher.HashPassword(user, password);
+    }
+
+    public bool VerifyPassword(User user, string hashedPassword, string providedPassword)
+    {
+        var result = _userManager.PasswordHasher.VerifyHashedPassword(user, hashedPassword, providedPassword);
+        return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
+    }
 }

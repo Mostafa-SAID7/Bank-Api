@@ -24,6 +24,9 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.Property(t => t.Amount)
             .HasPrecision(18, 2);
+
+        builder.Property(t => t.RowVersion)
+            .IsRowVersion();
     }
 }
 

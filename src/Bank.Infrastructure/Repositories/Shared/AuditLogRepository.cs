@@ -28,7 +28,6 @@ public class AuditLogRepository : IAuditLogRepository
             throw new ArgumentNullException(nameof(auditLog));
 
         _context.AuditLogs.Add(auditLog);
-        await _context.SaveChangesAsync(cancellationToken);
         return auditLog;
     }
 

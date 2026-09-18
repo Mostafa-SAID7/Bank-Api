@@ -13,11 +13,13 @@ namespace Bank.Application.Services;
 public class AuditLogService : IAuditLogService
 {
     private readonly IAuditLogRepository _auditLogRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AuditLogService> _logger;
 
-    public AuditLogService(IAuditLogRepository auditLogRepository, ILogger<AuditLogService> logger)
+    public AuditLogService(IAuditLogRepository auditLogRepository, IUnitOfWork unitOfWork, ILogger<AuditLogService> logger)
     {
         _auditLogRepository = auditLogRepository ?? throw new ArgumentNullException(nameof(auditLogRepository));
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -49,6 +51,7 @@ public class AuditLogService : IAuditLogService
                 requestId);
 
             var savedAuditLog = await _auditLogRepository.AddAsync(auditLog, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation(
                 "User action audit log created: UserId={UserId}, Action={Action}, EntityType={EntityType}, EntityId={EntityId}",
@@ -83,6 +86,7 @@ public class AuditLogService : IAuditLogService
                 requestId);
 
             var savedAuditLog = await _auditLogRepository.AddAsync(auditLog, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation(
                 "System event audit log created: Action={Action}, EntityType={EntityType}, EntityId={EntityId}",
@@ -125,6 +129,7 @@ public class AuditLogService : IAuditLogService
                 requestId);
 
             var savedAuditLog = await _auditLogRepository.AddAsync(auditLog, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogWarning(
                 "Security event audit log created: UserId={UserId}, Action={Action}, EntityType={EntityType}, EntityId={EntityId}, IpAddress={IpAddress}",

@@ -37,7 +37,12 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
             return Result<RegisterResponse>.Failure(result.Message ?? "Registration failed.");
         }
 
-        await _auditLogService.LogSecurityEventAsync("UserRegistered", $"New user registered: {request.Email}", result.User.Id, request.IpAddress);
+        await _auditLogService.LogSecurityEventAsync(
+                result.User.Id,
+                "UserRegistered",
+                "User",
+                result.User.Id.ToString(),
+                request.IpAddress);
 
         return Result<RegisterResponse>.Success(new RegisterResponse(result.User.Id, result.User.UserName!, result.User.Email!));
     }

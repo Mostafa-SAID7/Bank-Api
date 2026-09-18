@@ -121,14 +121,12 @@ public class PaymentTemplateRepository : IPaymentTemplateRepository
     public async Task<PaymentTemplate> AddAsync(PaymentTemplate template)
     {
         _context.PaymentTemplates.Add(template);
-        await _context.SaveChangesAsync();
         return template;
     }
 
     public async Task UpdateAsync(PaymentTemplate template)
     {
         _context.PaymentTemplates.Update(template);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)
@@ -137,7 +135,6 @@ public class PaymentTemplateRepository : IPaymentTemplateRepository
         if (template != null)
         {
             _context.PaymentTemplates.Remove(template);
-            await _context.SaveChangesAsync();
         }
     }
 }
