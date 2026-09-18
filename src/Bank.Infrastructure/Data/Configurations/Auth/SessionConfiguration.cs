@@ -20,8 +20,8 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
             .IsUnique()
             .HasDatabaseName("IX_Sessions_SessionToken");
 
-        builder.HasIndex(s => s.RefreshToken)
-            .HasDatabaseName("IX_Sessions_RefreshToken");
+        builder.HasIndex(s => s.RefreshTokenHash)
+            .HasDatabaseName("IX_Sessions_RefreshTokenHash");
 
         builder.HasIndex(s => new { s.UserId, s.Status })
             .HasDatabaseName("IX_Sessions_UserId_Status");
@@ -36,8 +36,15 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
             .HasMaxLength(128)
             .IsRequired();
 
-        builder.Property(s => s.RefreshToken)
-            .HasMaxLength(128);
+        builder.Property(s => s.RefreshTokenHash)
+            .HasMaxLength(256)
+            .IsRequired(false);
+
+        builder.Property(s => s.ReplacedByToken)
+            .HasMaxLength(256)
+            .IsRequired(false);
+
+
 
         builder.Property(s => s.IpAddress)
             .HasMaxLength(45)

@@ -11,7 +11,8 @@ public class Session : BaseEntity
     public string Token { get; set; }
     public Guid UserId { get; private set; }
     public string SessionToken { get; private set; } = string.Empty;
-    public string? RefreshToken { get; private set; }
+    public string? RefreshTokenHash { get; private set; }
+    public string? ReplacedByToken { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime? RefreshTokenExpiresAt { get; private set; }
     public SessionStatus Status { get; private set; }
@@ -22,6 +23,9 @@ public class Session : BaseEntity
     public DateTime? TerminatedAt { get; private set; }
     public string? TerminationReason { get; private set; }
     public bool IsAdminSession { get; private set; }
+    
+    public bool IsRevoked => TerminatedAt.HasValue || Status == SessionStatus.Terminated || Status == SessionStatus.Locked;
+
 
     // Navigation properties
     public User User { get; private set; } = null!;
@@ -32,7 +36,7 @@ public class Session : BaseEntity
     public Session(
         Guid userId,
         string sessionToken,
-        string? refreshToken,
+        string? refreshTokenHash,
         TimeSpan sessionTimeout,
         TimeSpan? refreshTokenTimeout,
         string ipAddress,
@@ -42,7 +46,7 @@ public class Session : BaseEntity
     {
         UserId = userId;
         SessionToken = sessionToken ?? throw new ArgumentNullException(nameof(sessionToken));
-        RefreshToken = refreshToken;
+        RefreshTokenHash = refreshTokenHash;
         ExpiresAt = DateTime.UtcNow.Add(sessionTimeout);
         RefreshTokenExpiresAt = refreshTokenTimeout.HasValue ? DateTime.UtcNow.Add(refreshTokenTimeout.Value) : null;
         Status = SessionStatus.Active;
@@ -99,15 +103,20 @@ public class Session : BaseEntity
         return Status == SessionStatus.Active && !IsExpired();
     }
 
-    public void RefreshTokens(string newSessionToken, string? newRefreshToken, TimeSpan sessionTimeout, TimeSpan? refreshTokenTimeout)
+    public void RefreshTokens(string newSessionToken, string? newRefreshTokenHash, string replacementToken, TimeSpan sessionTimeout, TimeSpan? refreshTokenTimeout)
     {
         if (Status == SessionStatus.Active)
         {
-            SessionToken = newSessionToken;
-            RefreshToken = newRefreshToken;
-            ExpiresAt = DateTime.UtcNow.Add(sessionTimeout);
-            RefreshTokenExpiresAt = refreshTokenTimeout.HasValue ? DateTime.UtcNow.Add(refreshTokenTimeout.Value) : null;
-            LastActivityAt = DateTime.UtcNow;
+            ReplacedByToken = replacementToken;
+            TerminatedAt = DateTime.UtcNow;
+            TerminationReason = "Rotated";
+            Status = SessionStatus.Terminated;
         }
+    }
+
+    public void RevokeFamily(string reason)
+    {
+        Terminate(reason);
+        ReplacedByToken = null;
     }
 }

@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUser, CurrentUserAccessor>();
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<ITwoFactorAuthService, TwoFactorService>();
+        services.AddScoped<IIdentityService, IdentityService>();
 
         // (Other infrastructure registrations would go here: DbContext, Repositories, etc.)
         

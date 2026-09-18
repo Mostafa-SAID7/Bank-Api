@@ -13,9 +13,9 @@ public interface ISessionRepository : IRepository<Session>
     Task<Session?> GetBySessionTokenAsync(string sessionToken);
 
     /// <summary>
-    /// Gets a session by refresh token
+    /// Gets a session by refresh token hash
     /// </summary>
-    Task<Session?> GetByRefreshTokenAsync(string refreshToken);
+    Task<Session?> GetByRefreshTokenHashAsync(string refreshTokenHash);
 
     /// <summary>
     /// Gets all active sessions for a user

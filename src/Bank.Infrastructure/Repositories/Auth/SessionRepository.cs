@@ -22,11 +22,11 @@ public class SessionRepository : Repository<Session>, ISessionRepository
             .FirstOrDefaultAsync(s => s.SessionToken == sessionToken);
     }
 
-    public async Task<Session?> GetByRefreshTokenAsync(string refreshToken)
+    public async Task<Session?> GetByRefreshTokenHashAsync(string refreshTokenHash)
     {
         return await _context.Sessions
             .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.RefreshToken == refreshToken);
+            .FirstOrDefaultAsync(s => s.RefreshTokenHash == refreshTokenHash);
     }
 
     public async Task<List<Session>> GetActiveSessionsByUserIdAsync(Guid userId)

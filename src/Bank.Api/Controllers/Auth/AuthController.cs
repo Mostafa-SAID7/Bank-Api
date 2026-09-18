@@ -1,5 +1,5 @@
-using Bank.Application.Interfaces;
-using Bank.Application.DTOs;
+using Bank.Application.Commands.Auth;
+using Bank.Application.DTOs.Auth.Core;
 using Bank.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +8,18 @@ namespace Bank.Api.Controllers.Auth;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BaseApiController
 {
-    private readonly IAuthService _authService;
-
-    public AuthController(IAuthService authService)
+    private string GetIpAddress()
     {
-        _authService = authService;
+        if (Request.Headers.ContainsKey("X-Forwarded-For"))
+            return Request.Headers["X-Forwarded-For"].ToString();
+        return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "unknown";
+    }
+
+    private string GetUserAgent()
+    {
+        return Request.Headers["User-Agent"].ToString();
     }
 
     /// <summary>
@@ -24,8 +29,23 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var token = await _authService.LoginAsync(request.Email, request.Password);
-        return this.CreateSuccessResponse("Login successful", new AuthResponse(token));
+        var command = new LoginCommand(request.Email, request.Password, GetIpAddress(), GetUserAgent());
+        var result = await Mediator.Send(command);
+
+        if (result.IsSuccess)
+        {
+            if (result.Value.RequiresTwoFactor)
+            {
+                return Ok(new { 
+                    requiresTwoFactor = true, 
+                    challengeToken = result.Value.ChallengeToken,
+                    message = "MFA verification required." 
+                });
+            }
+            return this.CreateSuccessResponse("Login successful", result.Value);
+        }
+
+        return Unauthorized(new { message = result.ErrorMessage });
     }
 
     /// <summary>
@@ -35,7 +55,32 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var user = await _authService.RegisterAsync(request.Username, request.Email, request.Password);
-        return this.CreateSuccessResponse("Registration successful", new { user.Id, user.UserName, user.Email });
+        var command = new RegisterCommand(request.Username, request.Email, request.Password, GetIpAddress());
+        var result = await Mediator.Send(command);
+
+        if (result.IsSuccess)
+        {
+            return this.CreateSuccessResponse("Registration successful", result.Value);
+        }
+
+        return BadRequest(new { message = result.ErrorMessage });
+    }
+
+    /// <summary>
+    /// Verify MFA token
+    /// </summary>
+    [HttpPost("verify-mfa")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyMfa([FromBody] VerifyMfaRequest request)
+    {
+        var command = new VerifyMfaCommand(request.ChallengeToken, request.Code, request.Email, GetIpAddress(), GetUserAgent());
+        var result = await Mediator.Send(command);
+
+        if (result.IsSuccess)
+        {
+            return this.CreateSuccessResponse("Login successful", result.Value);
+        }
+
+        return Unauthorized(new { message = result.ErrorMessage });
     }
 }

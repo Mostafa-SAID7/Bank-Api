@@ -16,7 +16,7 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Authentication & Authorization Services
-        services.AddScoped<IAuthService, Bank.Application.Services.AuthService>();
+        // AuthService is now handled via MediatR Commands in the Application layer
 
         services.AddScoped<ISessionService, Bank.Application.Services.SessionService>();
         services.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
