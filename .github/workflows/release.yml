@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
         with:
           release-type: simple
           token: ${{ secrets.RELEASE_PLEASE_TOKEN != '' && secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
