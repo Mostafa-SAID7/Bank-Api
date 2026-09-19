@@ -10,4 +10,9 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Bank.BuildingBlocks.Application\Bank.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\..\Bank.Contracts\Bank.Contracts.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+  </ItemGroup>
 </Project>

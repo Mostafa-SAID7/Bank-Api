@@ -1,5 +1,3 @@
-global using Bank.Payments.Application;
-global using Bank.Payments.Application.Commands;
 global using Bank.Payments.Domain;
 global using Bank.Payments.Domain.Entities;
 global using Bank.Payments.Domain.Enums;
