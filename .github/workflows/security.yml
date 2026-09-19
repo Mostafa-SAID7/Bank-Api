@@ -60,5 +60,10 @@ jobs:
     - name: Restore
       run: dotnet restore src/Bank.sln
 
+    # Bank.Host is not selected by the solution's legacy build configuration,
+    # but it is the deployed application and must be restored before auditing.
+    - name: Restore deployed host
+      run: dotnet restore src/Bank.Host/Bank.Host.csproj
+
     - name: Audit NuGet packages for known vulnerabilities
       run: dotnet list src/Bank.sln package --vulnerable --include-transitive
