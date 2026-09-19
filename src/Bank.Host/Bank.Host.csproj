@@ -34,5 +34,6 @@
     <ProjectReference Include="..\Modules\Payments\Bank.Payments.Infrastructure\Bank.Payments.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Infrastructure\Bank.Notifications.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Presentation\Bank.Notifications.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\CoreBanking\Bank.CoreBanking.Presentation\Bank.CoreBanking.Presentation.csproj" />
   </ItemGroup>
 </Project>

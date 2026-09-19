@@ -5,6 +5,7 @@ using Bank.Api.Extensions.DependencyInjection;
 using Bank.Api.Extensions.Infrastructure;
 using Bank.Api.Extensions.Middleware;
 using Bank.BuildingBlocks.Application.Modules;
+using Bank.CoreBanking.Presentation;
 using Bank.Notifications.Infrastructure;
 using Bank.Notifications.Presentation;
 using Bank.Payments.Infrastructure;
@@ -101,7 +102,7 @@ app.ConfigureSecurityMiddleware();
 app.UseRouting();
 
 app.MapControllers();
-app.MapModules(new NotificationsModule(), new PaymentsModule());
+app.MapModules(new NotificationsModule(), new PaymentsModule(), new CoreBankingModule());
 
 app.Run();
 
