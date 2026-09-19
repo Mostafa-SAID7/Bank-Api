@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using Xunit;
 
 namespace Bank.Architecture.Tests;
 
@@ -33,8 +34,9 @@ public sealed class ModuleProjectRulesTests
             var moduleName = Path.GetFileName(moduleDirectory);
             foreach (var layer in ModuleLayers)
             {
+                var projectFile = $"Bank.{moduleName}{layer}";
                 Assert.True(
-                    File.Exists(Path.Combine(moduleDirectory, $"Bank.{moduleName}{layer}")),
+                    File.Exists(Path.Combine(moduleDirectory, Path.GetFileNameWithoutExtension(projectFile), projectFile)),
                     $"{moduleName} is missing its {layer.TrimStart('.').Replace(".csproj", string.Empty)} project.");
             }
         }
@@ -89,7 +91,7 @@ public sealed class ModuleProjectRulesTests
     [Fact]
     public void Contracts_do_not_reference_modules()
     {
-        var moduleReferences = XDocument.Load(contractsProject)
+        var moduleReferences = XDocument.Load(ContractsProject)
             .Descendants("ProjectReference")
             .Select(reference => reference.Attribute("Include")?.Value)
             .Where(reference => reference is not null && reference.Contains("Modules", StringComparison.OrdinalIgnoreCase))
