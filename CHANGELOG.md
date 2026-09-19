@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/Mostafa-SAID7/Bank-Api-Modular-Monolith/compare/v1.0.0...v1.1.0) (2026-09-19)
+
+
+### Features
+
+* **modularity:** complete payments module with contract integration and event publishing ([cf74fac](https://github.com/Mostafa-SAID7/Bank-Api-Modular-Monolith/commit/cf74facce5b9c6e7167fb02561d5de2ffa520380))
+
+
+### Bug Fixes
+
+* **ci:** restore host and correct notifications migration ([3b234d2](https://github.com/Mostafa-SAID7/Bank-Api-Modular-Monolith/commit/3b234d2998c51bc9b2ce19a20a8e923f30240a17))
+* **security:** restore all projects before audit ([97d94e3](https://github.com/Mostafa-SAID7/Bank-Api-Modular-Monolith/commit/97d94e3f214fbc2a33e3f296a95775513215c537))
+
 ## 1.0.0 (2026-09-19)
 
 
