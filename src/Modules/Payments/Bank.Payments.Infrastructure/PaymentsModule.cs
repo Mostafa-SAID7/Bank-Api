@@ -1,8 +1,12 @@
 using Bank.BuildingBlocks.Application.Modules;
 using Bank.Payments.Domain;
 
-namespace Bank.Payments.Application;
+namespace Bank.Payments.Infrastructure;
 
+/// <summary>
+/// Composition root for the Payments bounded context.
+/// The host knows this module facade, not the module's internal layers.
+/// </summary>
 public sealed class PaymentsModule : IModule
 {
     public string Name => ModuleMetadata.Name;
@@ -10,6 +14,7 @@ public sealed class PaymentsModule : IModule
     public void AddServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions();
+        services.AddPaymentsInfrastructure();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
