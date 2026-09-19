@@ -2,9 +2,7 @@ using Bank.Api.Extensions.Configuration;
 using Bank.Api.Extensions.DependencyInjection;
 using Bank.Api.Extensions.Infrastructure;
 using Bank.BuildingBlocks.Application.Modules;
-using Bank.Notifications.Application;
 using Bank.Notifications.Infrastructure;
-using Bank.Payments.Application;
 using Bank.Payments.Infrastructure;
 
 namespace Bank.Api.Extensions;
@@ -48,8 +46,6 @@ public static class ServiceCollectionExtensions
             configuration,
             new NotificationsModule(),
             new PaymentsModule());
-        services.AddNotificationsInfrastructure();
-        services.AddPaymentsInfrastructure();
 
         return services;
     }

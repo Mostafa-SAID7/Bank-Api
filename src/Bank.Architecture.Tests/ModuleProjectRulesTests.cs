@@ -4,11 +4,44 @@ namespace Bank.Architecture.Tests;
 
 public sealed class ModuleProjectRulesTests
 {
+    private static readonly string SourceRoot = Path.GetFullPath(
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+
     private static readonly string ModulesRoot = Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Modules"));
+        Path.Combine(SourceRoot, "Modules"));
+
+    private static readonly string ContractsProject = Path.Combine(
+        SourceRoot, "Bank.Contracts", "Bank.Contracts.csproj");
+
+    private static readonly string[] ModuleLayers =
+    [
+        ".Domain.csproj",
+        ".Application.csproj",
+        ".Infrastructure.csproj",
+        ".Presentation.csproj"
+    ];
 
     [Fact]
-    public void Module_projects_do_not_reference_another_modules_domain_or_infrastructure()
+    public void Every_module_has_all_four_layers()
+    {
+        var moduleDirectories = Directory.GetDirectories(ModulesRoot);
+
+        Assert.NotEmpty(moduleDirectories);
+
+        foreach (var moduleDirectory in moduleDirectories)
+        {
+            var moduleName = Path.GetFileName(moduleDirectory);
+            foreach (var layer in ModuleLayers)
+            {
+                Assert.True(
+                    File.Exists(Path.Combine(moduleDirectory, $"Bank.{moduleName}{layer}")),
+                    $"{moduleName} is missing its {layer.TrimStart('.').Replace(".csproj", string.Empty)} project.");
+            }
+        }
+    }
+
+    [Fact]
+    public void Module_projects_reference_only_their_own_module_or_shared_contracts()
     {
         var projectFiles = Directory.GetFiles(ModulesRoot, "*.csproj", SearchOption.AllDirectories);
 
@@ -16,6 +49,7 @@ public sealed class ModuleProjectRulesTests
         {
             var projectName = Path.GetFileNameWithoutExtension(projectFile);
             var moduleDirectory = Directory.GetParent(projectFile)!.Parent!.FullName;
+            var ownModuleRoot = Path.GetFullPath(moduleDirectory);
             var references = XDocument.Load(projectFile)
                 .Descendants("ProjectReference")
                 .Select(reference => reference.Attribute("Include")?.Value)
@@ -24,27 +58,37 @@ public sealed class ModuleProjectRulesTests
                 .Select(Path.GetFullPath)
                 .ToArray();
 
-            var forbiddenReferences = references
-                .Where(reference => reference.Contains($"{Path.DirectorySeparatorChar}Modules{Path.DirectorySeparatorChar}"))
-                .Where(reference => !reference.StartsWith(moduleDirectory, StringComparison.OrdinalIgnoreCase))
-                .Where(reference =>
-                    reference.EndsWith(".Domain.csproj", StringComparison.OrdinalIgnoreCase) ||
-                    reference.EndsWith(".Infrastructure.csproj", StringComparison.OrdinalIgnoreCase))
+            var forbiddenModuleReferences = references
+                .Where(reference => reference.Contains(
+                    $"{Path.DirectorySeparatorChar}Modules{Path.DirectorySeparatorChar}",
+                    StringComparison.OrdinalIgnoreCase))
+                .Where(reference => !reference.StartsWith(
+                    ownModuleRoot + Path.DirectorySeparatorChar,
+                    StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
             Assert.True(
-                forbiddenReferences.Length == 0,
-                $"{projectName} references another module's Domain or Infrastructure project: " +
-                string.Join(", ", forbiddenReferences));
+                forbiddenModuleReferences.Length == 0,
+                $"{projectName} references another module: " +
+                string.Join(", ", forbiddenModuleReferences));
+
+            var forbiddenLegacyReferences = references
+                .Where(reference =>
+                    reference.EndsWith("Bank.Domain.csproj", StringComparison.OrdinalIgnoreCase) ||
+                    reference.EndsWith("Bank.Application.csproj", StringComparison.OrdinalIgnoreCase) ||
+                    reference.EndsWith("Bank.Infrastructure.csproj", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            Assert.True(
+                forbiddenLegacyReferences.Length == 0,
+                $"{projectName} references a legacy horizontal project: " +
+                string.Join(", ", forbiddenLegacyReferences));
         }
     }
 
     [Fact]
     public void Contracts_do_not_reference_modules()
     {
-        var contractsProject = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Bank.Contracts", "Bank.Contracts.csproj"));
-
         var moduleReferences = XDocument.Load(contractsProject)
             .Descendants("ProjectReference")
             .Select(reference => reference.Attribute("Include")?.Value)

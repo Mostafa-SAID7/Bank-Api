@@ -26,9 +26,7 @@
     <ProjectReference Include="..\Bank.Infrastructure\Bank.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingBlocks\Bank.BuildingBlocks.Application\Bank.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\Bank.Contracts\Bank.Contracts.csproj" />
-    <ProjectReference Include="..\Modules\Payments\Bank.Payments.Application\Bank.Payments.Application.csproj" />
     <ProjectReference Include="..\Modules\Payments\Bank.Payments.Infrastructure\Bank.Payments.Infrastructure.csproj" />
-    <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Application\Bank.Notifications.Application.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Infrastructure\Bank.Notifications.Infrastructure.csproj" />
   </ItemGroup>
 

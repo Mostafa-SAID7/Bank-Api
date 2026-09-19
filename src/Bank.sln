@@ -19,6 +19,34 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Infrastructure.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Api.IntegrationTests", "Bank.Api.IntegrationTests\Bank.Api.IntegrationTests.csproj", "{B99B9DAD-4F08-4973-993E-6F4CAF6F0D7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Host", "Bank.Host\Bank.Host.csproj", "{964DD9E7-3800-42A7-9512-021A040FA607}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Contracts", "Bank.Contracts\Bank.Contracts.csproj", "{D9CC8729-9811-406C-ABDA-C1E41C96DC42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.BuildingBlocks.Domain", "BuildingBlocks\Bank.BuildingBlocks.Domain\Bank.BuildingBlocks.Domain.csproj", "{04664FEA-AC79-43B2-9223-57EB535AD13F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.BuildingBlocks.Application", "BuildingBlocks\Bank.BuildingBlocks.Application\Bank.BuildingBlocks.Application.csproj", "{F8FC3446-6878-45AD-84FA-6FD62DC37F14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.BuildingBlocks.Infrastructure", "BuildingBlocks\Bank.BuildingBlocks.Infrastructure\Bank.BuildingBlocks.Infrastructure.csproj", "{B6C0D2FD-0C5C-4790-B12D-AAF9B680ABC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Notifications.Domain", "Modules\Notifications\Bank.Notifications.Domain\Bank.Notifications.Domain.csproj", "{B52F86A2-0D1D-4841-A9E2-1DB6C3C0DA25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Notifications.Application", "Modules\Notifications\Bank.Notifications.Application\Bank.Notifications.Application.csproj", "{1E61BC39-95D0-426F-85C7-82B24CB30F23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Notifications.Infrastructure", "Modules\Notifications\Bank.Notifications.Infrastructure\Bank.Notifications.Infrastructure.csproj", "{DDCFF4DF-12ED-419E-9ED9-21DD043AB329}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Notifications.Presentation", "Modules\Notifications\Bank.Notifications.Presentation\Bank.Notifications.Presentation.csproj", "{FF7524D7-39BB-4A6B-8A65-4C20D45AEF6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Payments.Domain", "Modules\Payments\Bank.Payments.Domain\Bank.Payments.Domain.csproj", "{C481C6AD-BB1C-40C3-89CF-8757AEEEF20E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Payments.Application", "Modules\Payments\Bank.Payments.Application\Bank.Payments.Application.csproj", "{1F634526-611C-44EB-B4EB-A351F2D03B55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Payments.Infrastructure", "Modules\Payments\Bank.Payments.Infrastructure\Bank.Payments.Infrastructure.csproj", "{7C6F8D85-8330-4EBF-B878-45B91B4C618D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Payments.Presentation", "Modules\Payments\Bank.Payments.Presentation\Bank.Payments.Presentation.csproj", "{55226878-78A8-4A7F-AC5A-840859FFF9C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Architecture.Tests", "Bank.Architecture.Tests\Bank.Architecture.Tests.csproj", "{2422E798-BAA8-457C-8823-508449646F78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
