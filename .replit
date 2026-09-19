@@ -1,4 +1,4 @@
-modules = ["web", "bash", "dotnet-9.0"]
+modules = ["dotnet-7.0", "web", "bash"]
 
 [nix]
 channel = "stable-25_05"
