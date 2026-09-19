@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Bank.Domain.Entities;
 using Bank.Infrastructure.Data;
+using Bank.Notifications.Infrastructure.Data;
 
 namespace Bank.Api.Extensions.Data;
 
@@ -21,6 +22,7 @@ public static class DataSeedingExtensions
         try
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<BankDbContext>();
+            var notificationsDbContext = scope.ServiceProvider.GetRequiredService<NotificationsDbContext>();
 
             logger.LogInformation("🔍 Applying database migrations...");
 
@@ -33,6 +35,7 @@ public static class DataSeedingExtensions
             try
             {
                 await dbContext.Database.MigrateAsync();
+                await notificationsDbContext.Database.MigrateAsync();
                 logger.LogInformation("✅ Database migrations applied successfully!");
                 return;
             }

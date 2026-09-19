@@ -14,7 +14,7 @@ public sealed class NotificationsModule : IModule
     public void AddServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions();
-        services.AddNotificationsInfrastructure();
+        services.AddNotificationsInfrastructure(configuration);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)

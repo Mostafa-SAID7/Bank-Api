@@ -6,6 +6,7 @@ using Bank.Api.Extensions.Infrastructure;
 using Bank.Api.Extensions.Middleware;
 using Bank.BuildingBlocks.Application.Modules;
 using Bank.Notifications.Infrastructure;
+using Bank.Notifications.Presentation;
 using Bank.Payments.Infrastructure;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,7 @@ ProcessConfigurationPlaceholders(builder.Configuration);
 
 // Add controllers with JSON configuration
 builder.Services.AddControllers()
+    .AddApplicationPart(typeof(NotificationController).Assembly)
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
