@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
+using Bank.Contracts.Notifications;
+using ContractNotificationChannel = Bank.Contracts.Notifications.NotificationChannel;
+using ContractNotificationPriority = Bank.Contracts.Notifications.NotificationPriority;
 
 namespace Bank.Application.Services;
 
@@ -19,17 +22,17 @@ public class PinManagementService : IPinManagementService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<PinManagementService> _logger;
-    private readonly INotificationService _notificationService;
+    private readonly INotificationDispatchContract _notifications;
     private readonly Dictionary<string, (string Code, DateTime Expiry)> _verificationCodes = new();
 
     public PinManagementService(
         IUnitOfWork unitOfWork,
         ILogger<PinManagementService> logger,
-        INotificationService notificationService)
+        INotificationDispatchContract notifications)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
-        _notificationService = notificationService;
+        _notifications = notifications;
     }
 
     public async Task<PinOperationResponse> SetPinAsync(SetPinRequest request, string userId)
@@ -70,11 +73,7 @@ public class PinManagementService : IPinManagementService
             await _unitOfWork.SaveChangesAsync();
 
             // Send notification
-            await _notificationService.SendCardAlertAsync(
-                userId, 
-                request.CardId, 
-                "PIN Set", 
-                "Your card PIN has been successfully set.");
+            await NotifyCardAsync(userId, request.CardId, "PIN Set", "Your card PIN has been successfully set.");
 
             _logger.LogInformation("PIN set successfully for card {CardId} by user {UserId}", 
                 SecureLoggingService.SanitizeInput(request.CardId), SecureLoggingService.SanitizeInput(userId));
@@ -158,11 +157,7 @@ public class PinManagementService : IPinManagementService
             await _unitOfWork.SaveChangesAsync();
 
             // Send notification
-            await _notificationService.SendCardAlertAsync(
-                userId, 
-                request.CardId, 
-                "PIN Changed", 
-                "Your card PIN has been successfully changed.");
+            await NotifyCardAsync(userId, request.CardId, "PIN Changed", "Your card PIN has been successfully changed.");
 
             _logger.LogInformation("PIN changed successfully for card {CardId} by user {UserId}", 
                 SecureLoggingService.SanitizeInput(request.CardId), SecureLoggingService.SanitizeInput(userId));
@@ -225,11 +220,7 @@ public class PinManagementService : IPinManagementService
             _verificationCodes.Remove($"{request.CardId}_{userId}");
 
             // Send notification
-            await _notificationService.SendCardAlertAsync(
-                userId, 
-                request.CardId, 
-                "PIN Reset", 
-                "Your card PIN has been successfully reset.");
+            await NotifyCardAsync(userId, request.CardId, "PIN Reset", "Your card PIN has been successfully reset.");
 
             _logger.LogInformation("PIN reset successfully for card {CardId} by user {UserId}", 
                 SecureLoggingService.SanitizeInput(request.CardId), SecureLoggingService.SanitizeInput(userId));
@@ -346,27 +337,15 @@ public class PinManagementService : IPinManagementService
             // Send verification code based on method
             if (verificationMethod.Equals("SMS", StringComparison.OrdinalIgnoreCase))
             {
-                await _notificationService.SendNotificationAsync(new SendNotificationRequest
-                {
-                    UserId = userId,
-                    Type = NotificationType.SecurityAlert,
-                    Subject = "PIN Reset Verification Code",
-                    Message = $"Your PIN reset verification code is: {code}. This code expires in 10 minutes.",
-                    Channel = NotificationChannel.SMS,
-                    Priority = NotificationPriority.High
-                });
+                await DispatchAsync(userId, "SecurityAlert", "PIN Reset Verification Code",
+                    $"Your PIN reset verification code is: {code}. This code expires in 10 minutes.",
+                    ContractNotificationChannel.SMS, $"pin-verification:{cardId}:{code}");
             }
             else if (verificationMethod.Equals("Email", StringComparison.OrdinalIgnoreCase))
             {
-                await _notificationService.SendNotificationAsync(new SendNotificationRequest
-                {
-                    UserId = userId,
-                    Type = NotificationType.SecurityAlert,
-                    Subject = "PIN Reset Verification Code",
-                    Message = $"Your PIN reset verification code is: {code}. This code expires in 10 minutes.",
-                    Channel = NotificationChannel.Email,
-                    Priority = NotificationPriority.High
-                });
+                await DispatchAsync(userId, "SecurityAlert", "PIN Reset Verification Code",
+                    $"Your PIN reset verification code is: {code}. This code expires in 10 minutes.",
+                    ContractNotificationChannel.Email, $"pin-verification:{cardId}:{code}");
             }
 
             _logger.LogInformation("Verification code generated for card {CardId} PIN reset by user {UserId}", 
@@ -428,11 +407,7 @@ public class PinManagementService : IPinManagementService
             await _unitOfWork.SaveChangesAsync();
 
             // Send notification
-            await _notificationService.SendCardAlertAsync(
-                userId, 
-                cardId, 
-                "Card Unblocked", 
-                "Your card has been successfully unblocked.");
+            await NotifyCardAsync(userId, cardId, "Card Unblocked", "Your card has been successfully unblocked.");
 
             _logger.LogInformation("Card {CardId} unblocked by user {UserId}", cardId, userId);
 
@@ -467,6 +442,22 @@ public class PinManagementService : IPinManagementService
 
         return await _unitOfWork.Repository<Card>().Query()
             .FirstOrDefaultAsync(c => c.Id == cardGuid && c.CustomerId == userGuid);
+    }
+
+    private Task NotifyCardAsync(string userId, string cardId, string alertType, string message) =>
+        DispatchAsync(userId, "CardAlert", $"Card Alert: {alertType}", message,
+            ContractNotificationChannel.InApp, $"card-alert:{cardId}:{alertType}:{Guid.NewGuid():N}");
+
+    private async Task DispatchAsync(string userId, string type, string subject, string message,
+        ContractNotificationChannel channel, string idempotencyKey)
+    {
+        if (!Guid.TryParse(userId, out var userGuid))
+        {
+            return;
+        }
+
+        await _notifications.DispatchAsync(new DispatchNotificationRequest(
+            userGuid, type, subject, message, channel, ContractNotificationPriority.High, idempotencyKey));
     }
 
     private static string HashPin(string pin)
