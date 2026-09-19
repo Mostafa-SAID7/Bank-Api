@@ -4,6 +4,9 @@ using Bank.Api.Extensions.Data;
 using Bank.Api.Extensions.DependencyInjection;
 using Bank.Api.Extensions.Infrastructure;
 using Bank.Api.Extensions.Middleware;
+using Bank.BuildingBlocks.Application.Modules;
+using Bank.Notifications.Application;
+using Bank.Payments.Application;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -56,40 +59,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-// === SERVICE REGISTRATIONS (Organized by Concern) ===
-
-// 1. Database & Data Access Layer
-builder.Services.AddDatabaseServices(builder.Configuration);
-
-// 2. Caching & Session Management
-builder.Services.AddCachingServices(builder.Configuration);
-
-// 3. Authentication & Authorization
-builder.Services.AddAuthenticationServices(builder.Configuration);
-
-// 4. Repository Layer (Data Access)
-builder.Services.AddRepositoryServices();
-
-// 5. Application Services (Business Logic)
-builder.Services.AddApplicationServices(builder.Configuration);
-
-// 6. Infrastructure Services (External Integrations)
-builder.Services.AddInfrastructureServices();
-
-// 7. CQRS & Validation
-builder.Services.AddCqrsServices();
-
-// 8. AutoMapper (Object Mapping)
-builder.Services.AddAutoMapperServices();
-
-// 9. Background Jobs
-builder.Services.AddBackgroundJobServices(builder.Configuration);
-
-// 10. API Documentation
-builder.Services.AddApiDocumentationServices();
-
-// 11. CORS Policies
-builder.Services.AddCorsServices(builder.Configuration);
+// The host owns composition only. Legacy registrations are grouped behind
+// AddBankApiServices while modules register through their own entry points.
+builder.Services.AddBankApiServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -127,6 +99,7 @@ app.ConfigureSecurityMiddleware();
 app.UseRouting();
 
 app.MapControllers();
+app.MapModules(new NotificationsModule(), new PaymentsModule());
 
 app.Run();
 

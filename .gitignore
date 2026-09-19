@@ -24,6 +24,7 @@ yarn-error.log
 # .NET
 **/bin/
 **/obj/
+**/.nuget/
 *.user
 *.userosscache
 *.sln.doccache

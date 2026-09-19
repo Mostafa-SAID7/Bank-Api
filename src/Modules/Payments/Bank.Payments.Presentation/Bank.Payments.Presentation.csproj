@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Bank.Payments.Application\Bank.Payments.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Bank.BuildingBlocks.Application\Bank.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\Bank.Contracts\Bank.Contracts.csproj" />
+  </ItemGroup>
+</Project>

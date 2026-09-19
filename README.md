@@ -40,9 +40,9 @@ dotnet restore
 # Set your PostgreSQL connection string
 export DATABASE_URL="postgresql://user:password@localhost:5432/bank_db"
 
-# 3. Build & Run
-dotnet build
-dotnet run --project src/Bank.Api/Bank.Api.csproj
+# 3. Build & Run the modular host
+dotnet build src/Bank.Host/Bank.Host.csproj
+dotnet run --project src/Bank.Host/Bank.Host.csproj
 ```
 
 API Documentation will be accessible at: `http://localhost:5000/swagger`

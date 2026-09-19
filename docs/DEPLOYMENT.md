@@ -115,17 +115,17 @@ Configure these in Railpack dashboard:
 
 ```bash
 # Manual migration application
-dotnet ef database update --project Bank.Infrastructure --startup-project Bank.Api --configuration Release
+dotnet ef database update --project Bank.Infrastructure --startup-project Bank.Host --configuration Release
 
 # Or via application startup (recommended)
 # Migrations apply automatically when the app starts
-dotnet run --project Bank.Api --configuration Release
+dotnet run --project Bank.Host --configuration Release
 ```
 
 ### Rolling Back Migrations
 ```bash
 # Rollback to previous migration
-dotnet ef database update <PreviousMigrationName> --project Bank.Infrastructure --startup-project Bank.Api
+dotnet ef database update <PreviousMigrationName> --project Bank.Infrastructure --startup-project Bank.Host
 ```
 
 ## Docker Deployment
@@ -139,23 +139,35 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["src/Bank.Api/Bank.Api.csproj", "Bank.Api/"]
+COPY ["src/Bank.Host/Bank.Host.csproj", "Bank.Host/"]
 COPY ["src/Bank.Application/Bank.Application.csproj", "Bank.Application/"]
 COPY ["src/Bank.Domain/Bank.Domain.csproj", "Bank.Domain/"]
 COPY ["src/Bank.Infrastructure/Bank.Infrastructure.csproj", "Bank.Infrastructure/"]
+COPY ["src/BuildingBlocks/Bank.BuildingBlocks.Domain/Bank.BuildingBlocks.Domain.csproj", "BuildingBlocks/Bank.BuildingBlocks.Domain/"]
+COPY ["src/BuildingBlocks/Bank.BuildingBlocks.Application/Bank.BuildingBlocks.Application.csproj", "BuildingBlocks/Bank.BuildingBlocks.Application/"]
+COPY ["src/BuildingBlocks/Bank.BuildingBlocks.Infrastructure/Bank.BuildingBlocks.Infrastructure.csproj", "BuildingBlocks/Bank.BuildingBlocks.Infrastructure/"]
+COPY ["src/Bank.Contracts/Bank.Contracts.csproj", "Bank.Contracts/"]
+COPY ["src/Modules/Payments/Bank.Payments.Domain/Bank.Payments.Domain.csproj", "Modules/Payments/Bank.Payments.Domain/"]
+COPY ["src/Modules/Payments/Bank.Payments.Application/Bank.Payments.Application.csproj", "Modules/Payments/Bank.Payments.Application/"]
+COPY ["src/Modules/Payments/Bank.Payments.Infrastructure/Bank.Payments.Infrastructure.csproj", "Modules/Payments/Bank.Payments.Infrastructure/"]
+COPY ["src/Modules/Payments/Bank.Payments.Presentation/Bank.Payments.Presentation.csproj", "Modules/Payments/Bank.Payments.Presentation/"]
+COPY ["src/Modules/Notifications/Bank.Notifications.Domain/Bank.Notifications.Domain.csproj", "Modules/Notifications/Bank.Notifications.Domain/"]
+COPY ["src/Modules/Notifications/Bank.Notifications.Application/Bank.Notifications.Application.csproj", "Modules/Notifications/Bank.Notifications.Application/"]
+COPY ["src/Modules/Notifications/Bank.Notifications.Infrastructure/Bank.Notifications.Infrastructure.csproj", "Modules/Notifications/Bank.Notifications.Infrastructure/"]
+COPY ["src/Modules/Notifications/Bank.Notifications.Presentation/Bank.Notifications.Presentation.csproj", "Modules/Notifications/Bank.Notifications.Presentation/"]
 
-RUN dotnet restore "Bank.Api/Bank.Api.csproj"
+RUN dotnet restore "Bank.Host/Bank.Host.csproj"
 COPY . .
-WORKDIR "/src/Bank.Api"
-RUN dotnet build "Bank.Api.csproj" -c Release -o /app/build
+WORKDIR "/src/Bank.Host"
+RUN dotnet build "Bank.Host.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Bank.Api.csproj" -c Release -o /app/publish
+RUN dotnet publish "Bank.Host.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Bank.Api.dll"]
+ENTRYPOINT ["dotnet", "Bank.Host.dll"]
 ```
 
 ### Docker Compose with PostgreSQL

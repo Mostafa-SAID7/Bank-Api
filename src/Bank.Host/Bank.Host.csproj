@@ -1,12 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
-
+  <ItemGroup>
+    <Compile Include="..\Bank.Api\**\*.cs"
+             Exclude="..\Bank.Api\bin\**;..\Bank.Api\obj\**"
+             LinkBase="Api" />
+    <None Include="..\Bank.Api\appsettings*.json"
+          LinkBase="."
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.13" />
@@ -20,7 +26,6 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.16.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Bank.Application\Bank.Application.csproj" />
     <ProjectReference Include="..\Bank.Infrastructure\Bank.Infrastructure.csproj" />
@@ -31,5 +36,4 @@
     <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Application\Bank.Notifications.Application.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Infrastructure\Bank.Notifications.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

@@ -10,5 +10,5 @@ export ASPNETCORE_URLS="http://+:${PORT}"
 echo "Port: $PORT"
 echo "Environment: ${ASPNETCORE_ENVIRONMENT:-Production}"
 
-# Run the application
-exec dotnet Bank.Api.dll
+# Run the modular host
+exec dotnet Bank.Host.dll

@@ -1,6 +1,11 @@
 using Bank.Api.Extensions.Configuration;
 using Bank.Api.Extensions.DependencyInjection;
 using Bank.Api.Extensions.Infrastructure;
+using Bank.BuildingBlocks.Application.Modules;
+using Bank.Notifications.Application;
+using Bank.Notifications.Infrastructure;
+using Bank.Payments.Application;
+using Bank.Payments.Infrastructure;
 
 namespace Bank.Api.Extensions;
 
@@ -28,6 +33,7 @@ public static class ServiceCollectionExtensions
         
         // CQRS and validation
         services.AddCqrsServices();
+        services.AddAutoMapperServices();
         
         // Background jobs
         services.AddBackgroundJobServices(configuration);
@@ -35,6 +41,15 @@ public static class ServiceCollectionExtensions
         // API features
         services.AddApiDocumentationServices();
         services.AddCorsServices(configuration);
+
+        // Module composition. Business features remain on their existing
+        // routes until each pilot is moved into its module boundary.
+        services.AddModules(
+            configuration,
+            new NotificationsModule(),
+            new PaymentsModule());
+        services.AddNotificationsInfrastructure();
+        services.AddPaymentsInfrastructure();
 
         return services;
     }
