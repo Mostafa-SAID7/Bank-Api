@@ -56,8 +56,6 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<CardAuthorization> CardAuthorizations => Set<CardAuthorization>();
     public DbSet<CardStatement> CardStatements => Set<CardStatement>();
     public DbSet<CardStatusHistory> CardStatusHistories => Set<CardStatusHistory>();
-    public DbSet<Notification> Notifications => Set<Notification>();
-    public DbSet<NotificationPreference> NotificationPreferences => Set<NotificationPreference>();
     public DbSet<Biller> Billers => Set<Biller>();
     public DbSet<BillPayment> BillPayments => Set<BillPayment>();
     public DbSet<BillPresentment> BillPresentments => Set<BillPresentment>();
@@ -115,8 +113,6 @@ public class BankDbContext : IdentityDbContext<User, Role, Guid>
         builder.Entity<CardAuthorization>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<CardStatement>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<CardStatusHistory>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<Notification>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<NotificationPreference>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Biller>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<BillPayment>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<BillPresentment>().HasQueryFilter(e => !e.IsDeleted);

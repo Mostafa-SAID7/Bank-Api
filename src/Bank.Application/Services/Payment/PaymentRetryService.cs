@@ -5,6 +5,9 @@ using Bank.Domain.Enums;
 using Bank.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Bank.Contracts.Notifications;
+using ContractNotificationChannel = Bank.Contracts.Notifications.NotificationChannel;
+using ContractNotificationPriority = Bank.Contracts.Notifications.NotificationPriority;
 
 namespace Bank.Application.Services;
 
@@ -16,7 +19,7 @@ public class PaymentRetryService : IPaymentRetryService
     private readonly IPaymentRetryRepository _paymentRetryRepository;
     private readonly IBillPaymentRepository _billPaymentRepository;
     private readonly IBillerIntegrationService _billerIntegrationService;
-    private readonly INotificationService _notificationService;
+    private readonly INotificationDispatchContract _notifications;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _configuration;
     private readonly ILogger<PaymentRetryService> _logger;
@@ -30,7 +33,7 @@ public class PaymentRetryService : IPaymentRetryService
         IPaymentRetryRepository paymentRetryRepository,
         IBillPaymentRepository billPaymentRepository,
         IBillerIntegrationService billerIntegrationService,
-        INotificationService notificationService,
+        INotificationDispatchContract notifications,
         IUnitOfWork unitOfWork,
         IConfiguration configuration,
         ILogger<PaymentRetryService> logger)
@@ -38,7 +41,7 @@ public class PaymentRetryService : IPaymentRetryService
         _paymentRetryRepository = paymentRetryRepository;
         _billPaymentRepository = billPaymentRepository;
         _billerIntegrationService = billerIntegrationService;
-        _notificationService = notificationService;
+        _notifications = notifications;
         _unitOfWork = unitOfWork;
         _configuration = configuration;
         _logger = logger;
@@ -393,20 +396,29 @@ public class PaymentRetryService : IPaymentRetryService
 
     private async Task NotifyMaxRetriesReached(BillPayment payment)
     {
-        await _notificationService.SendSystemNotificationAsync(
+        await DispatchAsync(
             payment.CustomerId,
             "FINAL_RETRY_ATTEMPT",
+            "FINAL_RETRY_ATTEMPT",
             $"The final retry attempt for your payment of {payment.Currency} {payment.Amount} to {payment.Biller?.Name} has been scheduled.",
-            null);
+            $"payment-retry-final:{payment.Id}");
     }
 
     private async Task NotifyPaymentPermanentlyFailed(BillPayment payment)
     {
-        await _notificationService.SendSystemNotificationAsync(
+        await DispatchAsync(
             payment.CustomerId,
             "PAYMENT_PERMANENT_FAILURE",
+            "PAYMENT_PERMANENT_FAILURE",
             $"Your payment of {payment.Currency} {payment.Amount} to {payment.Biller?.Name} has permanently failed after {_maxRetryAttempts} attempts.",
-            null);
+            $"payment-permanent-failure:{payment.Id}");
+    }
+
+    private async Task DispatchAsync(Guid userId, string type, string subject, string message, string idempotencyKey)
+    {
+        await _notifications.DispatchAsync(new DispatchNotificationRequest(
+            userId, type, subject, message, ContractNotificationChannel.InApp,
+            ContractNotificationPriority.High, idempotencyKey));
     }
 
     private static string GetRetryStatusMessage(BillPaymentStatus status, string failureReason)
