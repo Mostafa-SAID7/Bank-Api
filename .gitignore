@@ -55,6 +55,9 @@ Logs/
 .env.local
 .env.*.local
 
+# Terraform working directory (provider selections are tracked in .terraform.lock.hcl)
+**/.terraform/
+
 # Kubernetes Secrets (DO NOT COMMIT)
 devops/kubernetes/secrets.env
 devops/kubernetes/sealed-secret.yaml
