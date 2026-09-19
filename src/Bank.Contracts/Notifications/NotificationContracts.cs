@@ -8,7 +8,7 @@ public enum NotificationChannel
 {
     InApp = 1,
     Email = 2,
-    Sms = 3,
+    SMS = 3,
     Push = 4
 }
 
@@ -18,6 +18,15 @@ public enum NotificationPriority
     Normal = 2,
     High = 3,
     Critical = 4
+}
+
+public enum NotificationDeliveryStatus
+{
+    Pending = 1,
+    Sent = 2,
+    Delivered = 3,
+    Read = 4,
+    Failed = 5
 }
 
 /// <summary>
@@ -49,6 +58,41 @@ public interface INotificationDispatchContract
     Task<DispatchNotificationResult> DispatchAsync(
         DispatchNotificationRequest request,
         CancellationToken cancellationToken = default);
+}
+
+public sealed record NotificationHistoryEntry(
+    Guid Id,
+    string Type,
+    string Subject,
+    string Message,
+    NotificationChannel Channel,
+    NotificationDeliveryStatus Status,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? SentAt,
+    DateTimeOffset? ReadAt,
+    string? ErrorMessage);
+
+public sealed record NotificationPreferences(
+    bool TransactionAlerts,
+    bool SecurityAlerts,
+    bool LowBalanceAlerts,
+    bool PaymentReminders,
+    bool MarketingNotifications,
+    decimal TransactionAlertThreshold,
+    decimal LowBalanceThreshold,
+    IReadOnlyList<NotificationChannel> PreferredChannels,
+    string? PhoneNumber,
+    string? Email,
+    string Language,
+    string TimeZone);
+
+public interface INotificationManagementContract
+{
+    Task<IReadOnlyList<NotificationHistoryEntry>> GetHistoryAsync(Guid userId, int page, int pageSize, CancellationToken cancellationToken = default);
+    Task<int> GetUnreadCountAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<bool> MarkAsReadAsync(Guid notificationId, Guid userId, CancellationToken cancellationToken = default);
+    Task<NotificationPreferences?> GetPreferencesAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task SavePreferencesAsync(Guid userId, NotificationPreferences preferences, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

@@ -15,8 +15,12 @@ public static class DependencyInjection
 
         services.AddScoped<Bank.Notifications.Application.Notifications.INotificationStore,
             Data.EfNotificationStore>();
+        services.AddScoped<Bank.Notifications.Application.Notifications.INotificationReadStore,
+            Data.EfNotificationStore>();
         services.AddScoped<Bank.Contracts.Notifications.INotificationDispatchContract,
             Bank.Notifications.Application.Notifications.NotificationDispatcher>();
+        services.AddScoped<Bank.Contracts.Notifications.INotificationManagementContract,
+            Bank.Notifications.Application.Notifications.NotificationManagementService>();
         services.AddSingleton(TimeProvider.System);
 
         // Email/SMS adapters and the event consumer move here next; no module

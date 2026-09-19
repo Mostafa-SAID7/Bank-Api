@@ -7,6 +7,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\Bank.Notifications.Application\Bank.Notifications.Application.csproj" />
+    <ProjectReference Include="..\Bank.Notifications.Domain\Bank.Notifications.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Bank.BuildingBlocks.Application\Bank.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\..\Bank.Contracts\Bank.Contracts.csproj" />
   </ItemGroup>
