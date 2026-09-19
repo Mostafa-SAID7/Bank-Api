@@ -54,5 +54,22 @@ API Documentation will be accessible at: `http://localhost:5000/swagger`
 - [Project Setup](docs/PROJECT_SETUP.md)
 - [Architecture Structure](docs/STRUCTURE.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
+- [Entity Relationship Diagram](docs/ERD.md)
+- [Architecture Decisions](docs/architecture/)
+
+## 🧪 API Testing
+- **Swagger UI** — available at `http://localhost:5000/swagger` when running locally
+- **Postman Collection** — 70 endpoints across 8 domains → [test-postman/](test-postman/README.md)
+
+---
+
+## 🤝 Community
+
+- [Contributing Guide](.github/CONTRIBUTING.md) — how to contribute code, tests, or docs
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md) — community standards
+- [Support](.github/SUPPORT.md) — where to get help
+- [Security Policy](.github/SECURITY.md) — how to report vulnerabilities
+
+---
 
 *Licensed under MIT.*

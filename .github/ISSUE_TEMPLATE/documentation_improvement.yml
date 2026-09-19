@@ -1,0 +1,81 @@
+name: 📝 Documentation Improvement
+description: Report missing, incorrect, or unclear documentation
+title: "[DOCS] "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good documentation makes a project usable. Thank you for helping improve it.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of Documentation Issue
+      options:
+        - Missing documentation (topic not covered anywhere)
+        - Incorrect information (something is wrong or outdated)
+        - Unclear / hard to understand
+        - Broken link or missing file reference
+        - Code example doesn't work
+        - Typo or grammar issue
+    validations:
+      required: true
+
+  - type: dropdown
+    id: location
+    attributes:
+      label: Where is the documentation issue?
+      multiple: true
+      options:
+        - README.md (root)
+        - docs/PROJECT_SETUP.md
+        - docs/DEPLOYMENT.md
+        - docs/STRUCTURE.md
+        - docs/FEATURES.md
+        - docs/TECHNOLOGIES.md
+        - docs/USE_CASES.md
+        - docs/ERD.md
+        - docs/architecture/ (ADRs)
+        - .github/CONTRIBUTING.md
+        - .github/SECURITY.md
+        - Code comments / XML docs
+        - Swagger / OpenAPI spec
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current State
+      description: What does the documentation currently say (or fail to say)?
+      placeholder: "The PROJECT_SETUP.md says to run 'dotnet ef database update --startup-project Bank.Api' but Bank.Api no longer exists as the startup project..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What Should It Say / Cover?
+      description: Describe the correct information or the topic that should be documented.
+      placeholder: "It should say 'dotnet ef database update --startup-project Bank.Host' since Bank.Host is the current composition root."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Link to the file, section, or line number if possible.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before Submitting
+      options:
+        - label: I checked that this issue does not already exist
+          required: true
+        - label: I am willing to submit a PR to fix this

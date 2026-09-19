@@ -1,35 +1,46 @@
-# Global code owners
-* @yourusername
+# Global code owners — applies to everything not matched below
+* @Mostafa-SAID7
 
-# Backend code owners
-/bank-backend/ @yourusername @backend-team
-/bank-backend/Bank.Api/Controllers/ @yourusername @api-team
-/bank-backend/Bank.Domain/ @yourusername @domain-experts
-/bank-backend/Bank.Infrastructure/ @yourusername @infrastructure-team
+# ── Composition root & host ────────────────────────────────────────
+/src/Bank.Host/ @Mostafa-SAID7
 
-# Frontend code owners
-/Bank.Frontend/ @yourusername @frontend-team
-/Bank.Frontend/src/app/features/ @yourusername @ui-team
+# ── Modules (vertical slices) ─────────────────────────────────────
+/src/Modules/ @Mostafa-SAID7
 
-# DevOps and Infrastructure
-/devops/ @yourusername @devops-team
-/.github/ @yourusername @devops-team
-/docker/ @yourusername @devops-team
+# ── BuildingBlocks & shared contracts ─────────────────────────────
+/src/BuildingBlocks/ @Mostafa-SAID7
+/src/Bank.Contracts/ @Mostafa-SAID7
 
-# Documentation
-/docs/ @yourusername @documentation-team
-README.md @yourusername @documentation-team
+# ── Legacy horizontal layer (being migrated) ───────────────────────
+/src/Bank.Api/ @Mostafa-SAID7
+/src/Bank.Domain/ @Mostafa-SAID7
+/src/Bank.Application/ @Mostafa-SAID7
+/src/Bank.Infrastructure/ @Mostafa-SAID7
 
-# Security-sensitive files
-/bank-backend/Bank.Api/Controllers/AuthController.cs @yourusername @security-team
-/devops/kubernetes/configmap.yaml @yourusername @security-team @devops-team
-/devops/terraform/ @yourusername @security-team @devops-team
+# ── Tests ─────────────────────────────────────────────────────────
+/src/Bank.Domain.Tests/ @Mostafa-SAID7
+/src/Bank.Application.Tests/ @Mostafa-SAID7
+/src/Bank.Infrastructure.Tests/ @Mostafa-SAID7
+/src/Bank.Api.IntegrationTests/ @Mostafa-SAID7
+/src/Bank.Architecture.Tests/ @Mostafa-SAID7
 
-# Database and migrations
-/bank-backend/Bank.Infrastructure/Data/ @yourusername @database-team
-/devops/scripts/backup.sh @yourusername @database-team @devops-team
+# ── DevOps & infrastructure ───────────────────────────────────────
+/devops/ @Mostafa-SAID7
+/.github/ @Mostafa-SAID7
+Dockerfile @Mostafa-SAID7
+docker-compose.yml @Mostafa-SAID7
 
-# Configuration files
-*.json @yourusername @config-reviewers
-*.yml @yourusername @config-reviewers
-*.yaml @yourusername @config-reviewers
+# ── Documentation ─────────────────────────────────────────────────
+/docs/ @Mostafa-SAID7
+README.md @Mostafa-SAID7
+CHANGELOG.md @Mostafa-SAID7
+
+# ── Security-sensitive paths ──────────────────────────────────────
+/src/Bank.Api/Controllers/AuthController.cs @Mostafa-SAID7
+/src/Bank.Infrastructure/Services/Security/ @Mostafa-SAID7
+/src/Modules/*/Infrastructure/ @Mostafa-SAID7
+
+# ── Configuration files ───────────────────────────────────────────
+*.json @Mostafa-SAID7
+*.yml @Mostafa-SAID7
+*.yaml @Mostafa-SAID7

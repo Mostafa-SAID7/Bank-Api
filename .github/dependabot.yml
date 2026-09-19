@@ -1,17 +1,17 @@
 version: 2
 updates:
-  # .NET dependencies
+  # .NET / NuGet — actual source lives under /src
   - package-ecosystem: "nuget"
-    directory: "/bank-backend"
+    directory: "/src"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "yourusername"
+      - "Mostafa-SAID7"
     assignees:
-      - "yourusername"
+      - "Mostafa-SAID7"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -20,37 +20,17 @@ updates:
       - "backend"
       - "security"
 
-  # npm dependencies for Angular frontend
-  - package-ecosystem: "npm"
-    directory: "/Bank.Frontend"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "yourusername"
-    assignees:
-      - "yourusername"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "frontend"
-      - "security"
-
-  # Docker dependencies
+  # Docker — Dockerfile is at the repo root
   - package-ecosystem: "docker"
-    directory: "/devops/docker"
+    directory: "/"
     schedule:
       interval: "weekly"
       day: "tuesday"
       time: "09:00"
     reviewers:
-      - "yourusername"
+      - "Mostafa-SAID7"
     assignees:
-      - "yourusername"
+      - "Mostafa-SAID7"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -59,7 +39,7 @@ updates:
       - "docker"
       - "security"
 
-  # GitHub Actions dependencies
+  # GitHub Actions workflows
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -67,9 +47,9 @@ updates:
       day: "wednesday"
       time: "09:00"
     reviewers:
-      - "yourusername"
+      - "Mostafa-SAID7"
     assignees:
-      - "yourusername"
+      - "Mostafa-SAID7"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -78,7 +58,7 @@ updates:
       - "github-actions"
       - "security"
 
-  # Terraform dependencies
+  # Terraform — infrastructure scripts under /devops/terraform
   - package-ecosystem: "terraform"
     directory: "/devops/terraform"
     schedule:
@@ -86,9 +66,9 @@ updates:
       day: "thursday"
       time: "09:00"
     reviewers:
-      - "yourusername"
+      - "Mostafa-SAID7"
     assignees:
-      - "yourusername"
+      - "Mostafa-SAID7"
     commit-message:
       prefix: "chore"
       include: "scope"

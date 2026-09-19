@@ -1,0 +1,20 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🔐 Report a Security Vulnerability (Private)
+    url: https://github.com/Mostafa-SAID7/Bank-Api/security/advisories/new
+    about: >
+      NEVER report security vulnerabilities in a public issue.
+      Use GitHub's private Security Advisory to report confidentially.
+
+  - name: ❓ Ask a Question / Get Help
+    url: https://github.com/Mostafa-SAID7/Bank-Api/discussions/new?category=q-a
+    about: Use GitHub Discussions for questions about setup, configuration, or usage.
+
+  - name: 💡 Share an Idea (Discussion)
+    url: https://github.com/Mostafa-SAID7/Bank-Api/discussions/new?category=ideas
+    about: Use Discussions for broad ideas before opening a formal Feature Request.
+
+  - name: 📚 Documentation
+    url: https://github.com/Mostafa-SAID7/Bank-Api/tree/main/docs
+    about: Check the docs first — your answer may already be there.

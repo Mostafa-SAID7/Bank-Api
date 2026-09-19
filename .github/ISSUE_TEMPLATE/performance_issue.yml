@@ -1,0 +1,135 @@
+name: ⚡ Performance Issue
+description: Report a latency, throughput, memory, or resource usage problem
+title: "[PERF] "
+labels: ["performance", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Performance issues in a financial API can have direct impact on user experience and SLA compliance.
+        Please provide as much measurement data as possible — gut-feel reports are hard to act on.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Performance Issue Type
+      options:
+        - High API response latency (slow endpoint)
+        - High database query time
+        - Memory leak / excessive memory usage
+        - High CPU usage under load
+        - Slow application startup
+        - Slow database migrations
+        - Throughput degradation under concurrent load
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the performance problem clearly.
+      placeholder: "The GET /api/transactions/history endpoint takes 3-4 seconds for accounts with 1000+ transactions..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Affected Module / Endpoint
+      multiple: true
+      options:
+        - Identity / Authentication
+        - Core Banking / Accounts
+        - Core Banking / Transactions
+        - Payments / Transfers
+        - Payments / Bill Pay
+        - Loans
+        - Cards
+        - Deposits
+        - Notifications
+        - Statements
+        - Audit / Compliance
+        - Database / EF Core
+        - Application Startup
+        - Multiple / Systemic
+    validations:
+      required: true
+
+  - type: textarea
+    id: measurements
+    attributes:
+      label: Measured Data
+      description: Provide concrete numbers. Include response times, request rates, memory readings, or profiler output.
+      render: shell
+      placeholder: |
+        Endpoint: GET /api/transactions/history?accountId=xxx
+        p50:  450ms
+        p95: 3200ms
+        p99: 5100ms
+        Load: ~50 concurrent users
+        Database: Neon PostgreSQL (us-east-1)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Performance
+      description: What response time or throughput do you expect? Reference any SLA or benchmark.
+      placeholder: "This endpoint should respond in under 200ms at p95 for accounts with up to 10,000 transactions."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce the performance problem consistently?
+      placeholder: |
+        1. Seed an account with 5000 transactions
+        2. Call GET /api/transactions/history?accountId={id}&pageSize=50
+        3. Measure with: curl -w "%{time_total}" ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Runtime environment details matter for performance issues.
+      placeholder: |
+        .NET version: 9.0.308
+        PostgreSQL: 16 (Neon serverless, us-east-1)
+        OS: Linux (Docker container)
+        CPU: 2 vCPU
+        Memory: 2 GB
+        ASPNETCORE_ENVIRONMENT: Production
+    validations:
+      required: true
+
+  - type: textarea
+    id: profiler
+    attributes:
+      label: Profiler / Diagnostic Output
+      description: Paste any output from dotnet-trace, dotnet-counters, EF Core logging, or database EXPLAIN ANALYZE.
+      render: shell
+
+  - type: textarea
+    id: analysis
+    attributes:
+      label: Your Analysis (optional)
+      description: If you've already diagnosed the root cause (e.g., missing index, N+1 query, no pagination), describe it here.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before Submitting
+      options:
+        - label: I have provided actual measured data, not just a general feeling
+          required: true
+        - label: I searched existing issues — this is not a duplicate
+          required: true

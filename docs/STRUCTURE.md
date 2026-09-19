@@ -2,70 +2,133 @@
 
 ## Overview
 
-This project follows Clean Architecture principles with clear separation of concerns across different layers.
+The project has migrated from a horizontal layered layout to a **modular monolith**.
+`Bank.Host` is the single deployable process and composition root. Business capabilities
+are organized as vertical modules under `src/Modules/`. Legacy horizontal projects
+(`Bank.Api`, `Bank.Application`, `Bank.Domain`, `Bank.Infrastructure`) remain active
+during the incremental migration and will be removed after each module is fully extracted.
 
-## Directory Structure
+---
+
+## Repository Layout
 
 ```
-Bank/
-├── bank-backend/
-│   ├── Bank.Api/                 # Web API Layer
-│   │   ├── Controllers/          # API Controllers
-│   │   ├── DTOs/                # Data Transfer Objects
-│   │   ├── Middleware/          # Custom Middleware
-│   │   └── Program.cs           # Application Entry Point
+Bank-Api/
+├── src/
+│   ├── Bank.Host/                      # Single composition root & entry point
+│   │   ├── Program.cs                  # App startup, module registration
+│   │   └── Bank.Host.csproj
 │   │
-│   ├── Bank.Application/        # Application Layer
-│   │   ├── Commands/            # CQRS Commands
-│   │   ├── Interfaces/          # Service Interfaces
-│   │   └── Services/            # Business Logic Services
+│   ├── Bank.Contracts/                 # Cross-module DTOs & integration events
+│   │   └── Bank.Contracts.csproj
 │   │
-│   ├── Bank.Domain/             # Domain Layer
-│   │   ├── Entities/            # Domain Entities
-│   │   ├── Enums/              # Domain Enumerations
-│   │   └── ValueObjects/        # Value Objects
+│   ├── BuildingBlocks/                 # Shared framework abstractions (no business logic)
+│   │   ├── Bank.BuildingBlocks.Domain/
+│   │   ├── Bank.BuildingBlocks.Application/
+│   │   └── Bank.BuildingBlocks.Infrastructure/
 │   │
-│   └── Bank.Infrastructure/     # Infrastructure Layer
-│       ├── Data/               # Database Context
-│       ├── Repositories/       # Data Access Layer
-│       └── Services/           # External Services
+│   ├── Modules/                        # Vertical business modules
+│   │   ├── Payments/
+│   │   │   ├── Bank.Payments.Domain/
+│   │   │   ├── Bank.Payments.Application/
+│   │   │   ├── Bank.Payments.Infrastructure/
+│   │   │   └── Bank.Payments.Presentation/
+│   │   └── Notifications/
+│   │       ├── Bank.Notifications.Domain/
+│   │       ├── Bank.Notifications.Application/
+│   │       ├── Bank.Notifications.Infrastructure/
+│   │       └── Bank.Notifications.Presentation/
+│   │
+│   ├── — Legacy horizontal layer (being migrated) —
+│   ├── Bank.Api/                       # All controllers (route compatibility layer)
+│   ├── Bank.Application/               # CQRS commands, queries, services
+│   ├── Bank.Domain/                    # Core domain entities and value objects
+│   ├── Bank.Infrastructure/            # EF Core, BankDbContext, repositories
+│   │
+│   └── — Test projects —
+│       ├── Bank.Domain.Tests/
+│       ├── Bank.Application.Tests/
+│       ├── Bank.Infrastructure.Tests/
+│       ├── Bank.Api.IntegrationTests/
+│       └── Bank.Architecture.Tests/    # ArchUnit-style layer boundary tests
 │
-├── docs/                       # Documentation
-├── screenshots/                # Project Screenshots
-├── .github/                   # GitHub Configuration
-└── README.md                  # Project Overview
+├── docs/                               # Developer reference documentation
+│   └── architecture/                   # Architecture Decision Records (ADRs)
+├── devops/                             # Infrastructure & CI/CD scripts
+├── .github/                            # GitHub configuration (workflows, templates)
+├── Dockerfile                          # Multi-stage production Docker build
+├── docker-compose.yml                  # Local development orchestration
+├── README.md
+└── CHANGELOG.md
 ```
+
+---
+
+## Module Rules
+
+1. **Host only composes** — `Bank.Host` contains middleware and module registration; no business logic.
+2. **No cross-module coupling** — A module may reference `BuildingBlocks` and `Bank.Contracts` but not another module's `Domain` or `Infrastructure` project.
+3. **No cross-module table access** — Modules own their own schema. Cross-module reads use a contract or integration event.
+4. **Financial commands carry an idempotency key.**
+5. **Transactions are local** — No distributed transactions.
+
+---
+
+## Module Migration Order
+
+Per [ADR-002](architecture/ADR-002-module-migration-order.md):
+
+| Order | Module | Status |
+|---|---|---|
+| 1 | Notifications | ✅ Seam created |
+| 2 | Payments | ✅ Seam created |
+| 3 | Core Banking | ⏳ Pending |
+| 4 | Identity | ⏳ Pending |
+| 5 | Deposits | ⏳ Pending |
+| 6 | Loans | ⏳ Pending |
+| 7 | Cards | ⏳ Pending |
+| 8 | Statements | ⏳ Pending |
+| 9 | Audit & Compliance | ⏳ Pending |
+
+Legacy horizontal projects are deleted only after a module's migration is complete and API integration tests confirm route compatibility.
+
+---
 
 ## Layer Responsibilities
 
-### API Layer (Bank.Api)
-- HTTP request/response handling
-- Authentication and authorization
-- Input validation
-- API documentation
+### Bank.Host
+- Application composition root
+- Module registration via `IModule`
+- Middleware pipeline configuration
+- No business logic
 
-### Application Layer (Bank.Application)
-- Business logic orchestration
-- Command and query handling
-- Service interfaces
-- Application-specific DTOs
+### BuildingBlocks
+- Framework-level abstractions (base entities, domain events, result types)
+- Shared by all modules; must contain no business rules
 
-### Domain Layer (Bank.Domain)
-- Core business entities
-- Domain rules and logic
-- Value objects
-- Domain events
+### Bank.Contracts
+- Integration event definitions
+- Cross-module use-case contracts (DTOs)
+- No business logic
 
-### Infrastructure Layer (Bank.Infrastructure)
-- Database access
-- External service integrations
-- File system operations
-- Third-party API clients
+### Module (vertical slice)
+| Sub-project | Responsibility |
+|---|---|
+| `*.Domain` | Entities, value objects, domain events, business invariants |
+| `*.Application` | Command/query handlers, application services, interfaces |
+| `*.Infrastructure` | EF configurations, migrations, external adapters |
+| `*.Presentation` | Controllers, minimal API endpoints, module route registration |
 
-## Design Patterns Used
+---
 
-- **Clean Architecture**: Separation of concerns
-- **CQRS**: Command Query Responsibility Segregation
-- **Repository Pattern**: Data access abstraction
-- **Dependency Injection**: Loose coupling
-- **Middleware Pattern**: Request processing pipeline
+## Design Patterns
+
+| Pattern | Where Used |
+|---|---|
+| **Clean Architecture** | Hard dependency inversion between all layers |
+| **CQRS + MediatR** | Commands (writes) and Queries (reads) strictly separated |
+| **Repository + Unit of Work** | Data access in Infrastructure layer |
+| **Domain Events** | Cross-aggregate communication within a module |
+| **Integration Events** | Cross-module communication via `Bank.Contracts` |
+| **Soft Delete** | Audit-safe deletion via `IsDeleted` flag |
+| **Audit Trail** | Immutable `AuditLog` for financial data changes |

@@ -1,93 +1,90 @@
-# Automatic labeling configuration for Bank Management System
+# Automatic labeling configuration for Bank API (modular monolith)
 
-# Backend related changes
+# ── Backend / C# source ──────────────────────────────────────────
 backend:
-  - bank-backend/**/*
-  - "**/*.cs"
-  - "**/*.csproj"
+  - "src/**/*.cs"
+  - "src/**/*.csproj"
+  - "src/**/*.sln"
 
-# Frontend related changes  
-frontend:
-  - Bank.Frontend/**/*
-  - "**/*.ts"
-  - "**/*.html"
-  - "**/*.css"
-  - "**/*.scss"
-  - "**/*.json"
+# ── Modules (vertical slices) ───────────────────────────────────
+modules:
+  - "src/Modules/**/*"
 
-# DevOps and Infrastructure
+# ── BuildingBlocks & shared contracts ───────────────────────────
+building-blocks:
+  - "src/BuildingBlocks/**/*"
+  - "src/Bank.Contracts/**/*"
+
+# ── DevOps and Infrastructure ───────────────────────────────────
 devops:
-  - devops/**/*
-  - .github/**/*
-  - "**/*.yml"
-  - "**/*.yaml"
+  - "devops/**/*"
+  - ".github/**/*"
   - "**/Dockerfile*"
   - "**/docker-compose*"
+  - "*.yml"
+  - "*.yaml"
 
-# Database related
+# ── Database / migrations ───────────────────────────────────────
 database:
-  - "**/*migration*"
+  - "**/*Migration*"
   - "**/Data/**/*"
   - "**/Migrations/**/*"
   - "**/*DbContext*"
 
-# Security related
+# ── Security ────────────────────────────────────────────────────
 security:
   - "**/Auth*"
   - "**/Security*"
   - "**/*Security*"
   - "**/Middleware/**/*"
-  - .github/SECURITY.md
+  - ".github/SECURITY.md"
 
-# API changes
+# ── API / Controllers ───────────────────────────────────────────
 api:
-  - "**/Controllers/**/*"
-  - "**/DTOs/**/*"
+  - "src/Bank.Api/Controllers/**/*"
+  - "src/Modules/*/Presentation/**/*"
   - "**/*Controller.cs"
-  - "**/*Dto.cs"
+  - "**/DTOs/**/*"
 
-# Documentation
+# ── Documentation ───────────────────────────────────────────────
 documentation:
-  - docs/**/*
+  - "docs/**/*"
   - "**/*.md"
-  - README.md
+  - "README.md"
 
-# Configuration
+# ── Configuration ───────────────────────────────────────────────
 configuration:
   - "**/appsettings*.json"
   - "**/launchSettings.json"
   - "**/*.config"
   - "**/Program.cs"
 
-# Testing
+# ── Testing ─────────────────────────────────────────────────────
 testing:
-  - "**/*Test*"
-  - "**/*test*"
-  - "**/Tests/**/*"
+  - "src/**/*Tests/**/*"
+  - "src/**/*Test*.cs"
 
-# Dependencies
+# ── Dependencies ────────────────────────────────────────────────
 dependencies:
-  - "**/package*.json"
-  - "**/*.csproj"
-  - "**/requirements*.txt"
+  - "src/**/*.csproj"
+  - "src/**/NuGet.Config"
 
-# Banking domain specific
+# ── Banking domain labels ────────────────────────────────────────
 account-management:
-  - "**/Account*"
-  - "**/*Account*"
+  - "src/**/Account*"
+  - "src/**/*Account*"
 
 transaction-processing:
-  - "**/Transaction*"
-  - "**/*Transaction*"
+  - "src/**/Transaction*"
+  - "src/**/*Transaction*"
+
+payments:
+  - "src/Modules/Payments/**/*"
+
+notifications:
+  - "src/Modules/Notifications/**/*"
 
 user-management:
-  - "**/User*"
-  - "**/*User*"
-  - "**/Profile*"
-  - "**/*Profile*"
-
-reporting:
-  - "**/Report*"
-  - "**/*Report*"
-  - "**/Analytics*"
-  - "**/*Analytics*"
+  - "src/**/User*"
+  - "src/**/*User*"
+  - "src/**/Identity/**/*"

@@ -1,0 +1,120 @@
+name: 💡 Feature Request
+description: Propose a new feature or enhancement for the FinBank API
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, check [open issues](https://github.com/Mostafa-SAID7/Bank-Api/issues) and [discussions](https://github.com/Mostafa-SAID7/Bank-Api/discussions) to see if this has already been proposed.
+        For broad ideas, consider starting a [Discussion](https://github.com/Mostafa-SAID7/Bank-Api/discussions/new?category=ideas) first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Be specific.
+      placeholder: "Currently, there is no way to... which means developers must..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature you'd like. Include API endpoint shapes, request/response structures, or behaviors if relevant.
+      placeholder: |
+        Add a new endpoint: POST /api/payments/recurring
+        Request body: { accountId, amount, schedule, beneficiaryId }
+        Response: { recurringPaymentId, nextRunAt }
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other approaches did you consider? Why are they insufficient?
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Target Module / Domain
+      description: Which banking domain does this feature belong to?
+      multiple: true
+      options:
+        - Identity / Authentication
+        - Core Banking / Accounts
+        - Core Banking / Transactions
+        - Payments / Transfers
+        - Payments / Bill Pay
+        - Loans
+        - Cards
+        - Deposits
+        - Notifications
+        - Statements
+        - Audit / Compliance
+        - Infrastructure / Database
+        - CI/CD / DevOps
+        - New Module
+        - Cross-cutting / Multiple modules
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - "Critical — security or compliance requirement"
+        - "High — core banking feature, significant user impact"
+        - "Medium — improves developer/user experience"
+        - "Low — nice to have"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Breaking Change?
+      description: Would this feature require changes to existing API contracts?
+      options:
+        - "No — purely additive"
+        - "Yes — changes existing endpoint behavior"
+        - "Yes — adds new required fields to existing requests"
+        - "Unsure"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance / Regulatory Impact
+      description: Check if this feature touches regulated areas.
+      options:
+        - label: Affects payment processing (PCI DSS scope)
+        - label: Affects personal data handling (GDPR scope)
+        - label: Affects financial reporting (SOX scope)
+        - label: No compliance impact
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know when this feature is done? List specific, testable conditions.
+      placeholder: |
+        - [ ] POST /api/payments/recurring creates a scheduled payment
+        - [ ] Recurring payment fires on the configured schedule
+        - [ ] Failed payments emit a PaymentFailed integration event
+        - [ ] Unit tests cover schedule calculation logic
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before Submitting
+      options:
+        - label: I searched existing issues and discussions — this has not been proposed before
+          required: true
+        - label: I am willing to contribute a PR for this feature

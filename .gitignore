@@ -1,27 +1,4 @@
-# Miscellaneous
-.angular/cache
-.sass-cache/
-connect.lock
-coverage
-libpeerconnection.log
-testem.log
-typings
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Node.js
-**/node_modules/
-npm-debug.log
-yarn-error.log
-
-# Angular
-/Bank.Frontend/dist/
-/Bank.Frontend/tmp/
-/Bank.Frontend/out-tsc/
-
-# .NET
+# ── .NET build artifacts ───────────────────────────────────────────
 **/bin/
 **/obj/
 **/.nuget/
@@ -39,29 +16,41 @@ bld/
 Log/
 Logs/
 
-# IDEs
+# ── IDE ────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# SQLite Database Files (Legacy - using SQL Server now)
-*.db
-*.db-shm
-*.db-wal
+# ── System files ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
 
-# Environment Variables
+# ── Environment / Secrets ──────────────────────────────────────────
+# Never commit real credentials — use .env.example as a template
 .env
 .env.local
 .env.*.local
 
-# Terraform working directory (provider selections are tracked in .terraform.lock.hcl)
+# ── Database ───────────────────────────────────────────────────────
+# Legacy SQLite files (project now uses PostgreSQL)
+*.db
+*.db-shm
+*.db-wal
+
+# ── Terraform ──────────────────────────────────────────────────────
+# Provider lock file is tracked; working directory is not
 **/.terraform/
 
-# Kubernetes Secrets (DO NOT COMMIT)
+# ── Kubernetes secrets ─────────────────────────────────────────────
 devops/kubernetes/secrets.env
 devops/kubernetes/sealed-secret.yaml
 devops/kubernetes/*-secret.yaml
 !devops/kubernetes/*.example
 !devops/kubernetes/*.template
 
+# ── Test results & coverage ────────────────────────────────────────
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
