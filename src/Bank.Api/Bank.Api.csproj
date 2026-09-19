@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Bank.Contracts\Bank.Contracts.csproj" />
     <ProjectReference Include="..\Modules\Payments\Bank.Payments.Infrastructure\Bank.Payments.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Infrastructure\Bank.Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Bank.Notifications.Presentation\Bank.Notifications.Presentation.csproj" />
   </ItemGroup>
 
 </Project>
