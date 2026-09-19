@@ -15,7 +15,7 @@ public class MaturityDto
     public decimal? RenewalInterestRate { get; set; }
     public Guid? WithdrawalAccountId { get; set; }
     public InterestReinvestmentType? InterestReinvestmentType { get; set; }
-    public NotificationPreference? NotificationPreference { get; set; }
+    public NotificationChannel? NotificationPreference { get; set; }
 }
 
 /// <summary>

@@ -9,10 +9,10 @@ public sealed class AddNotificationReadModels : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.AddColumn<int>("Status", "Notifications", "notifications", "integer", nullable: false, defaultValue: 1);
-        migrationBuilder.AddColumn<DateTimeOffset>("SentAt", "Notifications", "notifications", "timestamp with time zone", nullable: true);
-        migrationBuilder.AddColumn<DateTimeOffset>("ReadAt", "Notifications", "notifications", "timestamp with time zone", nullable: true);
-        migrationBuilder.AddColumn<string>("ErrorMessage", "Notifications", "notifications", "text", nullable: true);
+        migrationBuilder.AddColumn<int>("Status", "Notifications", type: "integer", nullable: false, defaultValue: 1, schema: "notifications");
+        migrationBuilder.AddColumn<DateTimeOffset>("SentAt", "Notifications", type: "timestamp with time zone", nullable: true, schema: "notifications");
+        migrationBuilder.AddColumn<DateTimeOffset>("ReadAt", "Notifications", type: "timestamp with time zone", nullable: true, schema: "notifications");
+        migrationBuilder.AddColumn<string>("ErrorMessage", "Notifications", type: "text", nullable: true, schema: "notifications");
         migrationBuilder.CreateTable(
             name: "NotificationPreferences", schema: "notifications",
             columns: table => new

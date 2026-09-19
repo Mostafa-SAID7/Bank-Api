@@ -51,7 +51,6 @@ global using Bank.Application.DTOs.Payment.Template;
 
 // Shared DTOs
 global using Bank.Application.DTOs.Shared.Audit;
-global using Bank.Application.DTOs.Shared.Notification;
 global using Bank.Application.DTOs.Shared.RateLimit;
 
 // Statement DTOs

@@ -33,7 +33,6 @@ global using Bank.Application.DTOs.Payment.Receipt;
 global using Bank.Application.DTOs.Payment.Recurring;
 global using Bank.Application.DTOs.Payment.Routing;
 global using Bank.Application.DTOs.Payment.Template;
-global using Bank.Application.DTOs.Shared.Notification;
 global using Bank.Application.DTOs.Shared.RateLimit;
 global using Bank.Application.DTOs.Statement.Analytics;
 global using Bank.Application.DTOs.Statement.Core;

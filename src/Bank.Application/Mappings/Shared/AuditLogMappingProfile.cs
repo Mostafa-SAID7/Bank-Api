@@ -1,5 +1,4 @@
 using AutoMapper;
-using Bank.Application.DTOs.Shared.Notification;
 using Bank.Application.DTOs.Shared.Audit;
 using Bank.Application.DTOs.Shared.RateLimit;
 using Bank.Domain.Entities;

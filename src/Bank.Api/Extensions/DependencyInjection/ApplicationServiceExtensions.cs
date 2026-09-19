@@ -76,9 +76,6 @@ public static class ApplicationServiceExtensions
         // HTTP Client for external integrations
         services.AddHttpClient<Bank.Application.Services.BillerIntegrationService>();
 
-        // Notification Services
-        services.AddScoped<INotificationService, Bank.Application.Services.NotificationService>();
-
         // Background Services (only if database is available)
         var allowOfflineMode = configuration.GetValue<bool>("DatabaseSettings:AllowOfflineMode", false);
         if (!allowOfflineMode)
