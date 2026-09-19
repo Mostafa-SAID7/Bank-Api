@@ -4,11 +4,11 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 5.3"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.0"
+      version = "~> 3.2"
     }
   }
 }
@@ -39,6 +39,13 @@ resource "azurerm_kubernetes_cluster" "bank_aks" {
     name       = "default"
     node_count = var.node_count
     vm_size    = var.node_vm_size
+  }
+
+  # AzureRM 5 requires an explicit provisioning profile. Keep the existing
+  # statically managed node-pool behavior rather than enabling auto-provisioning.
+  node_provisioning_profile {
+    mode               = "Manual"
+    default_node_pools = "None"
   }
 
   identity {
@@ -79,21 +86,21 @@ resource "azurerm_container_registry" "bank_acr" {
 
 # Assign AKS managed identity permission to pull from ACR
 resource "azurerm_role_assignment" "aks_acr_pull" {
-  scope              = azurerm_container_registry.bank_acr.id
+  scope                = azurerm_container_registry.bank_acr.id
   role_definition_name = "AcrPull"
-  principal_id       = azurerm_kubernetes_cluster.bank_aks.identity[0].principal_id
+  principal_id         = azurerm_kubernetes_cluster.bank_aks.identity[0].principal_id
 }
 
 # Azure SQL Database
 # SECURITY: identity block enables Azure Managed Identities for authentication
 # Allows applications to authenticate without managing credentials
 resource "azurerm_mssql_server" "bank_sql_server" {
-  name                         = "${var.cluster_name}-sql-server"
-  resource_group_name          = azurerm_resource_group.bank_rg.name
-  location                     = azurerm_resource_group.bank_rg.location
-  version                      = "12.0"
-  administrator_login          = var.sql_admin_username
-  administrator_login_password = var.sql_admin_password
+  name                          = "${var.cluster_name}-sql-server"
+  resource_group_name           = azurerm_resource_group.bank_rg.name
+  location                      = azurerm_resource_group.bank_rg.location
+  version                       = "12.0"
+  administrator_login           = var.sql_admin_username
+  administrator_login_password  = var.sql_admin_password
   public_network_access_enabled = false
 
   # Enable Managed Identity for secure access
@@ -108,12 +115,12 @@ resource "azurerm_mssql_server" "bank_sql_server" {
 }
 
 resource "azurerm_mssql_database" "bank_database" {
-  name           = "BankDB"
-  server_id      = azurerm_mssql_server.bank_sql_server.id
-  collation      = "SQL_Latin1_General_CP1_CI_AS"
-  license_type   = "LicenseIncluded"
-  max_size_gb    = 20
-  sku_name       = "S1"
+  name         = "BankDB"
+  server_id    = azurerm_mssql_server.bank_sql_server.id
+  collation    = "SQL_Latin1_General_CP1_CI_AS"
+  license_type = "LicenseIncluded"
+  max_size_gb  = 20
+  sku_name     = "S1"
 
   tags = {
     Environment = var.environment
@@ -126,15 +133,15 @@ resource "azurerm_mssql_database" "bank_database" {
 # This ensures only authorized identities (users/services) can access secrets
 # Protects against unauthorized resource access (CWE-668)
 resource "azurerm_key_vault" "bank_kv" {
-  name                            = "${var.cluster_name}-kv"
-  location                        = azurerm_resource_group.bank_rg.location
-  resource_group_name             = azurerm_resource_group.bank_rg.name
-  tenant_id                       = data.azurerm_client_config.current.tenant_id
-  sku_name                        = "standard"
-  purge_protection_enabled        = true
-  soft_delete_retention_days      = 90
-  public_network_access_enabled   = false
-  rbac_authorization_enabled      = true
+  name                          = "${var.cluster_name}-kv"
+  location                      = azurerm_resource_group.bank_rg.location
+  resource_group_name           = azurerm_resource_group.bank_rg.name
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  sku_name                      = "standard"
+  purge_protection_enabled      = true
+  soft_delete_retention_days    = 90
+  public_network_access_enabled = false
+  rbac_authorization_enabled    = true
 
   # Legacy access policies are disabled when RBAC is enabled
   # All access control is now managed through Azure RBAC role assignments
