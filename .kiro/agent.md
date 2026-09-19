@@ -1,0 +1,132 @@
+تحويل Bank-Api من أربعة مشاريع أفقية عامة (Api / Application / Domain / Infrastructure) إلى Modular Monolith: تطبيق واحد ونشر واحد في البداية، لكن لكل domain حدود برمجية وملكية بيانات واضحة.
+لا نغيّر الـAPI أو نفصل قواعد البيانات أو نبدأ Microservices الآن.
+حدود الـModules المقترحة
+Module	المسؤولية
+Identity	المستخدمون، الأدوار، الجلسات، 2FA، سياسة كلمات المرور
+Core Banking	الحسابات، القيود/ledger، التحويلات، الأرصدة
+Payments	المستفيدون، الفواتير، recurring payments، payment templates
+Loans	دورة حياة القروض ومدفوعاتها ووثائقها
+Cards	البطاقات، التفويضات، معاملات البطاقات، PIN
+Deposits	منتجات الودائع، الودائع الثابتة، الفوائد والاستحقاق
+Statements	كشف الحساب وتوليده
+Notifications	البريد/SMS/preferences
+Audit & Compliance	سجل التدقيق فقط؛ يستهلك الأحداث ولا يدخل في منطق الأعمال
+
+
+أبقيت Accounts + Transactions داخل Core Banking لأن الفصل بينهما الآن سيخاطر بالاتساق المالي.
+الهيكل المستهدف
+src/
+  Bank.Host/                         # الـ API composition root والنشر الوحيد
+
+  BuildingBlocks/
+    Bank.BuildingBlocks.Domain/
+    Bank.BuildingBlocks.Application/
+    Bank.BuildingBlocks.Infrastructure/
+    Bank.Contracts/                  # events وcontracts فقط
+
+  Modules/
+    CoreBanking/
+      Bank.CoreBanking.Domain/
+      Bank.CoreBanking.Application/
+      Bank.CoreBanking.Infrastructure/
+      Bank.CoreBanking.Presentation/
+
+    Payments/
+      Bank.Payments.Domain/
+      Bank.Payments.Application/
+      Bank.Payments.Infrastructure/
+      Bank.Payments.Presentation/
+
+    Identity/
+    Loans/
+    Cards/
+    Deposits/
+    Statements/
+    Notifications/
+    Audit/
+كل module يملك Domain/Application/Infrastructure الخاصة به. الـBank.Host لا يحتوي Business Logic؛ فقط يسجّل الـmodules ويشغّل الـcontrollers/middleware.
+قواعد لا تُكسر
+- لا يَعمل Module reference إلى Domain أو Infrastructure لموديول آخر.
+- لا يقرأ Module جداول module آخر مباشرة.
+- لا توجد Shared Entities أو Shared Business Services في BuildingBlocks.
+- الـcontracts المشتركة تقتصر على DTOs، integration events، وواجهات use-cases محدودة.
+- الاتصال بين modules يكون عبر:
+  - contract متزامن صغير عندما تحتاج العملية ردًا مباشرًا؛ مثل طلب Payment من Core Banking تنفيذ posting/routing.
+  - domain/integration events لكل ما يمكن أن يكون asynchronous؛ مثل PaymentCompleted → Notification وAudit.
+- كل consumer للأحداث idempotent، وكل command مالي يحمل idempotency key.
+- ينفّذ transaction واحد داخل الـmodule فقط. لا تستخدم distributed transactions مستقبلًا بين modules.
+مراحل التنفيذ
+المرحلة 0 — تثبيت الوضع الحالي
+النتيجة المطلوبة: نقطة بداية آمنة قبل أي نقل ملفات.
+- شغّل build واختبارات الـDomain/Application/Infrastructure/API integration الموجودة.
+- أنشئ Architecture Decision Records للحدود أعلاه.
+- ارسم dependency graph للـservices الحالية، خصوصًا IAccountService وITransactionService وما يستهلكهما.
+- أضف architecture tests تمنع لاحقًا references غير المسموح بها بين modules.
+- ثبّت الـroutes والـrequest/response contracts باختبارات integration حتى لا يتأثر العملاء.
+لا تبدأ بنقل كل الملفات دفعة واحدة.
+المرحلة 1 — تأسيس الـmodular platform
+النتيجة المطلوبة: الـsolution يبني ويعمل كما هو، لكن لديه مكان موحد للـmodules.
+- أنشئ Bank.Host وBuildingBlocks وواجهة IModule.
+- انقل composition root من Program.cs إلى registration مستقل لكل module، مثل services.AddPaymentsModule(...).
+- أضف abstraction للأحداث داخل العملية، ثم Outbox table وbackground publisher.
+- استخدم schema واحدًا في PostgreSQL لكل module:
+identity
+core_banking
+payments
+loans
+cards
+deposits
+statements
+notifications
+audit
+تبقى قاعدة البيانات واحدة في هذه المرحلة. فصل الـschemas يثبت ملكية البيانات دون تكلفة قواعد بيانات متعددة.
+المرحلة 2 — Pilot: Notifications ثم Payments
+ابدأ بـNotifications لأنه طرفي وسهل التحقق منه، ثم Payments لأنه أوضح bounded context وذو قيمة عالية.
+لكل pilot:
+1. انقل entities، repositories، commands، handlers، services، وcontrollers إلى الـmodule.
+2. امنع استدعاء services داخلية من modules أخرى.
+3. استبدلها بـcontracts صريحة، مثل:
+public interface ICoreBankingPostingContract
+{
+    Task<PostingResult> PostPaymentAsync(PostPaymentCommand command);
+}
+4. اجعل Payments يرسل PaymentCompleted وPaymentFailed.
+5. اجعل Notifications وAudit يستهلكان الحدث بدل الاستدعاء المباشر.
+6. اكتب migration تنقل الجداول إلى schema المملوك للموديول، مع الحفاظ على البيانات والـforeign keys الضرورية.
+7. نفّذ اختبارات module integration مستقلة، ثم اختبارات API end-to-end.
+بعد Payments، يجب أن يكون من الممكن تعديل الكود داخله دون لمس Bank.Application أو Bank.Infrastructure القديمة.
+المرحلة 3 — نقل الـCore ثم باقي الـdomains
+الترتيب المقترح:
+1. Core Banking
+2. Identity
+3. Deposits
+4. Loans
+5. Cards
+6. Statements
+7. Audit/Compliance
+لا تنقل Module إلا بعد أن يصبح الـpilot نمطًا معتمدًا في البناء والـDI والمigrations والاختبارات.
+المرحلة 4 — إزالة البقايا الأفقية
+بعد نقل آخر module:
+- احذف مشاريع Bank.Domain وBank.Application وBank.Infrastructure القديمة تدريجيًا.
+- أزل Generic Repository وUnit of Work كطبقة مشتركة إن كانا يفرضان coupling؛ كل module يحدد persistence abstractions التي يحتاجها.
+- اجعل migrations لكل module مع migration runner واحد في Bank.Host.
+- أضف observability باسم الـmodule: logs، metrics، وtraces.
+تعريف النجاح
+يُعد التحويل ناجحًا عندما:
+- يبقى deployment واحدًا وAPI واحدة.
+- كل Module يمتلك entities، schema، migrations، واختبارات خاصة به.
+- لا توجد مراجع compile-time إلى internals module آخر.
+- Payments لا يصل مباشرة إلى جداول Accounts، وNotifications/Audit لا تُستدعى من business services.
+- تغيير في Loans مثلًا لا يفرض rebuild منطقي أو تعديل في Payments.
+- يمكن لاحقًا استخراج Payments أو Notifications بأقل تعديل، لكن دون اعتبار ذلك هدفًا لازمًا.
+أول Pull Request مقترح
+ابدأ بـPR صغير بعنوان:
+feat(modularity): introduce module host, contracts, and architecture tests
+ويحتوي فقط على:
+- Bank.Host
+- BuildingBlocks
+- IModule
+- architecture tests
+- ADR للحدود وقواعد dependencies
+- دون نقل أي business feature بعد
+الـPR الثاني ينقل Notifications بالكامل، والثالث ينقل Payments. هذه أفضل نقطة بداية عملية؛ بعدها يصبح النمط مثبتًا قبل التعامل مع الـCore Banking الأكثر حساسية.
